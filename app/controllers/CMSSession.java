@@ -1,23 +1,68 @@
 package controllers;
 
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+
 import java.util.Date;
 
 import models.User;
 import play.mvc.Controller;
-import play.mvc.Http.Session;
 
 public class CMSSession extends Controller {
 	
-	public static void authenticate(User user) {
-		Session s = session();
-		s.put(AuthFields.USERNAME, user.getUsername());
-		s.put(AuthFields.PERMISSION_LEVEL, user.getPermissionLevel());
-		s.put(AuthFields.AUTH_TIME, new Date().toString());
+	/**
+	 * Enter a value into the session.
+	 */
+	public static String get(SessionKey sessionKey) {
+		return session().get(sessionKey.toString());
 	}
 	
-	public static class AuthFields {
-		static final String USERNAME = "username";
-		static final String PERMISSION_LEVEL = "permission";
-		static final String AUTH_TIME = "auth_time";
+	/**
+	 * Retrieve a value from the session.
+	 */
+	public static String put(SessionKey sessionkey, String value) {
+		return session().put(sessionkey.toString(), value);
 	}
+	
+	/**
+	 * Enter the given user's session data and note the time of authentication.
+	 */
+	public static void authenticate(User user) {
+		put(SessionKey.USERNAME, user.getUsername());
+		put(SessionKey.PERMISSION_LEVEL, user.getPermissionLevel());
+		put(SessionKey.AUTH_TIME, new Date().toString());
+	}
+
+	/**
+	 * Returns true if the session has been authenticated.
+	 */
+	public static boolean isAuthenticated() {
+		return isNotEmpty(get(SessionKey.USERNAME));
+	}	
+	
+	/**
+	 * Clears all data from the current session.
+	 */
+	public static void clear() {
+		session().clear();
+	}
+
+	/**
+	 * A catalogue of session keys used by this application.
+	 */
+	public static enum SessionKey {
+		// Authentication
+		USERNAME,
+		PERMISSION_LEVEL,
+		AUTH_TIME;
+		
+		/**
+		 * Provides the lower-case string representation of the enum.
+		 */
+		@Override
+		public String toString() {
+			return super.toString().toLowerCase();
+		}
+	}
+
+
 }

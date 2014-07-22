@@ -1,20 +1,27 @@
 package controllers;
 
+import static play.data.Form.form;
 import models.User;
 import models.data.AuthDataStore;
 import models.data.MySQLAuthDataStore;
-import play.*;
-import play.mvc.*;
-import static play.data.Form.form;
 import play.data.Form;
-import views.html.*;
+import play.mvc.Controller;
+import play.mvc.Result;
 import play.mvc.Security.Authenticated;
 import play.mvc.Security.Authenticator;
+import views.html.login;
 
 public class Application extends Controller {
 
+	/*
+	 * Serve the forms page for a logged-in user; login page for a user who is
+	 * not logged in.
+	 */
     public static Result index() {
-        return ok(index.render());
+    	if (CMSSession.isAuthenticated()) {
+    		return redirect("/forms");
+    	}
+        return ok(login.render(null));
     }
 
     final static Form<User> loginForm = form(User.class);
@@ -33,7 +40,7 @@ public class Application extends Controller {
     	if (authDataStore.credentialsAreValid(username, user.getPassword())) {
     		user.setPermissionLevel(authDataStore.getPermissionLevel(username));
     		CMSSession.authenticate(user);
-    		return redirect("/Main");
+    		return redirect("/forms");
     	}
     	filledLoginForm.reject("Something wasn't right with your username or password.");
     	return badRequest(login.render(filledLoginForm));
@@ -44,6 +51,11 @@ public class Application extends Controller {
      */
     @Authenticated(Authenticator.class)
     public static Result forms() {
-    	return ok("Authentication Successful.");
+    	return ok(views.html.forms.render());
+    }
+    
+    public static Result logout() {
+    	CMSSession.clear();
+    	return ok(login.render(null));
     }
 }
