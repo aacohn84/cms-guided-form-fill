@@ -30,11 +30,11 @@ public class FieldsNode extends SingleTargetNode {
 	List<Field> fields = new ArrayList<>();
 
 	public FieldsNode(String id, String idNext) {
-		super(id, idNext);
+		super(id, idNext, "Please enter the following: ");
 	}
 
-	public FieldsNode addField(String description, FieldType type) {
-		Field field = new Field(description, type);
+	public FieldsNode addField(String fieldDescription, FieldType type) {
+		Field field = new Field(fieldDescription, type);
 		fields.add(field);
 		return this;
 	}

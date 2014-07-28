@@ -7,6 +7,7 @@ GET     /                           controllers.Application.index()
 GET		/forms						controllers.Application.forms()
 GET		/logout						controllers.Application.logout()
 GET		/form						controllers.FormFill.getForm()
+GET		/nextNode					controllers.FormFill.getNextNode()
 
 POST    /authenticate               controllers.Application.authenticate()
 

@@ -19,10 +19,10 @@ public class ChoiceNode extends Node {
 	/**
 	 * A mapping of each option to the identifier of its target node.
 	 */
-	Map<String, String> options;
+	Map<String, String> options = new HashMap<>();
 
-	public ChoiceNode(String id) {
-		super(id);
+	public ChoiceNode(String id, String description) {
+		super(id, description);
 	}
 
 	/**

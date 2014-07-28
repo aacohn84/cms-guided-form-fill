@@ -13,9 +13,11 @@ import play.twirl.api.Html;
 public abstract class Node {
 
 	public String id;
+	public String description;
 
-	public Node(String id) {
+	public Node(String id, String description) {
 		this.id = id;
+		this.description = description;
 	}
 
 	/**

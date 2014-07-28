@@ -7,8 +7,11 @@
     <title>Change Order</title>
   </head>
   <body>
+    <h3>@node.description</h3>
     <form action="/nextNode" name="theForm" method="GET">
+      <input type="hidden" name="@FormFill.RequestParams.CURRENT_NODE" value="@node.id">
       @node.renderAsHtml()
+      <a href="javascript:theForm.submit()">Next >></a>
     </form>
   </body>
 </html>

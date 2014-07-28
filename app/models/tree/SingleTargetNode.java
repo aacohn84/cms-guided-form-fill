@@ -13,9 +13,9 @@ import java.util.Map;
 public abstract class SingleTargetNode extends Node {
 
 	String idNext;
-	
-	public SingleTargetNode(String id, String idNext) {
-		super(id);
+
+	public SingleTargetNode(String id, String idNext, String description) {
+		super(id, description);
 		this.idNext = idNext;
 	}
 

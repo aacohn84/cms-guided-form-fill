@@ -1,15 +1,20 @@
 package models.tree;
 
+import play.twirl.api.Html;
+
 /**
  * A node for displaying a note.
  * 
  * @author Aaron Cohn
  */
 public class NoteNode extends SingleTargetNode {
-	String message;
 
-	public NoteNode(String id, String message, String idNext) {
-		super(id, idNext);
-		this.message = message;
+	public NoteNode(String id, String idNext, String note) {
+		super(id, idNext, note);
+	}
+
+	@Override
+	public Html renderAsHtml() {
+		return new Html(description);
 	}
 }
