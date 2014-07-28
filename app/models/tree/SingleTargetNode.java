@@ -23,7 +23,7 @@ public abstract class SingleTargetNode extends Node {
 	 * Returns the identifier of the next node regardless of input entered.
 	 */
 	@Override
-	public String idNextNode(
+	public String getIdNextNode(
 			@SuppressWarnings("unused") Map<String, String> input) {
 		return idNext;
 	}

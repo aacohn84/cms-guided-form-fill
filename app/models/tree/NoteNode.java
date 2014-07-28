@@ -1,6 +1,6 @@
 package models.tree;
 
-import play.twirl.api.Html;
+import java.util.Map;
 
 /**
  * A node for displaying a note.
@@ -14,7 +14,12 @@ public class NoteNode extends SingleTargetNode {
 	}
 
 	@Override
-	public Html renderAsHtml() {
-		return new Html(description);
+	protected String getNodeHtml() {
+		return description;
+	}
+
+	@Override
+	public String serializeInput(Map<String, String> input) {
+		return "";
 	}
 }

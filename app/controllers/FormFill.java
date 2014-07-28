@@ -29,19 +29,29 @@ public class FormFill extends Controller {
 	 * Provides the next node of the current form.
 	 */
 	public static Result getNextNode() {
+		// get current node
 		CMSForm form = ChangeOrderForm.getInstance();
 		String idCurrentNode = request().getQueryString(
 				RequestParams.CURRENT_NODE);
 		Node currentNode = form.getNode(idCurrentNode);
 
+		// convert request query string to map
 		Map<String, String> input = new HashMap<>();
 		for (Entry<String, String[]> entry : request().queryString().entrySet()) {
-			String value = entry.getValue()[0];
+			String value = entry.getValue()[0]; // take only first value
 			input.put(entry.getKey(), value);
 		}
 
-		String idNextNode = currentNode.idNextNode(input);
+		// validate user input
 
+		// save user input
+		String serializedInput = currentNode.serializeInput(input);
+		session().put(currentNode.id, serializedInput);
+		
+		CMSSession.print();
+
+		// retrieve next node
+		String idNextNode = currentNode.getIdNextNode(input);
 		Node nextNode = form.getNode(idNextNode);
 
 		return ok(backdrop.render(nextNode));
