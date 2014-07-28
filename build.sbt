@@ -8,6 +8,7 @@ scalaVersion := "2.11.1"
 
 libraryDependencies ++= Seq(
   "mysql" % "mysql-connector-java" % "5.1.30",
+  "org.apache.pdfbox" % "pdfbox" % "1.8.6",
   javaJdbc,
   javaEbean,
   cache,
