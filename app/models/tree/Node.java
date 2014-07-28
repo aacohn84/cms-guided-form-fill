@@ -2,8 +2,10 @@ package models.tree;
 
 import java.util.Map;
 
+import play.twirl.api.Html;
+
 /**
- * Base class for all tree nodes.
+ * Abstraction of a node in a decision tree.
  * 
  * @author Aaron Cohn
  * 
@@ -24,4 +26,6 @@ public abstract class Node {
 	 *            - a mapping of input field names to input data.
 	 */
 	public abstract String idNextNode(Map<String, String> input);
+	
+	public abstract Html renderAsHtml();
 }

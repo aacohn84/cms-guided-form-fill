@@ -1,0 +1,14 @@
+@(node: tree.Node)
+
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Change Order</title>
+  </head>
+  <body>
+    <form action="/nextNode" name="theForm" method="GET">
+      @node.renderAsHtml()
+    </form>
+  </body>
+</html>

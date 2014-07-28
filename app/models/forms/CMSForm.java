@@ -5,7 +5,12 @@ import java.util.HashMap;
 import models.tree.Node;
 
 public class CMSForm {
-	private HashMap<String, Node> nodes;
+	private HashMap<String, Node> nodes = new HashMap<>();
+	protected Node root;
+
+	public Node getRoot() {
+		return root;
+	}
 
 	void addNode(Node node) {
 		if (nodes.containsKey(node.id)) {

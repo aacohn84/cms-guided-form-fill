@@ -1,8 +1,12 @@
 package models.tree;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import play.twirl.api.Html;
 
 /**
  * A node with some mutually exclusive options to choose from, intended to be
@@ -33,7 +37,7 @@ public class ChoiceNode extends Node {
 		options.put(option, targetId);
 		return this;
 	}
-	
+
 	/**
 	 * Returns a list of options to choose from.
 	 */
@@ -45,5 +49,15 @@ public class ChoiceNode extends Node {
 	public String idNextNode(Map<String, String> input) {
 		String choice = input.get("choice");
 		return options.get(choice);
+	}
+
+	@Override
+	public Html renderAsHtml() {
+		String html = new String();
+		for (Entry<String, String> option : options.entrySet()) {
+			html += "<input type=\"radio\" name=\"choice\" value=\""
+					+ option.getKey() + "\">" + option.getKey() + "<br>";
+		}
+		return new Html(html);
 	}
 }

@@ -2,15 +2,12 @@ package models.forms;
 
 import models.tree.FieldsNode;
 import models.tree.FieldsNode.FieldType;
-import models.tree.Node;
 import models.tree.NoteNode;
 import models.tree.ChoiceNode;
 
 public class ChangeOrderForm extends CMSForm {
 
 	private static ChangeOrderForm instance;
-	
-	Node root;
 
 	private ChangeOrderForm() {
 		root = new NoteNode("entry_note", "a note.", "change_order_type");
