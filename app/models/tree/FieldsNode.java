@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import play.twirl.api.Html;
+
 /**
  * A node with fields to fill in. Each field has a description and a type. The
  * fields are meant to be rendered as inputs in HTML.
@@ -51,6 +53,10 @@ public class FieldsNode extends SingleTargetNode {
 		super(id, idNext, "Please enter the following: ");
 	}
 
+	public FieldsNode(String id, String idNext, boolean isOutputNode) {
+		super(id, idNext, "Please enter the following: ", isOutputNode);
+	}
+
 	public FieldsNode addField(String fieldDescription, FieldType type) {
 		Field field = new Field(fieldDescription, type);
 		fields.add(field);
@@ -69,6 +75,16 @@ public class FieldsNode extends SingleTargetNode {
 	}
 
 	@Override
+	public Html renderSelectionAsHtml(String serializedSelection) {
+		String html = new String();
+		StoredSelection storedSelection = (StoredSelection) recreateObject(serializedSelection);
+		for (StoredSelection.StoredField field : storedSelection.fields) {
+			html += "<b>" + field.name + ":</b> " + field.value + "<br>";
+		}
+		return new Html(html);
+	}
+
+	@Override
 	public String serializeInput(Map<String, String> input) {
 		// create a list of field names & values
 		List<StoredSelection.StoredField> storedFields = new ArrayList<>();
@@ -80,7 +96,8 @@ public class FieldsNode extends SingleTargetNode {
 		}
 		// convert list to plain array for storage
 		StoredSelection storedSelection = new StoredSelection();
-		storedSelection.fields = new StoredSelection.StoredField[storedFields.size()];
+		storedSelection.fields = new StoredSelection.StoredField[storedFields
+				.size()];
 		storedSelection.fields = storedFields.toArray(storedSelection.fields);
 
 		return serializeAsString(storedSelection);

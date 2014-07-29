@@ -8,10 +8,11 @@
   </head>
   <body>
     <h3>@node.description</h3>
-    <form action="/nextNode" name="theForm" method="GET">
+    <form action="/nextNode" name="theForm" method="POST">
       <input type="hidden" name="@FormFill.RequestParams.CURRENT_NODE" value="@node.id">
       @node.renderAsHtml()
       <a href="javascript:theForm.submit()">Next >></a>
     </form>
+    <a href="/getFormOutput">[View Form Output]</a>
   </body>
 </html>

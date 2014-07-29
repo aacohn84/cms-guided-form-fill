@@ -14,7 +14,7 @@ public class ChangeOrderForm extends CMSForm {
 		addNode(root);
 
 		addNode(new ChoiceNode("change_order_type",
-				"What does the patron wish to do?")
+				"What does the patron wish to do?", true)
 			.addOption("Return/Exch", "none")
 			.addOption("Transfer", "transfer_contract_paid")
 			.addOption("Disinterment", "none"));
@@ -32,7 +32,7 @@ public class ChangeOrderForm extends CMSForm {
 		addNode(new NoteNode("receipt_reflecting_balance",
 				"transfer_type", "Cash receipt reflecting balance."));
 
-		addNode(new ChoiceNode("transfer_type", "Transfer Type: ")
+		addNode(new ChoiceNode("transfer_type", "Transfer Type: ", true)
 			.addOption("Transfer", "none")
 			.addOption("Donation", "none")
 			.addOption("Release", "fee_waived"));
@@ -40,7 +40,7 @@ public class ChangeOrderForm extends CMSForm {
 		addNode(new NoteNode("fee_waived", "name_loc_num_reason_2",
 				"Fee waived, no addt'l sigs"));
 
-		addNode(new FieldsNode("name_loc_num_reason_2", "done")
+		addNode(new FieldsNode("name_loc_num_reason_2", "done", true)
 			.addField("Patron Name", FieldType.TEXT)
 			.addField("Cemetery & Location", FieldType.TEXT)
 			.addField("Original Contract Number", FieldType.TEXT)

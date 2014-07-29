@@ -19,6 +19,12 @@ public abstract class SingleTargetNode extends Node {
 		this.idNext = idNext;
 	}
 
+	public SingleTargetNode(String id, String idNext, String description,
+			boolean isOutputNode) {
+		super(id, description, isOutputNode);
+		this.idNext = idNext;
+	}
+
 	/**
 	 * Returns the identifier of the next node regardless of input entered.
 	 */

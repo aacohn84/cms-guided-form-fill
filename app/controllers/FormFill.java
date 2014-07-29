@@ -1,12 +1,11 @@
 package controllers;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-
 import models.forms.CMSForm;
 import models.forms.ChangeOrderForm;
 import models.tree.Node;
+import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.questionnaire.backdrop;
@@ -31,29 +30,29 @@ public class FormFill extends Controller {
 	public static Result getNextNode() {
 		// get current node
 		CMSForm form = ChangeOrderForm.getInstance();
-		String idCurrentNode = request().getQueryString(
-				RequestParams.CURRENT_NODE);
+		Map<String, String> requestData = Form.form().bindFromRequest().data();
+		String idCurrentNode = requestData.get(RequestParams.CURRENT_NODE);
 		Node currentNode = form.getNode(idCurrentNode);
-
-		// convert request query string to map
-		Map<String, String> input = new HashMap<>();
-		for (Entry<String, String[]> entry : request().queryString().entrySet()) {
-			String value = entry.getValue()[0]; // take only first value
-			input.put(entry.getKey(), value);
-		}
 
 		// validate user input
 
 		// save user input
-		String serializedInput = currentNode.serializeInput(input);
+		String serializedInput = currentNode.serializeInput(requestData);
 		session().put(currentNode.id, serializedInput);
 		
-		CMSSession.print();
+		// CMSSession.print();
 
 		// retrieve next node
-		String idNextNode = currentNode.getIdNextNode(input);
+		String idNextNode = currentNode.getIdNextNode(requestData);
 		Node nextNode = form.getNode(idNextNode);
 
 		return ok(backdrop.render(nextNode));
+	}
+	
+	public static Result getFormOutput() {
+		CMSForm form = ChangeOrderForm.getInstance();
+		List<Node> nodes = form.getOutputNodes();
+		
+		return ok(views.html.questionnaire.output.render(nodes));
 	}
 }

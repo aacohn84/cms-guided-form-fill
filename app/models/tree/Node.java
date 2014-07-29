@@ -1,7 +1,9 @@
 package models.tree;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Map;
 
@@ -14,12 +16,19 @@ import play.twirl.api.Html;
  */
 public abstract class Node {
 
-	public String id;
-	public String description;
+	public String id = "";
+	public String description = "";
+	public boolean isOutputNode = false;
 
 	public Node(String id, String description) {
 		this.id = id;
 		this.description = description;
+	}
+
+	public Node(String id, String description, boolean isOutputNode) {
+		this.id = id;
+		this.description = description;
+		this.isOutputNode = isOutputNode;
 	}
 
 	/**
@@ -42,6 +51,8 @@ public abstract class Node {
 	 * Returns a String containing the HTML representation of the node.
 	 */
 	protected abstract String getNodeHtml();
+
+	public abstract Html renderSelectionAsHtml(String serializedSelection);
 
 	/**
 	 * Converts the input to an object and serializes it as a String.
@@ -66,5 +77,26 @@ public abstract class Node {
 			e.printStackTrace();
 		}
 		return serializedInput;
+	}
+
+	/**
+	 * Returns the deserialized object.
+	 * 
+	 * @param serializedObj
+	 *            - a String containing a serialized object.
+	 */
+	protected final Object recreateObject(String serializedObj) {
+		Object obj = null;
+		try {
+			ByteArrayInputStream bytesIn = new ByteArrayInputStream(
+					serializedObj.getBytes());
+			ObjectInputStream objIn = new ObjectInputStream(bytesIn);
+			obj = objIn.readObject();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return obj;
 	}
 }

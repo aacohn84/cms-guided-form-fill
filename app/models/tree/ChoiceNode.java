@@ -1,14 +1,13 @@
 package models.tree;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import play.twirl.api.Html;
 
 /**
  * A node with some mutually exclusive options to choose from, intended to be
@@ -43,6 +42,10 @@ public class ChoiceNode extends Node {
 		super(id, description);
 	}
 
+	public ChoiceNode(String id, String description, boolean isOutputNode) {
+		super(id, description, isOutputNode);
+	}
+
 	/**
 	 * Adds an option that points to the target node.
 	 * 
@@ -54,13 +57,6 @@ public class ChoiceNode extends Node {
 	public ChoiceNode addOption(String option, String targetId) {
 		options.put(option, targetId);
 		return this;
-	}
-
-	/**
-	 * Returns a list of options to choose from.
-	 */
-	public List<String> getOptions() {
-		return new ArrayList<String>(options.keySet());
 	}
 
 	@Override
@@ -77,6 +73,19 @@ public class ChoiceNode extends Node {
 					+ option.getKey() + "\">" + option.getKey() + "<br>";
 		}
 		return html;
+	}
+
+	/**
+	 * Returns a list of options to choose from.
+	 */
+	public List<String> getOptions() {
+		return new ArrayList<String>(options.keySet());
+	}
+
+	@Override
+	public Html renderSelectionAsHtml(String serializedSelection) {
+		StoredSelection storedSelection = (StoredSelection) recreateObject(serializedSelection);
+		return new Html(storedSelection.choice);
 	}
 
 	@Override

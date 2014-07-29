@@ -1,6 +1,9 @@
 package models.forms;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
 
 import models.tree.Node;
 
@@ -26,5 +29,20 @@ public class CMSForm {
 		}
 		throw new RuntimeException("Node with name " + nodeId
 				+ " does not exist in this form.");
+	}
+
+	/**
+	 * Returns a list nodes for which the <code>isOutputNode</code> field is set
+	 * to <code>true</code>.
+	 */
+	public List<Node> getOutputNodes() {
+		List<Node> outputNodes = new ArrayList<>();
+		for (Entry<String, Node> entry : nodes.entrySet()) {
+			Node node = entry.getValue();
+			if (node.isOutputNode) {
+				outputNodes.add(node);
+			}
+		}
+		return outputNodes;
 	}
 }

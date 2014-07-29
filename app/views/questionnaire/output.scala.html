@@ -1,0 +1,18 @@
+@(outputNodes: List[tree.Node])
+
+@printStr(str: String) = @{
+  if (str == null) {
+    "null"
+  } else {
+    str
+  }
+}
+
+<ul>
+@for(node <- outputNodes) {
+  <li>
+    <i>@node.id</i><br>
+    @node.renderSelectionAsHtml(session.get(node.id))
+  </li><br>
+}
+</ul>
