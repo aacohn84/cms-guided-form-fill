@@ -32,6 +32,21 @@ public abstract class Node {
 	}
 
 	/**
+	 * Uses the given input to fill any form fields associated with this node.
+	 * The filled fields are returned in a map where the key is the name of the
+	 * field, and the value is the input used to fill it.
+	 * 
+	 * @param serializedObj
+	 *            - a String containing a serialized object of saved user input.
+	 * 
+	 * @param formFields
+	 *            - a map that is either empty or contains filled form fields
+	 *            for the same form.
+	 */
+	public abstract void fillFormFields(String serializedObj,
+			Map<String, String> formFields);
+
+	/**
 	 * Returns the identifier of the next node in the tree based on the input
 	 * given.
 	 * 

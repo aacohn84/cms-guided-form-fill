@@ -15,6 +15,13 @@ public class NoteNode extends SingleTargetNode {
 		super(id, idNext, note);
 	}
 
+	@SuppressWarnings("unused")
+	@Override
+	public void fillFormFields(String serializedObj,
+			Map<String, String> formFields) {
+		// NoteNode does not fill any form fields.
+	}
+
 	@Override
 	protected String getNodeHtml() {
 		return description;

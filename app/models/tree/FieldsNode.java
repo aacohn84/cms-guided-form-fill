@@ -8,18 +8,21 @@ import java.util.Map;
 import play.twirl.api.Html;
 
 /**
- * A node with fields to fill in. Each field has a description and a type. The
- * fields are meant to be rendered as inputs in HTML.
+ * A node with fields to fill in. The fields are meant to be rendered as form
+ * inputs in HTML, with FieldType representing the kind of input data that each
+ * field will accept.
  * 
  * @author Aaron Cohn
  */
 public class FieldsNode extends SingleTargetNode {
 	public static class Field {
 		String description;
+		String name;
 		FieldType type;
 
-		public Field(String description, FieldType type) {
+		public Field(String description, String name, FieldType type) {
 			this.description = description;
+			this.name = name;
 			this.type = type;
 		}
 	}
@@ -50,17 +53,35 @@ public class FieldsNode extends SingleTargetNode {
 	List<Field> fields = new ArrayList<>();
 
 	public FieldsNode(String id, String idNext) {
-		super(id, idNext, "Please enter the following: ");
+		super(id, idNext, "Please enter the following: ", true);
 	}
 
-	public FieldsNode(String id, String idNext, boolean isOutputNode) {
-		super(id, idNext, "Please enter the following: ", isOutputNode);
-	}
-
-	public FieldsNode addField(String fieldDescription, FieldType type) {
-		Field field = new Field(fieldDescription, type);
+	/**
+	 * Add an input field to this FieldsNode.
+	 * 
+	 * @param fieldDescription
+	 *            - the text to be displayed alongside the input field.
+	 * @param name
+	 *            - the name of the corresponding field in the Acrobat form.
+	 * @param type
+	 *            - the type of input expected by this field
+	 * @return a reference to this FieldsNode so that calls to addField can be
+	 *         chained together.
+	 */
+	public FieldsNode addField(String fieldDescription, String name,
+			FieldType type) {
+		Field field = new Field(fieldDescription, name, type);
 		fields.add(field);
 		return this;
+	}
+
+	@Override
+	public void fillFormFields(String serializedObj,
+			Map<String, String> formFields) {
+		StoredSelection ss = (StoredSelection) recreateObject(serializedObj);
+		for (StoredSelection.StoredField storedField : ss.fields) {
+			formFields.put(storedField.name, storedField.value);
+		}
 	}
 
 	@Override

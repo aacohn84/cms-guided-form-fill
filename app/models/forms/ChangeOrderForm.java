@@ -10,41 +10,52 @@ public class ChangeOrderForm extends CMSForm {
 	private static ChangeOrderForm instance;
 
 	private ChangeOrderForm() {
-		root = new NoteNode("entry_note", "change_order_type", "a note.");
+		root = new NoteNode("entry_note", "change_order_type_choice", "a note.");
 		addNode(root);
 
-		addNode(new ChoiceNode("change_order_type",
-				"What does the patron wish to do?", true)
-			.addOption("Return/Exch", "none")
-			.addOption("Transfer", "transfer_contract_paid")
-			.addOption("Disinterment", "none"));
+		addNode(new ChoiceNode("change_order_type_choice",
+				"What does the patron wish to do?", "change_order_type_choice")
+			.addChoice("Return/Exch", "none")
+			.addChoice("Transfer", "paid_in_full_choice_2")
+			.addChoice("Disinterment", "none"));
 
 		// Transfer
-		addNode(new ChoiceNode("transfer_contract_paid",
+		addNode(new ChoiceNode("paid_in_full_choice_2",
 				"Is the original contract paid in full?")
-			.addOption("Yes", "transfer_type")
-			.addOption("No", "current_contract_balance_form"));
+			.addChoice("Yes", "transfer_type")
+			.addChoice("No", "curr_contract_balance_3"));
 
-		addNode(new FieldsNode("current_contract_balance_form",
-				"receipt_reflecting_balance")
-			.addField("Current Contract Balance", FieldType.NUMBER));
+		addNode(new FieldsNode("curr_contract_balance_3",
+				"cash_receipt_2")
+			.addField("Current Contract Balance", "Contract Balance",
+					FieldType.NUMBER));
 
-		addNode(new NoteNode("receipt_reflecting_balance",
-				"transfer_type", "Cash receipt reflecting balance."));
+		addNode(new NoteNode("cash_receipt_2",
+				"transfer_type_choice", "Cash receipt reflecting balance."));
 
-		addNode(new ChoiceNode("transfer_type", "Transfer Type: ", true)
-			.addOption("Transfer", "none")
-			.addOption("Donation", "none")
-			.addOption("Release", "fee_waived"));
+		addNode(new ChoiceNode("transfer_type_choice", "Transfer Type: ",
+				"transfer_type_choice")
+			.addChoice("Transfer", "none")
+			.addChoice("Donation", "none")
+			.addChoice("Release", "transfer_fee_waived"));
 
-		addNode(new NoteNode("fee_waived", "name_loc_num_reason_2",
+		addNode(new NoteNode("transfer_fee_waived", "name_9",
 				"Fee waived, no addt'l sigs"));
 
-		addNode(new FieldsNode("name_loc_num_reason_2", "done", true)
-			.addField("Patron Name", FieldType.TEXT)
-			.addField("Cemetery & Location", FieldType.TEXT)
-			.addField("Original Contract Number", FieldType.TEXT)
-			.addField("Reason for Change Order", FieldType.TEXT));
+		addNode(new FieldsNode("name_9", "loc_9")
+			.addField("Patron Name", "Names", FieldType.TEXT));
+		
+		addNode(new FieldsNode("loc_9", "orig_contract_num_9")
+			.addField("Cemetery", "Cemetery", FieldType.TEXT)
+			.addField("Location", "Location", FieldType.TEXT));
+		
+		addNode(new FieldsNode("orig_contract_num_9", "change_order_reason")
+			.addField("Original Contract Number", "Orig Contract",
+					FieldType.TEXT));
+			
+		addNode(new FieldsNode("change_order_reason", "done")
+			.addField("Reason for Change Order", "Reason for Change Order", 
+					FieldType.TEXT));
 
 		addNode(new NoteNode("done", "none", "End of form."));
 	}
