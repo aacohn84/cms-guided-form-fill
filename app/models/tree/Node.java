@@ -74,7 +74,7 @@ public abstract class Node {
 			objOut.writeObject(object);
 			serializedInput = bytesOut.toString();
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 		return serializedInput;
 	}
@@ -92,10 +92,8 @@ public abstract class Node {
 					serializedObj.getBytes());
 			ObjectInputStream objIn = new ObjectInputStream(bytesIn);
 			obj = objIn.readObject();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+		} catch (IOException | ClassNotFoundException e) {
+			throw new RuntimeException(e);
 		}
 		return obj;
 	}
