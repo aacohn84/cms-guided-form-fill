@@ -1,4 +1,4 @@
-package models;
+package models.data;
 
 import play.data.validation.Constraints.Required;
 

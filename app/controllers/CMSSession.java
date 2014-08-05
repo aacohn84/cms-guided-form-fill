@@ -5,7 +5,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import java.util.Date;
 import java.util.Map.Entry;
 
-import models.User;
+import models.data.User;
 import play.mvc.Controller;
 
 public class CMSSession extends Controller {

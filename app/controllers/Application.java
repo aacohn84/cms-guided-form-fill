@@ -1,9 +1,9 @@
 package controllers;
 
 import static play.data.Form.form;
-import models.User;
-import models.data.AuthDataStore;
-import models.data.MySQLAuthDataStore;
+import models.data.AuthStore;
+import models.data.MySQLAuthStore;
+import models.data.User;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -34,7 +34,7 @@ public class Application extends Controller {
     	if (filledLoginForm.hasErrors()) {
     		return badRequest(login.render(filledLoginForm));
     	}
-    	AuthDataStore authDataStore = new MySQLAuthDataStore();
+    	AuthStore authDataStore = new MySQLAuthStore();
     	User user = filledLoginForm.get();
     	String username = user.getUsername();
     	if (authDataStore.credentialsAreValid(username, user.getPassword())) {

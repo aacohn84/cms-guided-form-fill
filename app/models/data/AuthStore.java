@@ -1,6 +1,6 @@
 package models.data;
 
-public interface AuthDataStore {
+public interface AuthStore {
 	
 	/**
 	 * Returns true if credentials are valid.

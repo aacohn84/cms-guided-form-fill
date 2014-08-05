@@ -7,7 +7,7 @@ import java.sql.SQLException;
 
 import play.db.DB;
 
-public class MySQLAuthDataStore implements AuthDataStore {
+public class MySQLAuthStore implements AuthStore {
 
 	@Override
 	public boolean credentialsAreValid(String username, String password) {
