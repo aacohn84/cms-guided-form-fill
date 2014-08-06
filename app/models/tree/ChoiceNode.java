@@ -155,7 +155,7 @@ public class ChoiceNode extends Node {
 	 * Returns a list of choices to choose from.
 	 */
 	public List<String> getChoices() {
-		// TODO: Use or remove this method
+		// TODO: Use or remove ChoiceNode#getChoices
 		return new ArrayList<String>(choices.keySet());
 	}
 

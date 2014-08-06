@@ -6,11 +6,10 @@ import models.forms.CMSForm;
 import models.forms.ChangeOrderForm;
 import models.tree.Node;
 import play.data.Form;
-import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.questionnaire.backdrop;
 
-public class FormFill extends Controller {
+public class FormFill extends SecureController {
 
 	public static class RequestParams {
 		public static final String CURRENT_NODE = "currentNode";
