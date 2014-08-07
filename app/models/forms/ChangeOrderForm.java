@@ -16,14 +16,14 @@ public class ChangeOrderForm extends CMSForm {
 
 		addNode(new ChoiceNode("change_order_type_choice",
 				"What does the patron wish to do?", "change_order_type_choice")
-			.addChoice("Return/Exch", "none")
-			.addChoice("Transfer", "paid_in_full_choice_2")
-			.addChoice("Disinterment", "none"));
+			.addChoice("Return/Exch", "Return", "none")
+			.addChoice("Transfer", "Assignment", "paid_in_full_choice_2")
+			.addChoice("Disinterment", "Disinterment", "none"));
 
 		// Transfer
 		addNode(new ChoiceNode("paid_in_full_choice_2",
 				"Is the original contract paid in full?")
-			.addChoice("Yes", "transfer_type")
+			.addChoice("Yes", "transfer_type_choice")
 			.addChoice("No", "curr_contract_balance_3"));
 
 		addNode(new FieldsNode("curr_contract_balance_3",

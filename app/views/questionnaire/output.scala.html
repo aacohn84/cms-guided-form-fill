@@ -1,4 +1,4 @@
-@(outputNodes: List[tree.Node])
+@(decisionQueue: Queue[data.Decision])
 
 @printStr(str: String) = @{
   if (str == null) {
@@ -9,10 +9,10 @@
 }
 
 <ul>
-@for(node <- outputNodes) {
+@for(decision <- decisionQueue) {
   <li>
-    <i>@node.id</i><br>
-    @node.renderSelectionAsHtml(session.get(node.id))
+    <i>@decision.context.id</i><br>
+    @decision.context.renderSelectionAsHtml(decision.rawInput)
   </li><br>
 }
 </ul>
