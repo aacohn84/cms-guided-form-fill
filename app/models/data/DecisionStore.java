@@ -17,7 +17,7 @@ public interface DecisionStore {
 	 *             if the specified username doesn't match any entries within
 	 *             the DecisionStore.
 	 */
-	public DecisionQueue getDecisionQueue(String username)
+	public DecisionMap getDecisions(String username)
 			throws NoSuchUserException;
 
 	/**
@@ -26,10 +26,10 @@ public interface DecisionStore {
 	 * 
 	 * @param username
 	 *            - the key under which the DecisionQueue will be stored.
-	 * @param decisionQueue
+	 * @param decisions
 	 *            - the DecisionQueue to be inserted or updated.
 	 */
-	public void putDecisionQueue(String username, DecisionQueue decisionQueue);
+	public void putDecisions(String username, DecisionMap decisions);
 
 	/**
 	 * Removes the DecisionQueue associated with the specified username.
@@ -41,5 +41,5 @@ public interface DecisionStore {
 	 *             if the specified username doesn't match any entries within
 	 *             the DecisionStore.
 	 */
-	public void removeDecisionQueue(String username) throws NoSuchUserException;
+	public void removeDecisions(String username) throws NoSuchUserException;
 }

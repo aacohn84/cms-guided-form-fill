@@ -1,7 +1,7 @@
 package controllers;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 
 import models.data.Decision;
 import models.tree.Node;
@@ -20,15 +20,15 @@ public class FormFill extends SecureController {
 	 * Provides the root node of the requested form.
 	 */
 	public static Result getForm() {
-		Node root = CMSGuidedFormFill.getForm();
+		Node root = CMSGuidedFormFill.getForm(getUsername());
 		return ok(backdrop.render(root));
 	}
 
 	public static Result getFormOutput() {
 		String username = getUsername();
-		Queue<Decision> decisions = CMSGuidedFormFill.getFormOutput(username);
+		List<Decision> formOutput = CMSGuidedFormFill.getFormOutput(username);
 
-		return ok(views.html.questionnaire.output.render(decisions));
+		return ok(views.html.questionnaire.output.render(formOutput));
 	}
 
 	/*
