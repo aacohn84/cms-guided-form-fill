@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import models.data.FilledFormFields;
 import play.twirl.api.Html;
 
 /**
@@ -144,11 +145,10 @@ public class ChoiceNode extends Node {
 	}
 
 	@Override
-	public void fillFormFields(String serializedObj,
-			Map<String, String> formFields) {
+	public void fillFormFields(String serializedObj, FilledFormFields formFields) {
 		StoredSelection ss = (StoredSelection) recreateObject(serializedObj);
 		Choice choice = choices.get(ss.choice);
-		formFields.put(fieldName, choice.name);
+		formFields.fillField(fieldName, choice.name);
 	}
 
 	/**
@@ -169,22 +169,6 @@ public class ChoiceNode extends Node {
 				"Input for a ChoiceNode did not contain a \"choice\" field.");
 	}
 
-	/**
-	 * Provides HTML code to display this ChoiceNode. It is represented as a
-	 * radio input, where {@link Choice#description} is used as both the name of
-	 * the choice and the text displayed beside the radio button.
-	 */
-	@Override
-	protected String getNodeHtml() {
-		String html = new String();
-		for (Entry<String, Choice> entry : choices.entrySet()) {
-			Choice choice = entry.getValue();
-			html += "<input type=\"radio\" name=\"choice\" value=\""
-					+ choice.description + "\">" + choice.description + "<br>";
-		}
-		return html;
-	}
-
 	@Override
 	public Html renderSelectionAsHtml(String serializedSelection) {
 		StoredSelection storedSelection = (StoredSelection) recreateObject(serializedSelection);
@@ -196,6 +180,22 @@ public class ChoiceNode extends Node {
 		String choice = input.get("choice");
 		StoredSelection storedSelection = new StoredSelection(choice);
 		return serializeAsString(storedSelection);
+	}
+
+	/**
+	 * Provides HTML code to display this ChoiceNode. It is represented as a
+	 * radio input, where {@link Choice#description} is used as both the name of
+	 * the choice and the text displayed beside the radio button.
+	 */
+	@Override
+	protected String getNodeHtml(String rawInput) {
+		String html = new String();
+		for (Entry<String, Choice> entry : choices.entrySet()) {
+			Choice choice = entry.getValue();
+			html += "<input type=\"radio\" name=\"choice\" value=\""
+					+ choice.description + "\">" + choice.description + "<br>";
+		}
+		return html;
 	}
 
 }

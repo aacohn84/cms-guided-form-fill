@@ -20,8 +20,9 @@ public class FormFill extends SecureController {
 	 * Provides the root node of the requested form.
 	 */
 	public static Result getForm() {
-		Node root = CMSGuidedFormFill.getForm(getUsername());
-		return ok(backdrop.render(root));
+		Decision firstDecision = CMSGuidedFormFill
+				.getFirstDecision(getUsername());
+		return ok(backdrop.render(firstDecision));
 	}
 
 	public static Result getFormOutput() {
@@ -40,9 +41,9 @@ public class FormFill extends SecureController {
 		String idCurrentNode = requestData.get(RequestParams.CURRENT_NODE);
 		String username = getUsername();
 
-		Node nextNode = CMSGuidedFormFill.getNextNode(username, idCurrentNode,
-				requestData);
+		Decision nextDecision = CMSGuidedFormFill.makeDecision(username,
+				idCurrentNode, requestData);
 
-		return ok(backdrop.render(nextNode));
+		return ok(backdrop.render(nextDecision));
 	}
 }

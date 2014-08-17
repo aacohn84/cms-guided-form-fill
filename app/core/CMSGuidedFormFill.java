@@ -6,21 +6,28 @@ import java.util.Map;
 
 import models.data.Decision;
 import models.data.DecisionMap;
-import models.data.DecisionStore;
-import models.data.InMemoryDecisionStore;
-import models.data.NoSuchUserException;
+import models.data.FilledFormFields;
+import models.data.FormData;
+import models.data.FormDataStore;
+import models.data.InMemoryFormDataStore;
 import models.forms.CMSForm;
 import models.forms.ChangeOrderForm;
+import models.tree.CalculationNode;
 import models.tree.Node;
 
 public class CMSGuidedFormFill {
 
-	public static Node getForm(String owner) {
-		DecisionStore decisionStore = InMemoryDecisionStore.getInstance();
-		if (!decisionStore.containsUsername(owner)) {
-			decisionStore.putDecisions(owner, new DecisionMap());
+	public static Decision getFirstDecision(String owner) {
+		FormDataStore formDataStore = InMemoryFormDataStore.getInstance();
+		Node root = ChangeOrderForm.getInstance().getRoot();
+		if (!formDataStore.containsUsername(owner)) {
+			FormData formData = new FormData(owner);
+			Decision firstDecision = new Decision(root, null, null);
+			formData.decisionMap.putDecision(firstDecision);
+			formDataStore.setFormData(owner, formData);
 		}
-		return ChangeOrderForm.getInstance().getRoot();
+		DecisionMap decisionMap = formDataStore.getFormData(owner).decisionMap;
+		return decisionMap.getDecision(root.id);
 	}
 
 	/**
@@ -28,8 +35,9 @@ public class CMSGuidedFormFill {
 	 * decision tree. Only decisions that result in form output are listed.
 	 */
 	public static List<Decision> getFormOutput(String owner) {
-		DecisionMap decisions = getDecisions(
-				InMemoryDecisionStore.getInstance(), owner);
+		FormDataStore formDataStore = InMemoryFormDataStore.getInstance();
+		FormData formData = formDataStore.getFormData(owner);
+		DecisionMap decisions = formData.decisionMap;
 
 		List<Decision> formOutput = new ArrayList<>();
 		Node currNode = ChangeOrderForm.getInstance().getRoot();
@@ -40,10 +48,10 @@ public class CMSGuidedFormFill {
 			}
 			if (currDecision.next == null) {
 				break;
-			}			
+			}
 			currNode = currDecision.next;
 			currDecision = decisions.getDecision(currNode.id);
-			
+
 		}
 		return formOutput;
 	}
@@ -56,45 +64,48 @@ public class CMSGuidedFormFill {
 	 * @param requestData
 	 *            - a mapping of field names to input values.
 	 */
-	public static Node getNextNode(String owner, String idCurrentNode,
+	public static Decision makeDecision(String owner, String idCurrentNode,
 			Map<String, String> requestData) {
 
+		/*
+		 * Retrieve the owner's form data first. We won't bother doing anything
+		 * else if this raises an exception.
+		 */
+		FormDataStore formDataStore = InMemoryFormDataStore.getInstance();
+		FormData formData = formDataStore.getFormData(owner);
+
+		// retrieve the current node
 		CMSForm form = ChangeOrderForm.getInstance();
 		Node currentNode = form.getNode(idCurrentNode);
 
-		// validate user input
+		// TODO: validate user input
 
-		// retrieve next node
-		String idNextNode = currentNode.getIdNextNode(requestData);
-		Node nextNode = form.getNode(idNextNode);
+		// create a decision based on the data available
+		FilledFormFields filledFormFields = formData.filledFormFields;
+		Decision decision = currentNode.createDecision(form, requestData,
+				filledFormFields);
 
-		// save decision
-		String serializedInput = currentNode.serializeInput(requestData);
-
-		Decision decision = new Decision(currentNode, serializedInput, nextNode);
-		DecisionStore decisionStore = InMemoryDecisionStore.getInstance();
-		DecisionMap decisions = decisionStore.getDecisions(owner);
-		prepNextDecision(decisions, decision);
-		saveDecision(decisions, decision);
-
-		return nextNode;
-	}
-
-	/**
-	 * Save a decision made by the owner of the form.
-	 * 
-	 * @param owner
-	 *            - name of the user who made the decision.
-	 * @param decision
-	 */
-	static DecisionMap getDecisions(DecisionStore decisionStore, String username) {
-		DecisionMap decisions;
-		if (decisionStore.containsUsername(username)) {
-			decisions = decisionStore.getDecisions(username);
-		} else {
-			decisions = new DecisionMap();
+		// save/update decision and fill/update form fields
+		prepNextDecision(formData.decisionMap, decision);
+		saveDecision(formData.decisionMap, decision);
+		if (currentNode.isOutputNode) { 
+			currentNode.fillFormFields(decision.rawInput, filledFormFields);
 		}
-		return decisions;
+		// update the FormData in the FormDataStore
+		formDataStore.setFormData(owner, formData);
+
+		// return the decision associated with the next node
+		String idNextNode = currentNode.getIdNextNode(requestData);
+
+		/*
+		 * If the next node is a CalculationNode, process the calculation but do
+		 * not return its decision. Return the next one instead.
+		 */
+		Node nextNode = form.getNode(idNextNode);
+		if (nextNode instanceof CalculationNode) {
+			return makeDecision(owner, idNextNode, requestData);
+		}
+		return formData.decisionMap.getDecision(idNextNode);
 	}
 
 	static void saveDecision(DecisionMap decisions, Decision decision) {
@@ -112,11 +123,12 @@ public class CMSGuidedFormFill {
 	}
 
 	/*
+	 * Set the previous and context fields for the decision associated with the
+	 * next node in the sequence.
+	 * 
 	 * If the specified decision has a next node associated with it, this will
-	 * create or update the decision associated with the next node so that it
-	 * points back to this decision's associated node as the previous one in the
-	 * sequence. This is the main way that decisions know which node to
-	 * associate with the previous decision.
+	 * create or update the decision associated with the next node. This allows
+	 * the decision-tree to be traversed backwards.
 	 */
 	static void prepNextDecision(DecisionMap decisions, Decision decision) {
 		if (decision.next != null) {

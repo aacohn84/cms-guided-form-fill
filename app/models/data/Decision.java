@@ -3,11 +3,15 @@ package models.data;
 import models.tree.Node;
 
 /**
- * A decision made by the user while traversing a decision tree. A decision has
- * a context in which it was made, and it is part of a sequence.
+ * Represents a decision made by the user while traversing a decision tree.
+ * <p>
+ * It is comprised of an input, and a context in which that input was given. A
+ * Decision also knows which node is associated with the previous decision, and
+ * which node is associated with the next decision, so that a sequence of
+ * decisions is formed.
+ * </p>
  * 
  * @author Aaron Cohn
- * 
  */
 public class Decision {
 	public Node previous, next, context;

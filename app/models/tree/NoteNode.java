@@ -2,6 +2,7 @@ package models.tree;
 
 import java.util.Map;
 
+import models.data.FilledFormFields;
 import play.twirl.api.Html;
 
 /**
@@ -10,27 +11,29 @@ import play.twirl.api.Html;
  * @author Aaron Cohn
  */
 public class NoteNode extends SingleTargetNode {
+	
+	String note;
 
 	public NoteNode(String id, String idNext, String note) {
-		super(id, idNext, note);
+		super(id, idNext, "Note");
+		this.note = note;
 	}
 
 	@SuppressWarnings("unused")
 	@Override
 	public void fillFormFields(String serializedObj,
-			Map<String, String> formFields) {
+			FilledFormFields formFields) {
 		// NoteNode does not fill any form fields.
 	}
 
 	@Override
-	protected String getNodeHtml() {
-		return description;
+	protected String getNodeHtml(@SuppressWarnings("unused") String rawInput) {
+		return note + "<br>";
 	}
 
 	@Override
-	public Html renderSelectionAsHtml(
-			@SuppressWarnings("unused") String serializedSelection) {
-		return renderAsHtml();
+	public Html renderSelectionAsHtml(String rawInput) {
+		return renderAsHtml(rawInput);
 	}
 
 	@Override

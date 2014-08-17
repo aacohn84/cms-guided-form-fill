@@ -7,6 +7,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Map;
 
+import models.data.Decision;
+import models.data.FilledFormFields;
+import models.forms.CMSForm;
 import play.twirl.api.Html;
 
 /**
@@ -16,8 +19,8 @@ import play.twirl.api.Html;
  */
 public abstract class Node {
 
-	public String id = "";
 	public String description = "";
+	public String id = "";
 	public boolean isOutputNode = false;
 
 	public Node(String id, String description) {
@@ -29,6 +32,30 @@ public abstract class Node {
 		this.id = id;
 		this.description = description;
 		this.isOutputNode = isOutputNode;
+	}
+
+	/**
+	 * Creates a {@link Decision} from the available data.
+	 * 
+	 * @param form
+	 *            - the {@link CMSForm} instance associated with this decision.
+	 * @param requestData
+	 *            - the keys and values of input retrieved from the user.
+	 * @param filledFormFields
+	 *            - form fields that have been filled previously. These values
+	 *            are typically used by calculations that refer to other form
+	 *            fields.
+	 * @return a {@link Decision} prepared with all fields except
+	 *         {@link Decision#previous}
+	 */
+	public Decision createDecision(CMSForm form,
+			Map<String, String> requestData,
+			@SuppressWarnings("unused") FilledFormFields filledFormFields) {
+		String rawInput = serializeInput(requestData);
+		String idNextNode = getIdNextNode(requestData);
+		Node nextNode = form.getNode(idNextNode);
+
+		return new Decision(this, rawInput, nextNode);
 	}
 
 	/**
@@ -44,7 +71,7 @@ public abstract class Node {
 	 *            for the same form.
 	 */
 	public abstract void fillFormFields(String serializedObj,
-			Map<String, String> formFields);
+			FilledFormFields formFields);
 
 	/**
 	 * Returns the identifier of the next node in the tree based on the input
@@ -57,15 +84,13 @@ public abstract class Node {
 
 	/**
 	 * Returns an HTML representation of the node for rendering in a template.
+	 * 
+	 * @param rawInput
+	 *            - the rawInput from the decision associated with this node.
 	 */
-	public final Html renderAsHtml() {
-		return new Html(getNodeHtml());
+	public final Html renderAsHtml(String rawInput) {
+		return new Html(getNodeHtml(rawInput));
 	}
-
-	/**
-	 * Returns a String containing the HTML representation of the node.
-	 */
-	protected abstract String getNodeHtml();
 
 	public abstract Html renderSelectionAsHtml(String serializedSelection);
 
@@ -79,20 +104,12 @@ public abstract class Node {
 	public abstract String serializeInput(Map<String, String> input);
 
 	/**
-	 * Returns the serialized object as a String.
+	 * Returns a String containing the HTML representation of the node.
+	 * 
+	 * @param rawInput
+	 *            - the rawInput from the decision associated with this node.
 	 */
-	protected final String serializeAsString(Object object) {
-		String serializedInput = "";
-		try {
-			ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
-			ObjectOutputStream objOut = new ObjectOutputStream(bytesOut);
-			objOut.writeObject(object);
-			serializedInput = bytesOut.toString();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		return serializedInput;
-	}
+	protected abstract String getNodeHtml(String rawInput);
 
 	/**
 	 * Returns the deserialized object.
@@ -111,5 +128,21 @@ public abstract class Node {
 			throw new RuntimeException(e);
 		}
 		return obj;
+	}
+
+	/**
+	 * Returns the serialized object as a String.
+	 */
+	protected final String serializeAsString(Object object) {
+		String serializedInput = "";
+		try {
+			ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
+			ObjectOutputStream objOut = new ObjectOutputStream(bytesOut);
+			objOut.writeObject(object);
+			serializedInput = bytesOut.toString();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		return serializedInput;
 	}
 }
