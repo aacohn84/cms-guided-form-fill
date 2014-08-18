@@ -1,6 +1,7 @@
 package models.data;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import models.tree.Node;
@@ -17,8 +18,41 @@ import models.tree.Node;
  * 
  * @author Aaron Cohn
  */
-public class DecisionMap {
+public class DecisionMap implements Iterable<Decision> {
+
+	/**
+	 * Traverses the active path through the DecisionMap.
+	 * 
+	 * @author Aaron Cohn
+	 */
+	public class DecisionMapIterator implements Iterator<Decision> {
+		Decision current;
+		Decision negativeOne; // empty decision, serves to start iteration
+
+		public DecisionMapIterator() {
+			negativeOne = new Decision(null, null, firstDecision.context);
+			current = negativeOne;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return (current.next != null);
+		}
+
+		@Override
+		public Decision next() {
+			return (current = decisions.get(current.next.id));
+		}
+
+		@Override
+		public void remove() {
+			// no implementation
+		}
+
+	}
+
 	Map<String, Decision> decisions;
+	Decision firstDecision;
 
 	public DecisionMap() {
 		decisions = new HashMap<String, Decision>();
@@ -28,7 +62,19 @@ public class DecisionMap {
 		return decisions.get(contextId);
 	}
 
+	public Decision getFirstDecision() {
+		return firstDecision;
+	}
+
 	public void putDecision(Decision decision) {
+		if (decisions.isEmpty()) {
+			firstDecision = decision;
+		}
 		decisions.put(decision.context.id, decision);
+	}
+
+	@Override
+	public Iterator<Decision> iterator() {
+		return new DecisionMapIterator();
 	}
 }
