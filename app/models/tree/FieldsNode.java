@@ -16,7 +16,7 @@ import play.twirl.api.Html;
  * @author Aaron Cohn
  */
 public class FieldsNode extends SingleTargetNode {
-	public static class Field {
+	private static class Field {
 		String description;
 		String name;
 		FieldType type;
@@ -25,6 +25,15 @@ public class FieldsNode extends SingleTargetNode {
 			this.description = description;
 			this.name = name;
 			this.type = type;
+		}
+	}
+	
+	private static class FilledField extends Field {
+		String value;
+		
+		public FilledField(String name, String value) {
+			super(null, name, FieldType.TEXT);
+			this.value = value;
 		}
 	}
 
@@ -75,6 +84,12 @@ public class FieldsNode extends SingleTargetNode {
 		fields.add(field);
 		return this;
 	}
+	
+	public FieldsNode addFilledField(String name, String value) {
+		Field field = new FilledField(name, value);
+		fields.add(field);
+		return this;
+	}
 
 	@Override
 	public void fillFormFields(String serializedObj, FilledFormFields formFields) {
@@ -88,9 +103,11 @@ public class FieldsNode extends SingleTargetNode {
 	public String getNodeHtml(String rawInput) {
 		String html = new String();
 		for (Field field : fields) {
-			String type = field.type.toString();
-			html += field.description + ": <input type=\"" + type
-					+ "\" name=\"" + field.description + "\"><br>";
+			if (!(field instanceof FilledField)) {
+				String type = field.type.toString();
+				html += field.description + ": <input type=\"" + type
+						+ "\" name=\"" + field.description + "\"><br>";
+			}
 		}
 		return html;
 	}
@@ -112,7 +129,11 @@ public class FieldsNode extends SingleTargetNode {
 		for (Field field : fields) {
 			StoredSelection.Field storedField = new StoredSelection.Field();
 			storedField.name = field.name;
-			storedField.value = input.get(field.description);
+			if (field instanceof FilledField) {
+				storedField.value = ((FilledField) field).value;
+			} else {
+				storedField.value = input.get(field.description);
+			}
 			storedFields.add(storedField);
 		}
 		// convert list to plain array for storage
