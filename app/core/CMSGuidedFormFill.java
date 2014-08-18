@@ -1,5 +1,6 @@
 package core;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import models.data.FormDataStore;
 import models.data.InMemoryFormDataStore;
 import models.forms.CMSForm;
 import models.forms.ChangeOrderForm;
+import models.pdf.PDFFormFiller;
 import models.tree.CalculationNode;
 import models.tree.Node;
 
@@ -30,28 +32,47 @@ public class CMSGuidedFormFill {
 		return decisionMap.getDecision(root.id);
 	}
 
+	public static File getFormOutput(String owner) {
+		// Get user's form data
+		FormDataStore formDataStore = InMemoryFormDataStore.getInstance();
+		FormData formData = formDataStore.getFormData(owner);
+		
+		// Convert FormData to PDF
+		File filledPdf = getFilledPdf(formData);
+		
+		return filledPdf;
+	}
+	
+	private static File getFilledPdf(FormData formData) {
+		// fill fields along the path the user took through the decision tree
+		DecisionMap decisions = formData.decisionMap;
+		FilledFormFields fields = new FilledFormFields();
+		for (Decision decision : decisions) {
+			Node context = decision.context;
+			if (context.isOutputNode) {
+				context.fillFormFields(decision.rawInput, fields);
+			}
+		}
+		CMSForm form = ChangeOrderForm.getInstance();
+		PDFFormFiller ff = new PDFFormFiller();
+		return ff.fillForm(form, fields);
+	}
+
 	/**
 	 * Returns a list of decisions corresponding to the owner's path through the
 	 * decision tree. Only decisions that result in form output are listed.
 	 */
-	public static List<Decision> getFormOutput(String owner) {
+	public static List<Decision> getTestOutput(String owner) {
 		FormDataStore formDataStore = InMemoryFormDataStore.getInstance();
 		FormData formData = formDataStore.getFormData(owner);
 		DecisionMap decisions = formData.decisionMap;
 
 		List<Decision> formOutput = new ArrayList<>();
-		Node currNode = ChangeOrderForm.getInstance().getRoot();
-		Decision currDecision = decisions.getDecision(currNode.id);
-		while (currDecision != null) {
+		for (Decision currDecision : decisions) {
+			Node currNode = currDecision.context;
 			if (currNode.isOutputNode) {
 				formOutput.add(currDecision);
 			}
-			if (currDecision.next == null) {
-				break;
-			}
-			currNode = currDecision.next;
-			currDecision = decisions.getDecision(currNode.id);
-
 		}
 		return formOutput;
 	}

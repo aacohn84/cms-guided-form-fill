@@ -13,7 +13,7 @@ import static models.tree.CalculationNode.*;
 public class ChangeOrderForm extends CMSForm {
 	
 	static enum Fields {
-		// TODO: name each form field.
+		
 	}
 	
 	public static enum NodeDef {
@@ -131,13 +131,15 @@ public class ChangeOrderForm extends CMSForm {
 	}
 
 	private ChangeOrderForm() {
+		super("Change_Order_Form.pdf");
+		
 		root = new NoteNode("prerequisites_note", "change_order_type_choice",
 				"a note.");
 		addNode(root);
 
 		// What does the patron wish to do? (return/exchg, transfer, disinterment)
 		addNode(new ChoiceNode("change_order_type_choice",
-				"What does the patron wish to do?", "change_order_type_choice")
+				"What does the patron wish to do?", "Change Order Type")
 			.addChoice("Return/Exch", "Return", "curr_contract_value")
 			.addChoice("Transfer", "Assignment", "paid_in_full_choice_2")
 			.addChoice("Disinterment", "Disinterment", "none"));
@@ -152,7 +154,8 @@ public class ChangeOrderForm extends CMSForm {
 	private void returnExchg() {
 		// Return / Exchange
 		addNode(new FieldsNode("curr_contract_value", "curr_contract_balance_2")
-			.addField("Current contract value", "", FieldType.NUMBER));
+			.addField("Current contract value", "Contract Amount",
+					FieldType.NUMBER));
 		
 		addNode(new FieldsNode("curr_contract_balance_2", "return_inv_choice")
 			.addField("Current Contract Balance", "Contract Balance",
@@ -179,7 +182,7 @@ public class ChangeOrderForm extends CMSForm {
 				"transfer_type_choice", "Cash receipt reflecting balance."));
 
 		addNode(new ChoiceNode("transfer_type_choice", "Transfer Type: ",
-				"transfer_type_choice")
+				"Property Assignment")
 			.addChoice("Transfer", "Transfer of Ownership", "transfer_fee")
 			.addChoice("Donation", "Donation", "plot_fmv_2")
 			.addChoice("Release", "Release of Interest", "transfer_fee_waived_note"));
@@ -193,7 +196,7 @@ public class ChangeOrderForm extends CMSForm {
 
 	private void transferTransfer() {
 		addNode(new FeeNode("transfer_fee", "name_7",
-				"$300 fee applies to New Owner Transfer", "Admin/Return Fees",
+				"A fee applies to New Owner Transfer", "Admin/Return Fees",
 				new BigDecimal("300")));
 		
 		addNode(new FieldsNode("name_7", "loc_7")
@@ -214,8 +217,7 @@ public class ChangeOrderForm extends CMSForm {
 			.addField("Email", "Assignee Email", FieldType.TEXT));
 	
 		addNode(new FieldsNode("reason_7", "calc_7")
-			.addField("Reason for Change Order", "Reason for Change Order",
-					FieldType.TEXT));
+			.addField("Reason for Change Order", "Reason", FieldType.TEXT));
 		
 		addNode(new CalculationNode("calc_7", "done")
 			.addCalculatedField("Credit/Balance", new RefExpr(
@@ -225,7 +227,7 @@ public class ChangeOrderForm extends CMSForm {
 	private void transferDonation() {
 		addNode(new FieldsNode("plot_fmv_2", "name_8")
 			.addFilledField("Admin/Return Fees", "0")
-			.addField("Donation", "Donation", FieldType.NUMBER));
+			.addField("Donation", "Donation Amount", FieldType.NUMBER));
 	
 		addNode(new FieldsNode("name_8", "loc_8")
 			.addField("Patron Name", "Names", FieldType.TEXT));
@@ -239,8 +241,7 @@ public class ChangeOrderForm extends CMSForm {
 					FieldType.TEXT));
 	
 		addNode(new FieldsNode("reason_8", "done")
-			.addField("Reason for Change Order", "Reason for Change Order",
-					FieldType.TEXT));
+			.addField("Reason for Change Order", "Reason", FieldType.TEXT));
 	}
 
 	private void transferRelease() {
@@ -260,7 +261,6 @@ public class ChangeOrderForm extends CMSForm {
 					FieldType.TEXT));
 	
 		addNode(new FieldsNode("reason_9", "done")
-			.addField("Reason for Change Order", "Reason for Change Order",
-					FieldType.TEXT));
+			.addField("Reason for Change Order", "Reason", FieldType.TEXT));
 	}
 }

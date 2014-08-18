@@ -1,10 +1,9 @@
 package controllers;
 
-import java.util.List;
+import java.io.File;
 import java.util.Map;
 
 import models.data.Decision;
-import models.tree.Node;
 import play.data.Form;
 import play.mvc.Result;
 import views.html.questionnaire.backdrop;
@@ -27,9 +26,11 @@ public class FormFill extends SecureController {
 
 	public static Result getFormOutput() {
 		String username = getUsername();
-		List<Decision> formOutput = CMSGuidedFormFill.getFormOutput(username);
+		/*List<Decision> formOutput = CMSGuidedFormFill.getTestOutput(username);
 
-		return ok(views.html.questionnaire.output.render(formOutput));
+		return ok(views.html.questionnaire.output.render(formOutput));*/
+		File filledForm = CMSGuidedFormFill.getFormOutput(username);
+		return ok(filledForm, true);
 	}
 
 	/*
@@ -46,4 +47,5 @@ public class FormFill extends SecureController {
 
 		return ok(backdrop.render(nextDecision));
 	}
+	
 }

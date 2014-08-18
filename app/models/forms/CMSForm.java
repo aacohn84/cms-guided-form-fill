@@ -8,19 +8,16 @@ import java.util.Map.Entry;
 import models.tree.Node;
 
 public class CMSForm {
+	private String formFileName;
 	private HashMap<String, Node> nodes = new HashMap<>();
 	protected Node root;
 
-	public Node getRoot() {
-		return root;
+	public CMSForm(String formFileName) {
+		this.formFileName = formFileName;
 	}
 
-	void addNode(Node node) {
-		if (nodes.containsKey(node.id)) {
-			throw new RuntimeException("A node with the name " + node.id
-					+ " already exists in this form.");
-		}
-		nodes.put(node.id, node);
+	public String getFormFileName() {
+		return formFileName;
 	}
 
 	public Node getNode(String nodeId) {
@@ -44,5 +41,17 @@ public class CMSForm {
 			}
 		}
 		return outputNodes;
+	}
+
+	public Node getRoot() {
+		return root;
+	}
+
+	void addNode(Node node) {
+		if (nodes.containsKey(node.id)) {
+			throw new RuntimeException("A node with the name " + node.id
+					+ " already exists in this form.");
+		}
+		nodes.put(node.id, node);
 	}
 }
