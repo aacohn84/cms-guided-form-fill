@@ -1,11 +1,11 @@
-package models.tree;
+package models.tree.fields;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import models.data.FilledFormFields;
+import models.tree.SingleTargetNode;
 import play.twirl.api.Html;
 
 /**
@@ -16,50 +16,6 @@ import play.twirl.api.Html;
  * @author Aaron Cohn
  */
 public class FieldsNode extends SingleTargetNode {
-	private static class Field {
-		String description;
-		String name;
-		FieldType type;
-
-		public Field(String description, String name, FieldType type) {
-			this.description = description;
-			this.name = name;
-			this.type = type;
-		}
-	}
-	
-	private static class FilledField extends Field {
-		String value;
-		
-		public FilledField(String name, String value) {
-			super(null, name, FieldType.TEXT);
-			this.value = value;
-		}
-	}
-
-	public static enum FieldType {
-		NUMBER, TEXT;
-	}
-
-	/**
-	 * A data structure for storing the user's selection, intended to be
-	 * serialized and stored as a String.
-	 * 
-	 * @author Aaron Cohn
-	 */
-	private static class StoredSelection implements Serializable {
-		private static class Field implements Serializable {
-			private static final long serialVersionUID = -4801158335261387855L;
-
-			public String name;
-			public String value;
-		}
-
-		private static final long serialVersionUID = 1081518772940436931L;
-
-		Field[] fields;
-	}
-
 	List<Field> fields = new ArrayList<>();
 
 	public FieldsNode(String id, String idNext) {

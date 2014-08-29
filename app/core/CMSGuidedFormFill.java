@@ -109,7 +109,7 @@ public class CMSGuidedFormFill {
 		// save/update decision and fill/update form fields
 		prepNextDecision(formData.decisionMap, decision);
 		saveDecision(formData.decisionMap, decision);
-		if (currentNode.isOutputNode) { 
+		if (currentNode.isOutputNode) {
 			currentNode.fillFormFields(decision.rawInput, filledFormFields);
 		}
 		// update the FormData in the FormDataStore
@@ -130,7 +130,6 @@ public class CMSGuidedFormFill {
 	}
 
 	static void saveDecision(DecisionMap decisions, Decision decision) {
-		// TODO: Cache the DecisionQueue
 		Decision existingDecision = decisions.getDecision(decision.context.id);
 		Decision decisionToSave;
 		if (existingDecision != null) {

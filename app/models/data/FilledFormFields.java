@@ -40,7 +40,7 @@ public class FilledFormFields implements
 		}
 	}
 
-	public Map<String, String> filledFormFields;
+	private Map<String, String> filledFormFields;
 
 	public FilledFormFields() {
 		filledFormFields = new HashMap<String, String>();
