@@ -2,8 +2,11 @@ package models.forms;
 
 import java.math.BigDecimal;
 
+import models.data.FilledFormFields;
 import models.tree.CalculationNode;
 import models.tree.CalculationNode.BinaryExpr;
+import models.tree.CalculationNode.Condition;
+import models.tree.CalculationNode.ConditionalExpr;
 import models.tree.CalculationNode.NumExpr;
 import models.tree.CalculationNode.Operators;
 import models.tree.CalculationNode.RefExpr;
@@ -18,8 +21,43 @@ import models.tree.NoteNode;
 
 public class ChangeOrderForm extends CMSForm {
 
-	private static ChangeOrderForm instance;
+	private static final BinaryExpr twentyPercentOfContractAmount = new BinaryExpr(
+		new RefExpr(Field.contractAmount),
+		new NumExpr(new BigDecimal("0.20")),
+		Operators.MULTIPLY);
 
+	private static ChangeOrderForm instance;
+	
+	/*
+	 * The following private constants are objects that are reused throughout
+	 * the creation of the form.
+	 */
+	/**
+	 * satisfied if Field.adminReturnFees == 0.00
+	 */
+	private static final Condition adminReturnFeesCondition = new Condition() {
+		@Override
+		public boolean isSatisfied(FilledFormFields filledFormFields) {
+			try {
+				String adminReturnFees = filledFormFields.getFieldValue(Field.adminReturnFees);
+				BigDecimal returnFeeVal = new BigDecimal(adminReturnFees);
+				return (returnFeeVal.compareTo(BigDecimal.ZERO) == 0);
+			} catch (RuntimeException e) {
+				return false;
+			}
+		}
+	};
+	/**
+	 * <pre>if (Field.adminReturnFees == 0.00)
+	 *  	value -> 0.00
+	 *  else
+	 *  	value -> contractAmount * 0.20</pre>
+	 */
+	private static final ConditionalExpr conditionalAdminReturnFeesExpr = new ConditionalExpr(
+			new NumExpr(BigDecimal.ZERO),
+			twentyPercentOfContractAmount, 
+			adminReturnFeesCondition);
+	
 	public static ChangeOrderForm getInstance() {
 		if (instance == null) {
 			instance = new ChangeOrderForm();
@@ -190,7 +228,7 @@ public class ChangeOrderForm extends CMSForm {
 
 		addNode(new FieldsNode(Id.reason_2, Id.calc_2)
 			.addField("Reason for Change Order", "Reason", FieldType.TEXT));
-
+		
 		addNode(new CalculationNode(Id.calc_2, Id.apply_credit_choice)
 			/*
 			 *  Total to be Returned = Contract Amount - Contract Balance
@@ -204,10 +242,7 @@ public class ChangeOrderForm extends CMSForm {
 			 * Admin/Return Fees = Contract Amount * 20%
 			 */
 			.addCalculatedField(Field.adminReturnFees,
-				new BinaryExpr(
-					new RefExpr(Field.contractAmount),
-					new NumExpr(new BigDecimal("0.20")),
-					Operators.MULTIPLY))
+				conditionalAdminReturnFeesExpr)
 			/*
 			 *  Total Deductions = Admin/Return Fees
 			 */
@@ -246,7 +281,7 @@ public class ChangeOrderForm extends CMSForm {
 				new RefExpr(Field.contractBalance),
 				new RefExpr(Field.giftAmount),
 				Operators.SUBTRACT);
-
+		
 		addNode(new CalculationNode(Id.calc_3, Id.apply_credit_choice)
 			/* 
 			 * Total to be Returned = Contract Amt - Contract Bal - Gift Amt
@@ -260,10 +295,7 @@ public class ChangeOrderForm extends CMSForm {
 			 * Admin/Return Fees = Contract Amount * 0.20
 			 */
 			.addCalculatedField(Field.adminReturnFees,
-				new BinaryExpr(
-					new RefExpr(Field.contractAmount),
-					new NumExpr(new BigDecimal("0.20")),
-					Operators.MULTIPLY))
+				conditionalAdminReturnFeesExpr)
 			/*
 			 *  Total Deductions = Admin/Return Fees
 			 */
@@ -568,7 +600,7 @@ public class ChangeOrderForm extends CMSForm {
 	private void transferRelease() {
 		addNode(new FeeNode(Id.transfer_fee_waived_note, Id.name_9,
 				"Fee waived, no addt'l sigs", "Admin/Return Fees",
-				BigDecimal.ZERO));
+				new BigDecimal("0.00")));
 
 		addNode(new FieldsNode(Id.name_9, Id.loc_9)
 			.addField("Patron Name", "Names", FieldType.TEXT));

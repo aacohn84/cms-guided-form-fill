@@ -38,11 +38,11 @@ public class CalculationNode extends SingleTargetNode {
 		}
 
 		String value(FilledFormFields filledFormFields) {
-			return expr.value(filledFormFields).toString();
+			return expr.value(filledFormFields).setScale(2).toString();
 		}
 	}
 
-	static interface Expression {
+	public static interface Expression {
 		public BigDecimal value(FilledFormFields filledFormFields);
 	}
 
@@ -95,6 +95,101 @@ public class CalculationNode extends SingleTargetNode {
 		}
 	}
 
+	/**
+	 * Join multiple subexpressions by a common operation.
+	 * <p>
+	 * <strong>Ex:</strong><br>
+	 * e1 + e2 + ... + eN
+	 * </p>
+	 * 
+	 * @author Aaron Cohn
+	 */
+	public static class nAryExpr implements Expression {
+		private List<Expression> subExpressions;
+		private Operator operator;
+		
+		public nAryExpr(Operator operator) {
+			this.operator = operator;
+			this.subExpressions = new ArrayList<Expression>();
+		}
+		
+		public nAryExpr addExpr(Expression expression) {
+			subExpressions.add(expression);
+			return this;
+		}
+		
+		@Override
+		public BigDecimal value(FilledFormFields filledFormFields) {
+			if (subExpressions.isEmpty()) {
+				return BigDecimal.ZERO;
+			}
+			// get initial value
+			BigDecimal result = subExpressions.get(0).value(filledFormFields);
+			
+			// reduction (sum, product, difference) over all sub-expressions
+			int numExpressions = subExpressions.size();
+			for (int exprIndex = 1; exprIndex < numExpressions; exprIndex++) {
+				Expression expr = subExpressions.get(exprIndex);
+				result = operator.operate(result, expr.value(filledFormFields));
+			}
+			return result;
+		}
+	}
+
+	/**
+	 * Represents a conditional statement that can be satisfied.
+	 * 
+	 * @author Aaron Cohn
+	 */
+	public interface Condition {
+		/**
+		 * Returns <code>true</code> if the condition is satisfied.
+		 * 
+		 * @param filledFormFields
+		 *            - provided in case the condition depends on the value of a
+		 *            filled form field
+		 */
+		public boolean isSatisfied(FilledFormFields filledFormFields);
+	}
+
+	/**
+	 * Allows one expression to be evaluated over another in case a certain
+	 * condition is met.
+	 * 
+	 * @author Aaron Cohn
+	 */
+	public static class ConditionalExpr implements Expression {
+		private Expression exprTrue;
+		private Expression exprFalse;
+		private Condition condition;
+		
+		/**
+		 * Construct a condtional expression.
+		 * 
+		 * @param exprTrue
+		 *            - evaluated if condition is satisfied.
+		 * @param exprFalse
+		 *            - evaluated if condition is <i>not</i>
+		 *            satisfied.
+		 * @param condition
+		 *            - {@link Condition} to be checked.
+		 */
+		public ConditionalExpr(Expression exprTrue, Expression exprFalse,
+				Condition condition) {
+			this.exprTrue = exprTrue;
+			this.exprFalse = exprFalse;
+			this.condition = condition;
+		}
+		
+		@Override
+		public BigDecimal value(FilledFormFields filledFormFields) {
+			if (condition.isSatisfied(filledFormFields)) {
+				return exprTrue.value(filledFormFields);
+			}
+			return exprFalse.value(filledFormFields);
+		}
+	}
+	
 	public static class NumExpr implements Expression {
 		BigDecimal numVal;
 
