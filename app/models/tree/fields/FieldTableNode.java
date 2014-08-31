@@ -3,6 +3,8 @@ package models.tree.fields;
 import java.util.ArrayList;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import models.data.FilledFormFields;
 import models.tree.SingleTargetNode;
 import play.twirl.api.Html;
@@ -74,7 +76,13 @@ public class FieldTableNode extends SingleTargetNode {
 			for (int row = 1; row <= numRows; row++) {
 				StoredSelection.Field field = new StoredSelection.Field();
 				field.name = col.name + row;
-				field.value = input.get(field.name);
+				String inputVal = input.get(field.name);
+				if (StringUtils.isEmpty(inputVal)) {
+					field.value = col.type.defaultVal();
+				} else {
+					field.value = inputVal;
+				}
+				fields.add(field);
 			}
 		}
 		StoredSelection ss = new StoredSelection();
@@ -90,20 +98,20 @@ public class FieldTableNode extends SingleTargetNode {
 		for (Column c : columns) {
 			html += "<th>" + c.description + "</th>";
 		}
-		html += "</tr>";
+		html += "</tr>\n";
 		
 		// build rows of input fields
 		for (int row = 0; row < numRows; row++) {
+			html += "<tr>";
 			int numCols = columns.size();
 			for (int col = 0; col < numCols; col++) {
 				Column c = columns.get(col);
-				html += "<tr>";
 				html += "<td>" + "<input type=\"" + c.type.toString()
-						+ "\" name=\"" + (col + 1) + "\"" + "></td>";
+						+ "\" name=\"" + c.name + (row + 1) + "\"" + "></td>";
 			}
-			html += "</tr>";
+			html += "</tr>\n";
 		}
-		html += "</table>";
+		html += "</table>\n";
 		
 		return html;
 	}

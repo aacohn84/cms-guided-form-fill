@@ -89,8 +89,8 @@ public class CMSGuidedFormFill {
 			Map<String, String> requestData) {
 
 		/*
-		 * Retrieve the owner's form data first. We won't bother doing anything
-		 * else if this raises an exception.
+		 * Retrieve the owner's form data first. We won't bother continuing
+		 * if this raises an exception.
 		 */
 		FormDataStore formDataStore = InMemoryFormDataStore.getInstance();
 		FormData formData = formDataStore.getFormData(owner);
@@ -123,10 +123,10 @@ public class CMSGuidedFormFill {
 		 * not return its decision. Return the next one instead.
 		 */
 		Node nextNode = form.getNode(idNextNode);
-		if (nextNode instanceof CalculationNode) {
-			return makeDecision(owner, idNextNode, requestData);
+		if (nextNode.isVisible) {
+			return formData.decisionMap.getDecision(idNextNode);
 		}
-		return formData.decisionMap.getDecision(idNextNode);
+		return makeDecision(owner, idNextNode, requestData);
 	}
 
 	static void saveDecision(DecisionMap decisions, Decision decision) {
