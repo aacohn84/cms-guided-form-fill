@@ -358,6 +358,7 @@ public class ChangeOrderForm extends CMSForm {
 			.addCalculatedField(Field.totalToBeReturned, Expr.contractAmountMinusBalanceExpr)
 			/*
 			 *  Total Deductions = Admin/Return Fees + Credits/Discounts
+			 *  TODO: Original spec for this calculation is incorrect -- need to ask Chris about it
 			 */
 			.addCalculatedField(Field.totalDeductions, Expr.adminFeesPlusCredits)
 			/*
@@ -490,7 +491,7 @@ public class ChangeOrderForm extends CMSForm {
 
 	private void transferDonation() {
 		addNode(new FieldsNode(Id.plot_fmv_2, Id.name_8)
-			.addFilledField("Admin/Return Fees", "0")
+			.addFilledField("Admin/Return Fees", "0.00", FieldType.HIDDEN)
 			.addField("Donation", "Donation Amount", FieldType.NUMBER));
 
 		addNode(new FieldsNode(Id.name_8, Id.loc_8)

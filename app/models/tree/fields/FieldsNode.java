@@ -40,9 +40,9 @@ public class FieldsNode extends SingleTargetNode {
 		fields.add(field);
 		return this;
 	}
-	
-	public FieldsNode addFilledField(String name, String value) {
-		Field field = new FilledField(name, value);
+
+	public FieldsNode addFilledField(String name, String value, FieldType type) {
+		Field field = new FilledField(name, value, type);
 		fields.add(field);
 		return this;
 	}
@@ -59,13 +59,18 @@ public class FieldsNode extends SingleTargetNode {
 	public String getNodeHtml(String rawInput) {
 		String html = new String();
 		for (Field field : fields) {
-			if (!(field instanceof FilledField)) {
-				String type = field.type.toString();
-				html += field.description + ": <input type=\"" + type
-						+ "\" name=\"" + field.description + "\"><br>";
+			String fieldHtml = "<input type=\"" + field.type + "\" name=\""
+					+ field.description + "\">";
+			if (isNotHidden(field)) {
+				fieldHtml = field.description + ": " + fieldHtml + "<br>";
 			}
+			html += fieldHtml;
 		}
 		return html;
+	}
+
+	private boolean isNotHidden(Field field) {
+		return !field.type.equals(FieldType.HIDDEN);
 	}
 
 	@Override
