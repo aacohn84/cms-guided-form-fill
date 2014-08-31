@@ -20,44 +20,8 @@ import models.tree.NoteChecksABoxNode;
 import models.tree.NoteNode;
 
 public class ChangeOrderForm extends CMSForm {
-
-	private static final BinaryExpr twentyPercentOfContractAmount = new BinaryExpr(
-		new RefExpr(Field.contractAmount),
-		new NumExpr(new BigDecimal("0.20")),
-		Operators.MULTIPLY);
-
 	private static ChangeOrderForm instance;
-	
-	/*
-	 * The following private constants are objects that are reused throughout
-	 * the creation of the form.
-	 */
-	/**
-	 * satisfied if Field.adminReturnFees == 0.00
-	 */
-	private static final Condition adminReturnFeesCondition = new Condition() {
-		@Override
-		public boolean isSatisfied(FilledFormFields filledFormFields) {
-			try {
-				String adminReturnFees = filledFormFields.getFieldValue(Field.adminReturnFees);
-				BigDecimal returnFeeVal = new BigDecimal(adminReturnFees);
-				return (returnFeeVal.compareTo(BigDecimal.ZERO) == 0);
-			} catch (RuntimeException e) {
-				return false;
-			}
-		}
-	};
-	/**
-	 * <pre>if (Field.adminReturnFees == 0.00)
-	 *  	value -> 0.00
-	 *  else
-	 *  	value -> contractAmount * 0.20</pre>
-	 */
-	private static final ConditionalExpr conditionalAdminReturnFeesExpr = new ConditionalExpr(
-			new NumExpr(BigDecimal.ZERO),
-			twentyPercentOfContractAmount, 
-			adminReturnFeesCondition);
-	
+
 	public static ChangeOrderForm getInstance() {
 		if (instance == null) {
 			instance = new ChangeOrderForm();
@@ -234,27 +198,22 @@ public class ChangeOrderForm extends CMSForm {
 			 *  Total to be Returned = Contract Amount - Contract Balance
 			 */
 			.addCalculatedField(Field.totalToBeReturned,
-				new BinaryExpr(
-					new RefExpr(Field.contractAmount),
-					new RefExpr(Field.contractBalance),
-					Operators.SUBTRACT))
+				Expr.contractAmountMinusBalanceExpr)
 			/* 
+			 * If fee applies, then
 			 * Admin/Return Fees = Contract Amount * 20%
 			 */
 			.addCalculatedField(Field.adminReturnFees,
-				conditionalAdminReturnFeesExpr)
+				Expr.conditionalAdminReturnFees)
 			/*
 			 *  Total Deductions = Admin/Return Fees
 			 */
-			.addCalculatedField(Field.totalDeductions, new RefExpr(Field.adminReturnFees))
+			.addCalculatedField(Field.totalDeductions, Expr.adminReturnFeesExpr)
 			/*
 			 * Credit/Balance = Total to be Returned - Total Deductions
 			 */
 			.addCalculatedField(Field.creditBalance,
-				new BinaryExpr(
-					new RefExpr(Field.totalToBeReturned),
-					new RefExpr(Field.totalDeductions),
-					Operators.SUBTRACT)));
+				Expr.amtReturnedMinusDeductions));
 	}
 
 	private void returnIntermentRightsYes2() {
@@ -274,13 +233,6 @@ public class ChangeOrderForm extends CMSForm {
 
 		addNode(new FieldsNode(Id.reason_3, Id.calc_3)
 			.addField("Reason for Change Order", "Reason", FieldType.TEXT));
-
-		// sub-expressions to be used in the following calculation
-		final RefExpr contractAmount = new RefExpr(Field.contractAmount);
-		final BinaryExpr contractBalanceMinusGift = new BinaryExpr(
-				new RefExpr(Field.contractBalance),
-				new RefExpr(Field.giftAmount),
-				Operators.SUBTRACT);
 		
 		addNode(new CalculationNode(Id.calc_3, Id.apply_credit_choice)
 			/* 
@@ -288,27 +240,25 @@ public class ChangeOrderForm extends CMSForm {
 			 */
 			.addCalculatedField(Field.totalToBeReturned,
 				new BinaryExpr(
-					contractAmount,
-					contractBalanceMinusGift,
+					Expr.contractAmountMinusBalanceExpr,
+					new RefExpr(Field.giftAmount),
 					Operators.SUBTRACT))
 			/*
+			 * If fee applies, then
 			 * Admin/Return Fees = Contract Amount * 0.20
 			 */
 			.addCalculatedField(Field.adminReturnFees,
-				conditionalAdminReturnFeesExpr)
+				Expr.conditionalAdminReturnFees)
 			/*
 			 *  Total Deductions = Admin/Return Fees
 			 */
 			.addCalculatedField(Field.totalDeductions,
-					new RefExpr(Field.adminReturnFees))
+					Expr.adminReturnFeesExpr)
 			/* 
-			 * Credits/Discounts = Total to be Returned - Total Deductions
+			 * Credit/Balance = Total to be Returned - Total Deductions
 			 */
-			.addCalculatedField(Field.creditsDiscounts,
-				new BinaryExpr(
-					new RefExpr(Field.totalToBeReturned),
-					new RefExpr(Field.totalDeductions),
-					Operators.SUBTRACT)));
+			.addCalculatedField(Field.creditBalance,
+				Expr.amtReturnedMinusDeductions));
 	}
 
 	private void returnIntermentRightsNo() {
@@ -336,43 +286,30 @@ public class ChangeOrderForm extends CMSForm {
 		addNode(new FieldsNode(Id.reason_4, Id.calc_4)
 			.addField("Reason for Change Order", "Reason", FieldType.TEXT));
 
-		// expression to be used in the following calculation
-		nAryExpr itemsToBeReturnedExpr = new nAryExpr(Operators.ADD)
-			.addExpr(new RefExpr(Field.extendedPrice1))
-			.addExpr(new RefExpr(Field.extendedPrice2))
-			.addExpr(new RefExpr(Field.extendedPrice3))
-			.addExpr(new RefExpr(Field.extendedPrice4))
-			.addExpr(new RefExpr(Field.extendedPrice5));
-
 		addNode(new CalculationNode(Id.calc_4, Id.apply_credit_choice)
 			/*
 			 *  Total to be Returned = Items to be Returned - Contract Balance
 			 */
-			.addCalculatedField(Field.totalToBeReturned, new BinaryExpr(
-				itemsToBeReturnedExpr,
-				new RefExpr(Field.contractBalance),
-				Operators.SUBTRACT))
+			.addCalculatedField(Field.totalToBeReturned, Expr.sumItemsReturnedMinusContractBalance)
 			/* 
+			 * If admin fee applies, then
 			 * Admin/Return Fees = Items to be Returned * 20%
 			 */
-			.addCalculatedField(Field.adminReturnFees, new BinaryExpr(
-				itemsToBeReturnedExpr,
-				new NumExpr(new BigDecimal("0.20")),
-				Operators.MULTIPLY))
+			.addCalculatedField(Field.adminReturnFees, new ConditionalExpr(
+					Expr.zero,
+					new BinaryExpr(
+						Expr.sumItemsReturned,
+						Expr.twentyPercent,
+						Operators.MULTIPLY),
+					Expr.adminReturnFeesCondition))
 			/*
 			 *  Total Deductions = Admin/Return Fees + Credits/Discounts
 			 */
-			.addCalculatedField(Field.totalDeductions, new BinaryExpr(
-				new RefExpr(Field.adminReturnFees),
-				new RefExpr(Field.creditsDiscounts),
-				Operators.ADD))
+			.addCalculatedField(Field.totalDeductions, Expr.adminFeesPlusCredits)
 			/*
-			 * Credits/Discounts = Total to be Returned - Total Deductions
+			 * Credit/Balance = Total to be Returned - Total Deductions
 			 */
-			.addCalculatedField(Field.creditsDiscounts, new BinaryExpr(
-				new RefExpr(Field.totalToBeReturned),
-				new RefExpr(Field.totalDeductions),
-				Operators.SUBTRACT)));
+			.addCalculatedField(Field.creditBalance, Expr.amtReturnedMinusDeductions));
 	}
 
 	private void returnInventoryNo() {
@@ -418,24 +355,15 @@ public class ChangeOrderForm extends CMSForm {
 			/*
 			 *  Total to be Returned = Contract Amount - Contract Balance
 			 */
-			.addCalculatedField(Field.totalToBeReturned, new BinaryExpr(
-				new RefExpr(Field.contractAmount),
-				new RefExpr(Field.contractBalance),
-				Operators.SUBTRACT))
+			.addCalculatedField(Field.totalToBeReturned, Expr.contractAmountMinusBalanceExpr)
 			/*
 			 *  Total Deductions = Admin/Return Fees + Credits/Discounts
 			 */
-			.addCalculatedField(Field.totalDeductions, new BinaryExpr(
-				new RefExpr(Field.adminReturnFees),
-				new RefExpr(Field.creditsDiscounts),
-				Operators.ADD))
+			.addCalculatedField(Field.totalDeductions, Expr.adminFeesPlusCredits)
 			/*
-			 * Credits/Discounts = Total to be Returned - Total Deductions
+			 * Credit/Balance = Total to be Returned - Total Deductions
 			 */
-			.addCalculatedField(Field.creditsDiscounts, new BinaryExpr(
-				new RefExpr(Field.totalToBeReturned),
-				new RefExpr(Field.totalDeductions),
-				Operators.SUBTRACT)));
+			.addCalculatedField(Field.creditBalance, Expr.amtReturnedMinusDeductions));
 	}
 
 	private void returnGoodsNo() {
@@ -463,36 +391,19 @@ public class ChangeOrderForm extends CMSForm {
 		addNode(new FieldsNode(Id.reason_6, Id.calc_6)
 			.addField("Reason for Change Order", "Reason", FieldType.TEXT));
 
-		// expression to be used in the following calculation
-		nAryExpr itemsToBeReturnedExpr = new nAryExpr(Operators.ADD)
-			.addExpr(new RefExpr(Field.extendedPrice1))
-			.addExpr(new RefExpr(Field.extendedPrice2))
-			.addExpr(new RefExpr(Field.extendedPrice3))
-			.addExpr(new RefExpr(Field.extendedPrice4))
-			.addExpr(new RefExpr(Field.extendedPrice5));
-
 		addNode(new CalculationNode(Id.calc_6, Id.apply_credit_choice)
 			/*
 			 *  Total to be Returned = Items to be Returned - Contract Balance
 			 */
-			.addCalculatedField(Field.totalToBeReturned, new BinaryExpr(
-				itemsToBeReturnedExpr,
-				new RefExpr(Field.contractBalance),
-				Operators.SUBTRACT))
+			.addCalculatedField(Field.totalToBeReturned, Expr.sumItemsReturnedMinusContractBalance)
 			/*
 			 *  Total Deductions = Admin/Return Fees + Credits/Discounts
 			 */
-			.addCalculatedField(Field.totalDeductions, new BinaryExpr(
-				new RefExpr(Field.adminReturnFees),
-				new RefExpr(Field.creditsDiscounts),
-				Operators.ADD))
+			.addCalculatedField(Field.totalDeductions, Expr.adminFeesPlusCredits)
 			/*
-			 * Credits/Discounts = Total to be Returned - Total Deductions
+			 * Credit/Balance = Total to be Returned - Total Deductions
 			 */
-			.addCalculatedField(Field.creditsDiscounts, new BinaryExpr(
-				new RefExpr(Field.totalToBeReturned),
-				new RefExpr(Field.totalDeductions),
-				Operators.SUBTRACT)));
+			.addCalculatedField(Field.creditBalance, Expr.amtReturnedMinusDeductions));
 	}
 
 	private void applyCredit() {
@@ -676,294 +587,366 @@ public class ChangeOrderForm extends CMSForm {
 				"Efforts must be made to locate all parties to the original "
 				+ "contract!"));
 	}
+	
+	private static class Expr {
+		static final NumExpr zero = new NumExpr(BigDecimal.ZERO);
+
+		static final NumExpr twentyPercent = new NumExpr(new BigDecimal("0.20"));
+		
+		static final BinaryExpr amtReturnedMinusDeductions = new BinaryExpr(
+			new RefExpr(Field.totalToBeReturned),
+			new RefExpr(Field.totalDeductions),
+			Operators.SUBTRACT);
+		
+		static final BinaryExpr twentyPercentOfContractAmount = new BinaryExpr(
+			new RefExpr(Field.contractAmount),
+			Expr.twentyPercent,
+			Operators.MULTIPLY);
+		
+		// this condition satisfied if admin fee was waived (that is, fee == 0.00)
+		static final Condition adminReturnFeesCondition = new Condition() {
+			@Override
+			public boolean isSatisfied(FilledFormFields filledFormFields) {
+				try {
+					// return true if (fee == 0.00), false otherwise
+					String adminReturnFees = filledFormFields
+							.getFieldValue(Field.adminReturnFees);
+					BigDecimal returnFeeVal = new BigDecimal(adminReturnFees);
+					return (returnFeeVal.compareTo(BigDecimal.ZERO) == 0);
+				} catch (RuntimeException e) {
+					// field not filled (null); means the fee wasn't waived.
+					return false;
+				}
+			}
+		};
+
+		/**
+		 * <pre>
+		 * if (Field.adminReturnFees == 0.00)
+		 *     value -> 0.00
+		 * else
+		 *     value -> contractAmount * 0.20
+		 * </pre>
+		 */
+		static final ConditionalExpr conditionalAdminReturnFees = new ConditionalExpr(
+				Expr.zero,
+				twentyPercentOfContractAmount,
+				adminReturnFeesCondition);
+
+		static final nAryExpr sumItemsReturned = new nAryExpr(Operators.ADD)
+			.addExpr(new RefExpr(Field.extendedPrice1))
+			.addExpr(new RefExpr(Field.extendedPrice2))
+			.addExpr(new RefExpr(Field.extendedPrice3))
+			.addExpr(new RefExpr(Field.extendedPrice4))
+			.addExpr(new RefExpr(Field.extendedPrice5));
+
+		static final RefExpr contractBalance = new RefExpr(Field.contractBalance);
+
+		static final BinaryExpr contractAmountMinusBalanceExpr = new BinaryExpr(
+			new RefExpr(ChangeOrderForm.Field.contractAmount),
+			contractBalance,
+			Operators.SUBTRACT);
+
+		static final BinaryExpr sumItemsReturnedMinusContractBalance = new BinaryExpr(
+			sumItemsReturned,
+			contractBalance,
+			Operators.SUBTRACT);
+
+		static final RefExpr adminReturnFeesExpr = new RefExpr(Field.adminReturnFees);
+
+		static final BinaryExpr adminFeesPlusCredits = new BinaryExpr(
+			adminReturnFeesExpr,
+			new RefExpr(Field.creditsDiscounts),
+			Operators.ADD);
+	}
 
 	// Identifier of each node in the Change Order Form decision tree
 	@SuppressWarnings("unused")
 	private static class Id {
-		public final static String prerequisites_note = "prerequisites_note";
-		public final static String change_order_type_choice = "change_order_type_choice";
-		public final static String curr_contract_value = "curr_contract_value";
-		public final static String curr_contract_balance_1 = "curr_contract_balance_1";
-		public final static String curr_contract_balance_2 = "curr_contract_balance_2";
-		public final static String curr_contract_balance_3 = "curr_contract_balance_3";
-		public final static String paid_in_full_choice_1 = "paid_in_full_choice_1";
-		public final static String paid_in_full_choice_2 = "paid_in_full_choice_2";
-		public final static String cash_receipt_1 = "cash_receipt_1";
-		public final static String cash_receipt_2 = "cash_receipt_2";
-		public final static String return_inv_choice = "return_inv_choice";
-		public final static String property_owner_choice = "property_owner_choice";
-		public final static String property_owner_sig_note = "property_owner_sig_note";
-		public final static String disint_type_choice = "disint_type_choice";
-		public final static String disint_fee_1 = "disint_fee_1";
-		public final static String disint_fee_2 = "disint_fee_2";
-		public final static String disint_fee_3 = "disint_fee_3";
-		public final static String disint_fee_4 = "disint_fee_4";
-		public final static String name_1 = "name_1";
-		public final static String name_2 = "name_2";
-		public final static String name_3 = "name_3";
-		public final static String name_4 = "name_4";
-		public final static String name_5 = "name_5";
-		public final static String name_6 = "name_6";
-		public final static String name_7 = "name_7";
-		public final static String name_8 = "name_8";
-		public final static String name_9 = "name_9";
-		public final static String loc_1 = "loc_1";
-		public final static String loc_2 = "loc_2";
-		public final static String loc_3 = "loc_3";
-		public final static String loc_4 = "loc_4";
-		public final static String loc_5 = "loc_5";
-		public final static String loc_6 = "loc_6";
-		public final static String loc_7 = "loc_7";
-		public final static String loc_8 = "loc_8";
-		public final static String loc_9 = "loc_9";
-		public final static String orig_contract_num_1 = "orig_contract_num_1";
-		public final static String orig_contract_num_2 = "orig_contract_num_2";
-		public final static String orig_contract_num_3 = "orig_contract_num_3";
-		public final static String orig_contract_num_4 = "orig_contract_num_4";
-		public final static String orig_contract_num_5 = "orig_contract_num_5";
-		public final static String orig_contract_num_6 = "orig_contract_num_6";
-		public final static String orig_contract_num_7 = "orig_contract_num_7";
-		public final static String orig_contract_num_8 = "orig_contract_num_8";
-		public final static String orig_contract_num_9 = "orig_contract_num_9";
-		public final static String disint_info = "disint_info";
-		public final static String reason_1 = "reason_1";
-		public final static String reason_2 = "reason_2";
-		public final static String reason_3 = "reason_3";
-		public final static String reason_4 = "reason_4";
-		public final static String reason_5 = "reason_5";
-		public final static String reason_6 = "reason_6";
-		public final static String reason_7 = "reason_7";
-		public final static String reason_8 = "reason_8";
-		public final static String reason_9 = "reason_9";
-		public final static String calc_1 = "calc_1";
-		public final static String calc_2 = "calc_2";
-		public final static String calc_3 = "calc_3";
-		public final static String calc_4 = "calc_4";
-		public final static String calc_5 = "calc_5";
-		public final static String calc_6 = "calc_6";
-		public final static String calc_7 = "calc_7";
-		public final static String transfer_type_choice = "transfer_type_choice";
-		public final static String transfer_fee_note = "transfer_fee_note";
-		public final static String transfer_donation = "transfer_donation";
-		public final static String transfer_fee_waived_note = "transfer_fee_waived_note";
-		public final static String assignee_info = "assignee_info";
-		public final static String orig_contract_date_1 = "orig_contract_date_1";
-		public final static String orig_contract_date_2 = "orig_contract_date_2";
-		public final static String admin_fee_waived_1 = "admin_fee_waived_1";
-		public final static String admin_fee_waived_2 = "admin_fee_waived_2";
-		public final static String admin_fee_waived_3 = "admin_fee_waived_3";
-		public final static String admin_fee_waived_4 = "admin_fee_waived_4";
-		public final static String upgrade_exchg_choice_1 = "upgrade_exchg_choice_1";
-		public final static String upgrade_exchg_choice_2 = "upgrade_exchg_choice_2";
-		public final static String admin_fee_1 = "admin_fee_1";
-		public final static String admin_fee_2 = "admin_fee_2";
-		public final static String return_int_rights_choice = "return_int_rights_choice";
-		public final static String return_goods_choice = "return_goods_choice";
-		public final static String gift_amount = "gift_amount";
-		public final static String items_returned_1 = "items_returned_1";
-		public final static String items_returned_2 = "items_returned_2";
-		public final static String credits_discounts_1 = "credits_discounts_1";
-		public final static String credits_discounts_2 = "credits_discounts_2";
-		public final static String apply_credit_choice = "apply_credit_choice";
-		public final static String new_contract_note = "new_contract_note";
-		public final static String existing_contract_note = "existing_contract_note";
-		public final static String refund_request_note = "refund_request_note";
-		public final static String plot_fmv_1 = "plot_fmv_1";
-		public final static String plot_fmv_2 = "plot_fmv_2";
-		public final static String parties_avail_choice = "parties_avail_choice";
-		public final static String party_present_choice = "party_present_choice";
-		public final static String consult_ad_note = "consult_ad_note";
-		public final static String reason_party_unavail_choice = "reason_party_unavail_choice";
-		public final static String cfcs_burial_choice = "cfcs_burial_choice";
-		public final static String relocation_choice = "relocation_choice";
-		public final static String reasonable_effort_choice = "reasonable_effort_choice";
-		public final static String burial_evidence_note = "burial_evidence_note";
-		public final static String death_cert_note = "death_cert_note";
-		public final static String notary_sig_note = "notary_sig_note";
-		public final static String notarized_release_note = "notarized_release_note";
-		public final static String due_diligence_note = "due_diligence_note";
-		public final static String loc_all_parties_note = "loc_all_parties_note";
-		public final static String done = "done";
+		final static String prerequisites_note = "prerequisites_note";
+		final static String change_order_type_choice = "change_order_type_choice";
+		final static String curr_contract_value = "curr_contract_value";
+		final static String curr_contract_balance_1 = "curr_contract_balance_1";
+		final static String curr_contract_balance_2 = "curr_contract_balance_2";
+		final static String curr_contract_balance_3 = "curr_contract_balance_3";
+		final static String paid_in_full_choice_1 = "paid_in_full_choice_1";
+		final static String paid_in_full_choice_2 = "paid_in_full_choice_2";
+		final static String cash_receipt_1 = "cash_receipt_1";
+		final static String cash_receipt_2 = "cash_receipt_2";
+		final static String return_inv_choice = "return_inv_choice";
+		final static String property_owner_choice = "property_owner_choice";
+		final static String property_owner_sig_note = "property_owner_sig_note";
+		final static String disint_type_choice = "disint_type_choice";
+		final static String disint_fee_1 = "disint_fee_1";
+		final static String disint_fee_2 = "disint_fee_2";
+		final static String disint_fee_3 = "disint_fee_3";
+		final static String disint_fee_4 = "disint_fee_4";
+		final static String name_1 = "name_1";
+		final static String name_2 = "name_2";
+		final static String name_3 = "name_3";
+		final static String name_4 = "name_4";
+		final static String name_5 = "name_5";
+		final static String name_6 = "name_6";
+		final static String name_7 = "name_7";
+		final static String name_8 = "name_8";
+		final static String name_9 = "name_9";
+		final static String loc_1 = "loc_1";
+		final static String loc_2 = "loc_2";
+		final static String loc_3 = "loc_3";
+		final static String loc_4 = "loc_4";
+		final static String loc_5 = "loc_5";
+		final static String loc_6 = "loc_6";
+		final static String loc_7 = "loc_7";
+		final static String loc_8 = "loc_8";
+		final static String loc_9 = "loc_9";
+		final static String orig_contract_num_1 = "orig_contract_num_1";
+		final static String orig_contract_num_2 = "orig_contract_num_2";
+		final static String orig_contract_num_3 = "orig_contract_num_3";
+		final static String orig_contract_num_4 = "orig_contract_num_4";
+		final static String orig_contract_num_5 = "orig_contract_num_5";
+		final static String orig_contract_num_6 = "orig_contract_num_6";
+		final static String orig_contract_num_7 = "orig_contract_num_7";
+		final static String orig_contract_num_8 = "orig_contract_num_8";
+		final static String orig_contract_num_9 = "orig_contract_num_9";
+		final static String disint_info = "disint_info";
+		final static String reason_1 = "reason_1";
+		final static String reason_2 = "reason_2";
+		final static String reason_3 = "reason_3";
+		final static String reason_4 = "reason_4";
+		final static String reason_5 = "reason_5";
+		final static String reason_6 = "reason_6";
+		final static String reason_7 = "reason_7";
+		final static String reason_8 = "reason_8";
+		final static String reason_9 = "reason_9";
+		final static String calc_1 = "calc_1";
+		final static String calc_2 = "calc_2";
+		final static String calc_3 = "calc_3";
+		final static String calc_4 = "calc_4";
+		final static String calc_5 = "calc_5";
+		final static String calc_6 = "calc_6";
+		final static String calc_7 = "calc_7";
+		final static String transfer_type_choice = "transfer_type_choice";
+		final static String transfer_fee_note = "transfer_fee_note";
+		final static String transfer_donation = "transfer_donation";
+		final static String transfer_fee_waived_note = "transfer_fee_waived_note";
+		final static String assignee_info = "assignee_info";
+		final static String orig_contract_date_1 = "orig_contract_date_1";
+		final static String orig_contract_date_2 = "orig_contract_date_2";
+		final static String admin_fee_waived_1 = "admin_fee_waived_1";
+		final static String admin_fee_waived_2 = "admin_fee_waived_2";
+		final static String admin_fee_waived_3 = "admin_fee_waived_3";
+		final static String admin_fee_waived_4 = "admin_fee_waived_4";
+		final static String upgrade_exchg_choice_1 = "upgrade_exchg_choice_1";
+		final static String upgrade_exchg_choice_2 = "upgrade_exchg_choice_2";
+		final static String admin_fee_1 = "admin_fee_1";
+		final static String admin_fee_2 = "admin_fee_2";
+		final static String return_int_rights_choice = "return_int_rights_choice";
+		final static String return_goods_choice = "return_goods_choice";
+		final static String gift_amount = "gift_amount";
+		final static String items_returned_1 = "items_returned_1";
+		final static String items_returned_2 = "items_returned_2";
+		final static String credits_discounts_1 = "credits_discounts_1";
+		final static String credits_discounts_2 = "credits_discounts_2";
+		final static String apply_credit_choice = "apply_credit_choice";
+		final static String new_contract_note = "new_contract_note";
+		final static String existing_contract_note = "existing_contract_note";
+		final static String refund_request_note = "refund_request_note";
+		final static String plot_fmv_1 = "plot_fmv_1";
+		final static String plot_fmv_2 = "plot_fmv_2";
+		final static String parties_avail_choice = "parties_avail_choice";
+		final static String party_present_choice = "party_present_choice";
+		final static String consult_ad_note = "consult_ad_note";
+		final static String reason_party_unavail_choice = "reason_party_unavail_choice";
+		final static String cfcs_burial_choice = "cfcs_burial_choice";
+		final static String relocation_choice = "relocation_choice";
+		final static String reasonable_effort_choice = "reasonable_effort_choice";
+		final static String burial_evidence_note = "burial_evidence_note";
+		final static String death_cert_note = "death_cert_note";
+		final static String notary_sig_note = "notary_sig_note";
+		final static String notarized_release_note = "notarized_release_note";
+		final static String due_diligence_note = "due_diligence_note";
+		final static String loc_all_parties_note = "loc_all_parties_note";
+		final static String done = "done";
 	}
 
 	// Description associated with each node in the decision tree
 	@SuppressWarnings("unused")
 	private static class Desc {
-		public final static String prerequisites_note = "Before beginning the Change Order process, make sure you have the Patron’s original contract, and have performed all necessary verifications within HMIS (if applicable).";
-		public final static String change_order_type_choice = "What does the patron wish to do?";
-		public final static String curr_contract_value = "Is the original contract paid in full?";
+		final static String prerequisites_note = "Before beginning the Change Order process, make sure you have the Patron’s original contract, and have performed all necessary verifications within HMIS (if applicable).";
+		final static String change_order_type_choice = "What does the patron wish to do?";
+		final static String curr_contract_value = "Is the original contract paid in full?";
 		private final static String currContractBalance = "Please enter the outstanding contract balance.";
-		public final static String curr_contract_balance_1 = currContractBalance;
-		public final static String curr_contract_balance_2 = currContractBalance;
-		public final static String curr_contract_balance_3 = currContractBalance;
-		public final static String paid_in_full_choice_1 = "paid_in_full_choice_1";
-		public final static String paid_in_full_choice_2 = "paid_in_full_choice_2";
+		final static String curr_contract_balance_1 = currContractBalance;
+		final static String curr_contract_balance_2 = currContractBalance;
+		final static String curr_contract_balance_3 = currContractBalance;
+		final static String paid_in_full_choice_1 = "paid_in_full_choice_1";
+		final static String paid_in_full_choice_2 = "paid_in_full_choice_2";
 		private final static String cashReceipt = "Since the contract must be paid in full for this type of transaction, a cash receipt reflecting the outstanding balance must be included with the change order packet.";
-		public final static String cash_receipt_1 = cashReceipt;
-		public final static String cash_receipt_2 = cashReceipt;
-		public final static String return_inv_choice = "Is cemetery inventory (plot, crypt, niche) to be returned?";
-		public final static String property_owner_choice = "Does the property Owner(s) differ from the contract Patron(s)?";
-		public final static String property_owner_sig_note = "Since a disinterment is subject to the discretion of the property owners, they must be the signatory(s) on the change order.";
-		public final static String disint_type_choice = "Please select the type of disinterment that is to occur:";
+		final static String cash_receipt_1 = cashReceipt;
+		final static String cash_receipt_2 = cashReceipt;
+		final static String return_inv_choice = "Is cemetery inventory (plot, crypt, niche) to be returned?";
+		final static String property_owner_choice = "Does the property Owner(s) differ from the contract Patron(s)?";
+		final static String property_owner_sig_note = "Since a disinterment is subject to the discretion of the property owners, they must be the signatory(s) on the change order.";
+		final static String disint_type_choice = "Please select the type of disinterment that is to occur:";
 		private final static String disintFee = "A disinterment fee applies to this transaction.";
-		public final static String disint_fee_1 = disintFee;
-		public final static String disint_fee_2 = disintFee;
-		public final static String disint_fee_3 = disintFee;
-		public final static String disint_fee_4 = disintFee;
-		public final static String name_1 = "name_1";
-		public final static String name_2 = "name_2";
-		public final static String name_3 = "name_3";
-		public final static String name_4 = "name_4";
-		public final static String name_5 = "name_5";
-		public final static String name_6 = "name_6";
-		public final static String name_7 = "name_7";
-		public final static String name_8 = "name_8";
-		public final static String name_9 = "name_9";
-		public final static String loc_1 = "loc_1";
-		public final static String loc_2 = "loc_2";
-		public final static String loc_3 = "loc_3";
-		public final static String loc_4 = "loc_4";
-		public final static String loc_5 = "loc_5";
-		public final static String loc_6 = "loc_6";
-		public final static String loc_7 = "loc_7";
-		public final static String loc_8 = "loc_8";
-		public final static String loc_9 = "loc_9";
-		public final static String orig_contract = "orig_contract_num_1";
-		public final static String orig_contract_num_2 = "orig_contract_num_2";
-		public final static String orig_contract_num_3 = "orig_contract_num_3";
-		public final static String orig_contract_num_4 = "orig_contract_num_4";
-		public final static String orig_contract_num_5 = "orig_contract_num_5";
-		public final static String orig_contract_num_6 = "orig_contract_num_6";
-		public final static String orig_contract_num_7 = "orig_contract_num_7";
-		public final static String orig_contract_num_8 = "orig_contract_num_8";
-		public final static String orig_contract_num_9 = "orig_contract_num_9";
-		public final static String disint_info = "disint_info";
-		public final static String reason_1 = "reason_1";
-		public final static String reason_2 = "reason_2";
-		public final static String reason_3 = "reason_3";
-		public final static String reason_4 = "reason_4";
-		public final static String reason_5 = "reason_5";
-		public final static String reason_6 = "reason_6";
-		public final static String reason_7 = "reason_7";
-		public final static String reason_8 = "reason_8";
-		public final static String reason_9 = "reason_9";
-		public final static String calc_1 = "calc_1";
-		public final static String calc_2 = "calc_2";
-		public final static String calc_3 = "calc_3";
-		public final static String calc_4 = "calc_4";
-		public final static String calc_5 = "calc_5";
-		public final static String calc_6 = "calc_6";
-		public final static String calc_7 = "calc_7";
-		public final static String transfer_type_choice = "transfer_type_choice";
-		public final static String transfer_fee_note = "transfer_fee_note";
-		public final static String transfer_donation = "transfer_donation";
-		public final static String transfer_fee_waived_note = "transfer_fee_waived_note";
-		public final static String assignee_info = "assignee_info";
-		public final static String orig_contract_date_1 = "orig_contract_date_1";
-		public final static String orig_contract_date_2 = "orig_contract_date_2";
-		public final static String admin_fee_waived_1 = "admin_fee_waived_1";
-		public final static String admin_fee_waived_2 = "admin_fee_waived_2";
-		public final static String admin_fee_waived_3 = "admin_fee_waived_3";
-		public final static String admin_fee_waived_4 = "admin_fee_waived_4";
-		public final static String upgrade_exchg_choice_1 = "upgrade_exchg_choice_1";
-		public final static String upgrade_exchg_choice_2 = "upgrade_exchg_choice_2";
-		public final static String admin_fee_1 = "admin_fee_1";
-		public final static String admin_fee_2 = "admin_fee_2";
-		public final static String return_int_rights_choice = "return_int_rights_choice";
-		public final static String return_goods_choice = "return_goods_choice";
-		public final static String gift_amount = "gift_amount";
-		public final static String items_returned_1 = "items_returned_1";
-		public final static String items_returned_2 = "items_returned_2";
-		public final static String credits_discounts_1 = "credits_discounts_1";
-		public final static String credits_discounts_2 = "credits_discounts_2";
-		public final static String apply_credit_choice = "apply_credit_choice";
-		public final static String new_contract_note = "new_contract_note";
-		public final static String existing_contract_note = "existing_contract_note";
-		public final static String refund_request_note = "refund_request_note";
-		public final static String plot_fmv_1 = "plot_fmv_1";
-		public final static String plot_fmv_2 = "plot_fmv_2";
-		public final static String parties_avail_choice = "parties_avail_choice";
-		public final static String party_present_choice = "party_present_choice";
-		public final static String consult_ad_note = "consult_ad_note";
-		public final static String reason_party_unavail_choice = "reason_party_unavail_choice";
-		public final static String cfcs_burial_choice = "cfcs_burial_choice";
-		public final static String relocation_choice = "relocation_choice";
-		public final static String reasonable_effort_choice = "reasonable_effort_choice";
-		public final static String burial_evidence_note = "burial_evidence_note";
-		public final static String death_cert_note = "death_cert_note";
-		public final static String notary_sig_note = "notary_sig_note";
-		public final static String notarized_release_note = "notarized_release_note";
-		public final static String due_diligence_note = "due_diligence_note";
-		public final static String loc_all_parties_note = "loc_all_parties_note";
-		public final static String done = "done";
+		final static String disint_fee_1 = disintFee;
+		final static String disint_fee_2 = disintFee;
+		final static String disint_fee_3 = disintFee;
+		final static String disint_fee_4 = disintFee;
+		final static String name_1 = "name_1";
+		final static String name_2 = "name_2";
+		final static String name_3 = "name_3";
+		final static String name_4 = "name_4";
+		final static String name_5 = "name_5";
+		final static String name_6 = "name_6";
+		final static String name_7 = "name_7";
+		final static String name_8 = "name_8";
+		final static String name_9 = "name_9";
+		final static String loc_1 = "loc_1";
+		final static String loc_2 = "loc_2";
+		final static String loc_3 = "loc_3";
+		final static String loc_4 = "loc_4";
+		final static String loc_5 = "loc_5";
+		final static String loc_6 = "loc_6";
+		final static String loc_7 = "loc_7";
+		final static String loc_8 = "loc_8";
+		final static String loc_9 = "loc_9";
+		final static String orig_contract = "orig_contract_num_1";
+		final static String orig_contract_num_2 = "orig_contract_num_2";
+		final static String orig_contract_num_3 = "orig_contract_num_3";
+		final static String orig_contract_num_4 = "orig_contract_num_4";
+		final static String orig_contract_num_5 = "orig_contract_num_5";
+		final static String orig_contract_num_6 = "orig_contract_num_6";
+		final static String orig_contract_num_7 = "orig_contract_num_7";
+		final static String orig_contract_num_8 = "orig_contract_num_8";
+		final static String orig_contract_num_9 = "orig_contract_num_9";
+		final static String disint_info = "disint_info";
+		final static String reason_1 = "reason_1";
+		final static String reason_2 = "reason_2";
+		final static String reason_3 = "reason_3";
+		final static String reason_4 = "reason_4";
+		final static String reason_5 = "reason_5";
+		final static String reason_6 = "reason_6";
+		final static String reason_7 = "reason_7";
+		final static String reason_8 = "reason_8";
+		final static String reason_9 = "reason_9";
+		final static String calc_1 = "calc_1";
+		final static String calc_2 = "calc_2";
+		final static String calc_3 = "calc_3";
+		final static String calc_4 = "calc_4";
+		final static String calc_5 = "calc_5";
+		final static String calc_6 = "calc_6";
+		final static String calc_7 = "calc_7";
+		final static String transfer_type_choice = "transfer_type_choice";
+		final static String transfer_fee_note = "transfer_fee_note";
+		final static String transfer_donation = "transfer_donation";
+		final static String transfer_fee_waived_note = "transfer_fee_waived_note";
+		final static String assignee_info = "assignee_info";
+		final static String orig_contract_date_1 = "orig_contract_date_1";
+		final static String orig_contract_date_2 = "orig_contract_date_2";
+		final static String admin_fee_waived_1 = "admin_fee_waived_1";
+		final static String admin_fee_waived_2 = "admin_fee_waived_2";
+		final static String admin_fee_waived_3 = "admin_fee_waived_3";
+		final static String admin_fee_waived_4 = "admin_fee_waived_4";
+		final static String upgrade_exchg_choice_1 = "upgrade_exchg_choice_1";
+		final static String upgrade_exchg_choice_2 = "upgrade_exchg_choice_2";
+		final static String admin_fee_1 = "admin_fee_1";
+		final static String admin_fee_2 = "admin_fee_2";
+		final static String return_int_rights_choice = "return_int_rights_choice";
+		final static String return_goods_choice = "return_goods_choice";
+		final static String gift_amount = "gift_amount";
+		final static String items_returned_1 = "items_returned_1";
+		final static String items_returned_2 = "items_returned_2";
+		final static String credits_discounts_1 = "credits_discounts_1";
+		final static String credits_discounts_2 = "credits_discounts_2";
+		final static String apply_credit_choice = "apply_credit_choice";
+		final static String new_contract_note = "new_contract_note";
+		final static String existing_contract_note = "existing_contract_note";
+		final static String refund_request_note = "refund_request_note";
+		final static String plot_fmv_1 = "plot_fmv_1";
+		final static String plot_fmv_2 = "plot_fmv_2";
+		final static String parties_avail_choice = "parties_avail_choice";
+		final static String party_present_choice = "party_present_choice";
+		final static String consult_ad_note = "consult_ad_note";
+		final static String reason_party_unavail_choice = "reason_party_unavail_choice";
+		final static String cfcs_burial_choice = "cfcs_burial_choice";
+		final static String relocation_choice = "relocation_choice";
+		final static String reasonable_effort_choice = "reasonable_effort_choice";
+		final static String burial_evidence_note = "burial_evidence_note";
+		final static String death_cert_note = "death_cert_note";
+		final static String notary_sig_note = "notary_sig_note";
+		final static String notarized_release_note = "notarized_release_note";
+		final static String due_diligence_note = "due_diligence_note";
+		final static String loc_all_parties_note = "loc_all_parties_note";
+		final static String done = "done";
 	}
 
 	// Names of fillable form fields in the Change Order form PDF
 	@SuppressWarnings("unused")
 	private static class Field {
-		public final static String changeOrderType = "Change Order Type";
-		public final static String return_ = "Return";
-		public final static String assignment = "Assignment";
-		public final static String disinterment = "Disinterment";
-		public final static String names = "Names";
-		public final static String address = "Address";
-		public final static String phone = "Phone";
-		public final static String email = "Email";
-		public final static String cemetery = "Cemetery";
-		public final static String location = "Location";
-		public final static String origContractNum = "Orig Contract";
-		public final static String contractAmount = "Contract Amount";
-		public final static String contractBalance = "Contract Balance";
-		public final static String reason = "Reason";
-		public final static String itemCodeBase = "Item Code ";
-		public final static String itemCode1 = itemCodeBase + "1";
-		public final static String itemCode2 = itemCodeBase + "2";
-		public final static String itemCode3 = itemCodeBase + "3";
-		public final static String itemCode4 = itemCodeBase + "4";
-		public final static String itemCode5 = itemCodeBase + "5";
-		public final static String descriptionBase = "Description ";
-		public final static String description1 = descriptionBase + "1";
-		public final static String description2 = descriptionBase + "2";
-		public final static String description3 = descriptionBase + "3";
-		public final static String description4 = descriptionBase + "4";
-		public final static String description5 = descriptionBase + "5";
-		public final static String extendedPriceBase = "Extended Price ";
-		public final static String extendedPrice1 = extendedPriceBase + "1";
-		public final static String extendedPrice2 = extendedPriceBase + "2";
-		public final static String extendedPrice3 = extendedPriceBase + "3";
-		public final static String extendedPrice4 = extendedPriceBase + "4";
-		public final static String extendedPrice5 = extendedPriceBase + "5";
-		public final static String giftAmount = "Gift Amount";
-		public final static String adminReturnFees = "Admin/Return Fees";
-		public final static String creditsDiscounts = "Credits/Discounts";
-		public final static String totalToBeReturned = "Total to be Returned";
-		public final static String applyCredit = "Apply Credit";
-		public final static String newContract = "New Contract";
-		public final static String existingContract = "Existing Contract";
-		public final static String refund = "Refund";
-		public final static String totalDeductions = "Total Deductions";
-		public final static String creditBalance = "Credit/Balance";
-		public final static String propertyAssignment = "Property Assignment";
-		public final static String transferOfOwnership = "Transfer of Ownership";
-		public final static String releaseOfInterest = "Release of Interest";
-		public final static String donation = "Donation";
-		public final static String donationAmount = "Donation Amount";
-		public final static String assigneeNames = "Assignee Names";
-		public final static String assigneeAddress = "Assignee Address";
-		public final static String assigneePhone = "Assignee Phone";
-		public final static String assigneeEmail = "Assignee Email";
-		public final static String decedents = "Decedents";
-		public final static String placeOfFinalDisposition = "Place of Final Disposition";
-		public final static String cfcsReIntermentLocation = "CFCS ReInterment Location";
-		public final static String cfcsReIntermentCemetery = "CFCS ReInterment Cemetery";
-		public final static String notarySignature = "Notary Signature";
-		public final static String originalContract = "Original Contract";
-		public final static String deathCertificate = "Death Certificate";
-		public final static String cashReceipt = "Cash Receipt";
-		public final static String signedNotarizedRelease = "Signed/Notarized Release";
-		public final static String donationLetter = "Donation Letter";
-		public final static String statementOfDueDiligenceForm = "Statement of Due Diligence Form";
-		public final static String evidenceOfBurial = "Evidence of Burial";
-		public final static String newExistingContract = "New/Existing Contract";
+		final static String changeOrderType = "Change Order Type";
+		final static String return_ = "Return";
+		final static String assignment = "Assignment";
+		final static String disinterment = "Disinterment";
+		final static String names = "Names";
+		final static String address = "Address";
+		final static String phone = "Phone";
+		final static String email = "Email";
+		final static String cemetery = "Cemetery";
+		final static String location = "Location";
+		final static String origContractNum = "Orig Contract";
+		final static String contractAmount = "Contract Amount";
+		final static String contractBalance = "Contract Balance";
+		final static String reason = "Reason";
+		final static String itemCodeBase = "Item Code ";
+		final static String itemCode1 = itemCodeBase + "1";
+		final static String itemCode2 = itemCodeBase + "2";
+		final static String itemCode3 = itemCodeBase + "3";
+		final static String itemCode4 = itemCodeBase + "4";
+		final static String itemCode5 = itemCodeBase + "5";
+		final static String descriptionBase = "Description ";
+		final static String description1 = descriptionBase + "1";
+		final static String description2 = descriptionBase + "2";
+		final static String description3 = descriptionBase + "3";
+		final static String description4 = descriptionBase + "4";
+		final static String description5 = descriptionBase + "5";
+		final static String extendedPriceBase = "Extended Price ";
+		final static String extendedPrice1 = extendedPriceBase + "1";
+		final static String extendedPrice2 = extendedPriceBase + "2";
+		final static String extendedPrice3 = extendedPriceBase + "3";
+		final static String extendedPrice4 = extendedPriceBase + "4";
+		final static String extendedPrice5 = extendedPriceBase + "5";
+		final static String giftAmount = "Gift Amount";
+		final static String adminReturnFees = "Admin/Return Fees";
+		final static String creditsDiscounts = "Credits/Discounts";
+		final static String totalToBeReturned = "Total to be Returned";
+		final static String applyCredit = "Apply Credit";
+		final static String newContract = "New Contract";
+		final static String existingContract = "Existing Contract";
+		final static String refund = "Refund";
+		final static String totalDeductions = "Total Deductions";
+		final static String creditBalance = "Credit/Balance";
+		final static String propertyAssignment = "Property Assignment";
+		final static String transferOfOwnership = "Transfer of Ownership";
+		final static String releaseOfInterest = "Release of Interest";
+		final static String donation = "Donation";
+		final static String donationAmount = "Donation Amount";
+		final static String assigneeNames = "Assignee Names";
+		final static String assigneeAddress = "Assignee Address";
+		final static String assigneePhone = "Assignee Phone";
+		final static String assigneeEmail = "Assignee Email";
+		final static String decedents = "Decedents";
+		final static String placeOfFinalDisposition = "Place of Final Disposition";
+		final static String cfcsReIntermentLocation = "CFCS ReInterment Location";
+		final static String cfcsReIntermentCemetery = "CFCS ReInterment Cemetery";
+		final static String notarySignature = "Notary Signature";
+		final static String originalContract = "Original Contract";
+		final static String deathCertificate = "Death Certificate";
+		final static String cashReceipt = "Cash Receipt";
+		final static String signedNotarizedRelease = "Signed/Notarized Release";
+		final static String donationLetter = "Donation Letter";
+		final static String statementOfDueDiligenceForm = "Statement of Due Diligence Form";
+		final static String evidenceOfBurial = "Evidence of Burial";
+		final static String newExistingContract = "New/Existing Contract";
 	}
 }

@@ -24,11 +24,11 @@ public class FormFill extends SecureController {
 		return ok(backdrop.render(firstDecision));
 	}
 
+	/*
+	 * Provides a filled PDF for viewing/editing/printing
+	 */
 	public static Result getFormOutput() {
 		String username = getUsername();
-		/*List<Decision> formOutput = CMSGuidedFormFill.getTestOutput(username);
-
-		return ok(views.html.questionnaire.output.render(formOutput));*/
 		File filledForm = CMSGuidedFormFill.getFormOutput(username);
 		return ok(filledForm, true);
 	}
