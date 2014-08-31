@@ -18,10 +18,10 @@ import play.twirl.api.Html;
  * @author Aaron Cohn
  */
 public abstract class Node {
-
 	public String description = "";
 	public String id = "";
 	public boolean isOutputNode = false;
+	public boolean isVisible = true;
 
 	public Node(String id, String description) {
 		this.id = id;
@@ -32,6 +32,14 @@ public abstract class Node {
 		this.id = id;
 		this.description = description;
 		this.isOutputNode = isOutputNode;
+	}
+	
+	public Node(String id, String description, boolean isOutputNode,
+			boolean isVisible) {
+		this.id = id;
+		this.description = description;
+		this.isOutputNode = isOutputNode;
+		this.isVisible = isVisible;
 	}
 
 	/**

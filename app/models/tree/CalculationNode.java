@@ -221,7 +221,7 @@ public class CalculationNode extends SingleTargetNode {
 	public List<CalculatedField> calculatedFields = new ArrayList<>();
 
 	public CalculationNode(String id, String idNext) {
-		super(id, idNext, "", true);
+		super(id, idNext, "", true, false);
 	}
 
 	public CalculationNode addCalculatedField(String name, Expression expr) {
