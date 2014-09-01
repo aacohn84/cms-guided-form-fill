@@ -8,6 +8,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDField;
 
+import play.Logger;
 import models.data.FilledFormFields;
 import models.data.FilledFormFields.FilledFormField;
 import models.forms.CMSForm;
@@ -15,6 +16,7 @@ import models.forms.CMSForm;
 public class PDFFormFiller {
 	public File fillForm(CMSForm form, FilledFormFields formFields) {
 		String formFileName = form.getFormFileName();
+		File temp;
 		try {
 			// load PDF form
 			PDDocument pdfDoc = PDDocument.load(formFileName);
@@ -30,11 +32,13 @@ public class PDFFormFiller {
 							+ formFileName + "]");
 				}
 				pdField.setValue(formField.value);
-				pdfDoc.save(formFileName + "_filled.pdf");
 			}
-		} catch (IOException | COSVisitorException e) {
+			temp = File.createTempFile("Change_Order_Form_Filled", ".pdf");
+			pdfDoc.save(temp);
+			Logger.debug("Filled PDF @ " + temp.getAbsolutePath());
+		} catch (IOException | SecurityException | COSVisitorException e) {
 			throw new RuntimeException(e);
 		}
-		return new File(formFileName + "_filled.pdf");
+		return temp;
 	}
 }

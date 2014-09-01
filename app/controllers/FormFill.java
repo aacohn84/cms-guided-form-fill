@@ -6,6 +6,7 @@ import java.util.Map;
 import models.data.Decision;
 import play.data.Form;
 import play.mvc.Result;
+import util.FileDeletionHandler;
 import views.html.questionnaire.backdrop;
 import core.CMSGuidedFormFill;
 
@@ -30,7 +31,9 @@ public class FormFill extends SecureController {
 	public static Result getFormOutput() {
 		String username = getUsername();
 		File filledForm = CMSGuidedFormFill.getFormOutput(username);
-		return ok(filledForm, true);
+		Status result = ok(filledForm, true);
+		FileDeletionHandler.deleteFile(filledForm);
+		return result;
 	}
 
 	/*
@@ -47,5 +50,5 @@ public class FormFill extends SecureController {
 
 		return ok(backdrop.render(nextDecision));
 	}
-	
+
 }

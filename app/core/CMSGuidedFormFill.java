@@ -54,8 +54,8 @@ public class CMSGuidedFormFill {
 			}
 		}
 		CMSForm form = ChangeOrderForm.getInstance();
-		PDFFormFiller ff = new PDFFormFiller();
-		return ff.fillForm(form, fields);
+		PDFFormFiller formFiller = new PDFFormFiller();
+		return formFiller.fillForm(form, fields);
 	}
 
 	/**
