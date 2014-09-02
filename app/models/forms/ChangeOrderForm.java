@@ -35,14 +35,14 @@ public class ChangeOrderForm extends CMSForm {
 
 		// decision tree definition
 		root = new NoteNode(Id.prerequisites_note,
-				Id.change_order_type_choice, "a note.");
+				Id.change_order_type_choice, Desc.prerequisites_note);
 		addNode(root);
 		
 		addNode(new ChoiceNode(Id.change_order_type_choice,
-				"What does the patron wish to do?", "Change Order Type")
-			.addChoice("Return/Exch", "Return", Id.curr_contract_value)
-			.addChoice("Transfer", "Assignment", Id.paid_in_full_choice_2)
-			.addChoice("Disinterment", "Disinterment", Id.paid_in_full_choice_1));
+				Desc.change_order_type_choice, Field.changeOrderType)
+			.addChoice("Return/Exch", Field.return_, Id.curr_contract_value)
+			.addChoice("Transfer", Field.assignment, Id.paid_in_full_choice_2)
+			.addChoice("Disinterment", Field.disinterment, Id.paid_in_full_choice_1));
 
 		returnExchg();
 
@@ -56,18 +56,12 @@ public class ChangeOrderForm extends CMSForm {
 	}
 
 	private void disinterment() {
-		addNode(new ChoiceNode(Id.paid_in_full_choice_1,
-				"Is the original contract paid in full?")
-			.addChoice("Yes", Id.property_owner_choice)
-			.addChoice("No", Id.curr_contract_balance_1));
+		addNode(Node.paidInFullChoice(Id.paid_in_full_choice_1,
+				Id.property_owner_choice, Id.curr_contract_balance_1));
 
-		addNode(new FieldsNode(Id.curr_contract_balance_1, Id.cash_receipt_1)
-			.addField("Current Contract Balance", "Contract Balance",
-				FieldType.NUMBER));
+		addNode(Node.currContractBalance(Id.curr_contract_balance_1, Id.cash_receipt_1));
 
-		addNode(new NoteChecksABoxNode(Id.cash_receipt_1,
-				Id.property_owner_choice, Field.cashReceipt,
-				Desc.cash_receipt_1));
+		addNode(Node.cashReceipt(Id.cash_receipt_1, Id.property_owner_choice));
 
 		disintermentPropertyOwnerChoice();
 	}
@@ -90,31 +84,18 @@ public class ChangeOrderForm extends CMSForm {
 			.addChoice("Urn", Id.disint_fee_3)
 			.addChoice("Infant", Id.disint_fee_4));
 
-		addNode(new FeeNode(Id.disint_fee_1, Id.name_1, Desc.disint_fee_1,
-				Field.adminReturnFees, new BigDecimal("1950.00")));
-
-		addNode(new FeeNode(Id.disint_fee_2, Id.name_1, Desc.disint_fee_2,
-				Field.adminReturnFees, new BigDecimal("1350.00")));
-
-		addNode(new FeeNode(Id.disint_fee_3, Id.name_1, Desc.disint_fee_3,
-				Field.adminReturnFees, new BigDecimal("750.00")));
-
-		addNode(new FeeNode(Id.disint_fee_4, Id.name_1, Desc.disint_fee_4,
-				Field.adminReturnFees, new BigDecimal("500.00")));
+		addNode(Node.disintFee(Id.disint_fee_1, new BigDecimal("1950.00")));
+		addNode(Node.disintFee(Id.disint_fee_2, new BigDecimal("1350.00")));
+		addNode(Node.disintFee(Id.disint_fee_3, new BigDecimal("750.00")));
+		addNode(Node.disintFee(Id.disint_fee_4, new BigDecimal("500.00")));
 
 		disintermentInfo();
 	}
 
 	private void disintermentInfo() {
-		addNode(new FieldsNode(Id.name_1, Id.loc_1)
-			.addField("Patron Name", Field.names, FieldType.TEXT));
-
-		addNode(new FieldsNode(Id.loc_1, Id.orig_contract_num_1 )
-			.addField("Cemetery", Field.cemetery, FieldType.TEXT)
-			.addField("Location", Field.location, FieldType.TEXT));
-
-		addNode(new FieldsNode(Id.orig_contract_num_1, Id.disint_info)
-			.addField("Original Contract Number", Field.origContractNum, FieldType.TEXT));
+		addNode(Node.name(Id.name_1, Id.loc_1));
+		addNode(Node.loc(Id.loc_1, Id.orig_contract_num_1));
+		addNode(Node.origContractNum(Id.orig_contract_num_1, Id.disint_info));
 
 		addNode(new FieldsNode(Id.disint_info, Id.reason_1)
 			.addField("Decedent(s)", Field.decedents, FieldType.TEXT)
@@ -122,25 +103,21 @@ public class ChangeOrderForm extends CMSForm {
 			.addField("CFCS Re-Interment Location", Field.cfcsReIntermentLocation, FieldType.TEXT)
 			.addField("Cemetery", Field.cfcsReIntermentCemetery, FieldType.TEXT));
 
-		addNode(new FieldsNode(Id.reason_1, Id.calc_1)
-			.addField("Reason for Change Order", Field.reason, FieldType.TEXT));
+		addNode(Node.reason(Id.reason_1, Id.calc_1));
 
 		addNode(new CalculationNode(Id.calc_1, Id.parties_avail_choice)
-			.addCalculatedField("Credit/Balance", new RefExpr("Admin/Return Fees")));
+			.addCalculatedField(Field.creditBalance, new RefExpr(Field.adminReturnFees)));
 	}
 
 	private void returnExchg() {
 		addNode(new FieldsNode(Id.curr_contract_value,
 				Id.curr_contract_balance_2)
-			.addField("Current contract value", "Contract Amount",
-					FieldType.NUMBER));
+			.addField("Current contract value", Field.contractAmount, FieldType.NUMBER));
 
-		addNode(new FieldsNode(Id.curr_contract_balance_2, Id.return_inv_choice)
-			.addField("Current Contract Balance", "Contract Balance",
-					FieldType.NUMBER));
+		addNode(Node.currContractBalance(Id.curr_contract_balance_2,
+				Id.return_inv_choice));
 
-		addNode(new ChoiceNode(Id.return_inv_choice,
-				"Is inventory to be returned?")
+		addNode(new ChoiceNode(Id.return_inv_choice, Desc.return_inv_choice)
 			.addChoice("Yes", Id.orig_contract_date_1)
 			.addChoice("No", Id.orig_contract_date_2));
 
@@ -152,20 +129,16 @@ public class ChangeOrderForm extends CMSForm {
 	}
 
 	private void returnInventoryYes() {
-		addNode(new ChoiceNode(Id.orig_contract_date_1, Desc.orig_contract_date_1)
-			.addChoice("Within 30 days", Id.admin_fee_waived_1)
-			.addChoice("Outside 30 days", Id.upgrade_exchg_choice_1));
+		addNode(Node.origContractDate(Id.orig_contract_date_1,
+				Id.admin_fee_waived_1, Id.upgrade_exchg_choice_1));
+		addNode(Node.adminFeeWaived(Id.admin_fee_waived_1, Id.return_int_rights_choice));
 
-		addNode(new FeeNode(Id.admin_fee_waived_1, Id.return_int_rights_choice,
-				Desc.admin_fee_waived_1, Field.adminReturnFees,
-				new BigDecimal("0.00")));
-
-		addNode(new ChoiceNode(Id.upgrade_exchg_choice_1, Desc.upgrade_exchg_choice_1)
+		addNode(new ChoiceNode(Id.upgrade_exchg_choice_1, Desc.upgrade_exchg_choice)
 			.addChoice("Yes", Id.admin_fee_waived_1)
 			.addChoice("No", Id.admin_fee_1));
 
 		addNode(new NoteNode(Id.admin_fee_1, Id.return_int_rights_choice,
-				Desc.admin_fee_1));
+				Desc.admin_fee));
 
 		addNode(new ChoiceNode(Id.return_int_rights_choice, Desc.return_int_rights_choice)
 			.addChoice("Yes-Contract date before 8/1/12", Id.name_2)
@@ -180,18 +153,10 @@ public class ChangeOrderForm extends CMSForm {
 	}
 
 	private void returnIntermentRightsYes1() {
-		addNode(new FieldsNode(Id.name_2, Id.loc_2)
-			.addField("Patron Name", Field.names, FieldType.TEXT));
-
-		addNode(new FieldsNode(Id.loc_2, Id.orig_contract_num_2)
-			.addField("Cemetery", Field.cemetery, FieldType.TEXT)
-			.addField("Location", Field.location, FieldType.TEXT));
-
-		addNode(new FieldsNode(Id.orig_contract_num_2, Id.reason_2)
-			.addField("Original Contract Number", Field.origContractNum, FieldType.TEXT));
-
-		addNode(new FieldsNode(Id.reason_2, Id.calc_2)
-			.addField("Reason for Change Order", "Reason", FieldType.TEXT));
+		addNode(Node.name(Id.name_2, Id.loc_2));
+		addNode(Node.loc(Id.loc_2, Id.orig_contract_num_2));
+		addNode(Node.origContractNum(Id.orig_contract_num_2, Id.reason_2));
+		addNode(Node.reason(Id.reason_2, Id.calc_2));
 		
 		addNode(new CalculationNode(Id.calc_2, Id.apply_credit_choice)
 			/*
@@ -217,22 +182,14 @@ public class ChangeOrderForm extends CMSForm {
 	}
 
 	private void returnIntermentRightsYes2() {
-		addNode(new FieldsNode(Id.name_3, Id.loc_3)
-			.addField("Patron Name", Field.names, FieldType.TEXT));
-
-		addNode(new FieldsNode(Id.loc_3, Id.orig_contract_num_3)
-			.addField("Cemetery", Field.cemetery, FieldType.TEXT)
-			.addField("Location", Field.location, FieldType.TEXT));
-
-		addNode(new FieldsNode(Id.orig_contract_num_3, Id.gift_amount)
-			.addField("Original Contract Number", Field.origContractNum,
-					FieldType.TEXT));
-
+		addNode(Node.name(Id.name_3, Id.loc_3));
+		addNode(Node.loc(Id.loc_3, Id.orig_contract_num_3));
+		addNode(Node.origContractNum(Id.orig_contract_num_3, Id.gift_amount));
+		
 		addNode(new FieldsNode(Id.gift_amount, Id.reason_3)
 			.addField("Gift Amount", Field.giftAmount, FieldType.NUMBER));
 
-		addNode(new FieldsNode(Id.reason_3, Id.calc_3)
-			.addField("Reason for Change Order", "Reason", FieldType.TEXT));
+		addNode(Node.reason(Id.reason_3, Id.calc_3));
 		
 		addNode(new CalculationNode(Id.calc_3, Id.apply_credit_choice)
 			/* 
@@ -262,29 +219,12 @@ public class ChangeOrderForm extends CMSForm {
 	}
 
 	private void returnIntermentRightsNo() {
-		addNode(new FieldsNode(Id.name_4, Id.loc_4)
-			.addField("Patron Name", Field.names, FieldType.TEXT));
-
-		addNode(new FieldsNode(Id.loc_4, Id.orig_contract_num_4)
-			.addField("Cemetery", Field.cemetery, FieldType.TEXT)
-			.addField("Location", Field.location, FieldType.TEXT));
-
-		addNode(new FieldsNode(Id.orig_contract_num_4, Id.items_returned_1)
-			.addField("Original Contract Number", Field.origContractNum,
-					FieldType.TEXT));
-
-		addNode(new FieldTableNode(Id.items_returned_1, Desc.items_returned_1,
-				5, Id.credits_discounts_1)
-			.addColumn("Item Code", Field.itemCodeBase, FieldType.TEXT)
-			.addColumn("Description", Field.descriptionBase, FieldType.TEXT)
-			.addColumn("Extended Price (including tax)", Field.extendedPriceBase, FieldType.NUMBER));
-
-		addNode(new FieldsNode(Id.credits_discounts_1, Id.reason_4)
-			.addField("Credits & Discounts to be deducted",
-					Field.creditsDiscounts, FieldType.NUMBER));
-
-		addNode(new FieldsNode(Id.reason_4, Id.calc_4)
-			.addField("Reason for Change Order", "Reason", FieldType.TEXT));
+		addNode(Node.name(Id.name_4, Id.loc_4));
+		addNode(Node.loc(Id.loc_4, Id.orig_contract_num_4));
+		addNode(Node.origContractNum(Id.orig_contract_num_4, Id.items_returned_1));
+		addNode(Node.itemsReturned(Id.items_returned_1, Id.credits_discounts_1));
+		addNode(Node.creditsDiscounts(Id.credits_discounts_1, Id.reason_4));
+		addNode(Node.reason(Id.reason_4, Id.calc_4));
 
 		addNode(new CalculationNode(Id.calc_4, Id.apply_credit_choice)
 			/*
@@ -313,20 +253,17 @@ public class ChangeOrderForm extends CMSForm {
 	}
 
 	private void returnInventoryNo() {
-		addNode(new ChoiceNode(Id.orig_contract_date_2, Desc.orig_contract_date_2)
-			.addChoice("Within 30 days", Id.admin_fee_waived_2)
-			.addChoice("Outside 30 days", Id.upgrade_exchg_choice_2));
+		addNode(Node.origContractDate(Id.orig_contract_date_2,
+				Id.admin_fee_waived_2, Id.upgrade_exchg_choice_2));
 
-		addNode(new FeeNode(Id.admin_fee_waived_2, Id.return_goods_choice,
-				Desc.admin_fee_waived_2, Field.adminReturnFees,
-				new BigDecimal("0.00")));
+		addNode(Node.adminFeeWaived(Id.admin_fee_waived_2, Id.return_goods_choice));
 
-		addNode(new ChoiceNode(Id.upgrade_exchg_choice_2, Desc.upgrade_exchg_choice_2)
+		addNode(new ChoiceNode(Id.upgrade_exchg_choice_2, Desc.upgrade_exchg_choice)
 			.addChoice("Yes", Id.admin_fee_waived_2)
 			.addChoice("No", Id.admin_fee_2));
 
 		addNode(new NoteNode(Id.admin_fee_2, Id.return_goods_choice,
-				Desc.admin_fee_2));
+				Desc.admin_fee));
 
 		addNode(new ChoiceNode(Id.return_goods_choice, Desc.return_goods_choice)
 			.addChoice("Yes", Id.name_5)
@@ -338,19 +275,11 @@ public class ChangeOrderForm extends CMSForm {
 	}
 
 	private void returnGoodsYes() {
-		addNode(new FieldsNode(Id.name_5, Id.loc_5)
-			.addField("Patron Name", Field.names, FieldType.TEXT));
-
-		addNode(new FieldsNode(Id.loc_5, Id.orig_contract_num_5)
-			.addField("Cemetery", Field.cemetery, FieldType.TEXT)
-			.addField("Location", Field.location, FieldType.TEXT));
-
-		addNode(new FieldsNode(Id.orig_contract_num_5, Id.reason_5)
-			.addField("Original Contract Number", Field.origContractNum, FieldType.TEXT));
-
-		addNode(new FieldsNode(Id.reason_5, Id.calc_5)
-			.addField("Reason for Change Order", "Reason", FieldType.TEXT));
-
+		addNode(Node.name(Id.name_5, Id.loc_5));
+		addNode(Node.loc(Id.loc_5, Id.orig_contract_num_5));
+		addNode(Node.origContractNum(Id.orig_contract_num_5, Id.reason_5));
+		addNode(Node.reason(Id.reason_5, Id.calc_5));
+		
 		addNode(new CalculationNode(Id.calc_5, Id.apply_credit_choice)
 			/*
 			 *  Total to be Returned = Contract Amount - Contract Balance
@@ -368,30 +297,19 @@ public class ChangeOrderForm extends CMSForm {
 	}
 
 	private void returnGoodsNo() {
-		addNode(new FieldsNode(Id.name_6, Id.loc_6)
-			.addField("Patron Name", Field.names, FieldType.TEXT));
+		addNode(Node.name(Id.name_6, Id.loc_6));
+		addNode(Node.loc(Id.loc_6, Id.orig_contract_num_6));
+		addNode(Node.origContractNum(Id.orig_contract_num_6, Id.items_returned_2));
 
-		addNode(new FieldsNode(Id.loc_6, Id.orig_contract_num_6)
-			.addField("Cemetery", Field.cemetery, FieldType.TEXT)
-			.addField("Location", Field.location, FieldType.TEXT));
-
-		addNode(new FieldsNode(Id.orig_contract_num_6, Id.items_returned_2)
-			.addField("Original Contract Number", Field.origContractNum,
-					FieldType.TEXT));
-
-		addNode(new FieldTableNode(Id.items_returned_2, Desc.items_returned_2,
+		addNode(new FieldTableNode(Id.items_returned_2, Desc.items_returned,
 				5, Id.credits_discounts_2)
 			.addColumn("Item Code", Field.itemCodeBase, FieldType.TEXT)
 			.addColumn("Description", Field.descriptionBase, FieldType.TEXT)
 			.addColumn("Extended Price (including tax)", Field.extendedPriceBase, FieldType.NUMBER));
 
-		addNode(new FieldsNode(Id.credits_discounts_2, Id.reason_6)
-			.addField("Credits & Discounts to be deducted",
-					Field.creditsDiscounts, FieldType.NUMBER));
-
-		addNode(new FieldsNode(Id.reason_6, Id.calc_6)
-			.addField("Reason for Change Order", "Reason", FieldType.TEXT));
-
+		addNode(Node.creditsDiscounts(Id.credits_discounts_2, Id.reason_6));
+		addNode(Node.reason(Id.reason_6, Id.calc_6));
+		
 		addNode(new CalculationNode(Id.calc_6, Id.apply_credit_choice)
 			/*
 			 *  Total to be Returned = Items to be Returned - Contract Balance
@@ -409,10 +327,10 @@ public class ChangeOrderForm extends CMSForm {
 
 	private void applyCredit() {
 		addNode(new ChoiceNode(Id.apply_credit_choice, Desc.apply_credit_choice, Field.applyCredit)
-			.addChoice("New Contract", Field.newContract, Id.new_contract_note)
-			.addChoice("Old Contract", Field.existingContract, Id.existing_contract_note)
-			.addChoice("Refund", Field.refund, Id.refund_request_note)
-			.addChoice("Donation", Field.donation, Id.plot_fmv_1));
+			.addChoice(Field.newContract, Field.newContract, Id.new_contract_note)
+			.addChoice(Field.existingContract, Field.existingContract, Id.existing_contract_note)
+			.addChoice(Field.refund, Field.refund, Id.refund_request_note)
+			.addChoice(Field.donation, Field.donation, Id.plot_fmv_1));
 
 		addNode(new NoteChecksABoxNode(Id.new_contract_note,
 				Id.parties_avail_choice, Field.newExistingContract,
@@ -432,24 +350,19 @@ public class ChangeOrderForm extends CMSForm {
 
 	private void transfer() {
 		addNode(new ChoiceNode(Id.paid_in_full_choice_2,
-				"Is the original contract paid in full?")
+				Desc.paid_in_full_choice)
 			.addChoice("Yes", Id.transfer_type_choice)
 			.addChoice("No", Id.curr_contract_balance_3));
 
-		addNode(new FieldsNode(Id.curr_contract_balance_3,
-				Id.cash_receipt_2)
-			.addField("Current Contract Balance", "Contract Balance",
-					FieldType.NUMBER));
+		addNode(Node.currContractBalance(Id.curr_contract_balance_3,
+				Id.cash_receipt_2));
+		addNode(Node.cashReceipt(Id.cash_receipt_2, Id.transfer_type_choice));
 
-		addNode(new NoteChecksABoxNode(Id.cash_receipt_2,
-				Id.transfer_type_choice, Field.cashReceipt,
-				"Cash receipt reflecting balance."));
-
-		addNode(new ChoiceNode(Id.transfer_type_choice, "Transfer Type: ",
-				"Property Assignment")
-			.addChoice("Transfer", "Transfer of Ownership", Id.transfer_fee_note)
-			.addChoice("Donation", "Donation", Id.plot_fmv_2)
-			.addChoice("Release", "Release of Interest", Id.transfer_fee_waived_note));
+		addNode(new ChoiceNode(Id.transfer_type_choice, Desc.transfer_type_choice,
+				Field.propertyAssignment)
+			.addChoice(Field.transferOfOwnership, "Transfer of Ownership", Id.transfer_fee_note)
+			.addChoice(Field.donation, "Donation", Id.plot_fmv_2)
+			.addChoice(Field.releaseOfInterest, "Release of Interest", Id.transfer_fee_waived_note));
 
 		transferTransfer();
 
@@ -459,30 +372,21 @@ public class ChangeOrderForm extends CMSForm {
 	}
 
 	private void transferTransfer() {
-		addNode(new FeeNode(Id.transfer_fee_note, Id.name_7,
-				"A processing fee applies for any property transfer to a new owner.",
-				"Admin/Return Fees",
+		addNode(new FeeNode(Id.transfer_fee_note, Id.name_7, 
+				Desc.transfer_fee_note, Field.adminReturnFees,
 				new BigDecimal("300.00")));
 
-		addNode(new FieldsNode(Id.name_7, Id.loc_7)
-		.addField("Patron Name", "Names", FieldType.TEXT));
-
-		addNode(new FieldsNode(Id.loc_7, Id.orig_contract_num_7)
-			.addField("Cemetery", "Cemetery", FieldType.TEXT)
-			.addField("Location", "Location", FieldType.TEXT));
-
-		addNode(new FieldsNode(Id.orig_contract_num_7, Id.assignee_info)
-			.addField("Original Contract Number", "Orig Contract",
-					FieldType.TEXT));
+		addNode(Node.name(Id.name_7, Id.loc_7));
+		addNode(Node.loc(Id.loc_7, Id.orig_contract_num_7));
+		addNode(Node.origContractNum(Id.orig_contract_num_7, Id.assignee_info));
 
 		addNode(new FieldsNode(Id.assignee_info, Id.reason_7)
-			.addField("Name", "Assignee Names", FieldType.TEXT)
-			.addField("Address", "Assignee Address", FieldType.TEXT)
-			.addField("Phone", "Assignee Phone", FieldType.TEXT)
-			.addField("Email", "Assignee Email", FieldType.TEXT));
+			.addField("Name", Field.assigneeNames, FieldType.TEXT)
+			.addField("Address", Field.assigneeAddress, FieldType.TEXT)
+			.addField("Phone", Field.assigneePhone, FieldType.TEXT)
+			.addField("Email", Field.assigneeEmail, FieldType.TEXT));
 
-		addNode(new FieldsNode(Id.reason_7, Id.calc_7)
-			.addField("Reason for Change Order", "Reason", FieldType.TEXT));
+		addNode(Node.reason(Id.reason_7, Id.calc_7));
 
 		addNode(new CalculationNode(Id.calc_7, Id.parties_avail_choice)
 			.addCalculatedField("Credit/Balance", new RefExpr(
@@ -491,102 +395,77 @@ public class ChangeOrderForm extends CMSForm {
 
 	private void transferDonation() {
 		addNode(new FieldsNode(Id.plot_fmv_2, Id.name_8)
-			.addFilledField("Admin/Return Fees", "0.00", FieldType.HIDDEN)
-			.addField("Donation", "Donation Amount", FieldType.NUMBER));
+			.addFilledField(Field.adminReturnFees, "0.00", FieldType.HIDDEN)
+			.addField("Donation", Field.donationAmount, FieldType.NUMBER));
 
-		addNode(new FieldsNode(Id.name_8, Id.loc_8)
-			.addField("Patron Name", "Names", FieldType.TEXT));
-
-		addNode(new FieldsNode(Id.loc_8, Id.orig_contract_num_8)
-			.addField("Cemetery", "Cemetery", FieldType.TEXT)
-			.addField("Location", "Location", FieldType.TEXT));
-
-		addNode(new FieldsNode(Id.orig_contract_num_8, Id.reason_8)
-			.addField("Original Contract Number", "Orig Contract",
-					FieldType.TEXT));
-
-		addNode(new FieldsNode(Id.reason_8, Id.parties_avail_choice)
-			.addField("Reason for Change Order", "Reason", FieldType.TEXT));
+		addNode(Node.name(Id.name_8, Id.loc_8));
+		addNode(Node.loc(Id.loc_8, Id.orig_contract_num_8));
+		addNode(Node.origContractNum(Id.orig_contract_num_8, Id.reason_8));
+		addNode(Node.reason(Id.reason_8, Id.parties_avail_choice));
 	}
 
 	private void transferRelease() {
 		addNode(new FeeNode(Id.transfer_fee_waived_note, Id.name_9,
-				"Fee waived, no addt'l sigs", "Admin/Return Fees",
+				Desc.transfer_fee_waived_note, Field.adminReturnFees,
 				new BigDecimal("0.00")));
 
-		addNode(new FieldsNode(Id.name_9, Id.loc_9)
-			.addField("Patron Name", "Names", FieldType.TEXT));
-
-		addNode(new FieldsNode(Id.loc_9, Id.orig_contract_num_9)
-			.addField("Cemetery", "Cemetery", FieldType.TEXT)
-			.addField("Location", "Location", FieldType.TEXT));
-
-		addNode(new FieldsNode(Id.orig_contract_num_9, Id.reason_9)
-			.addField("Original Contract Number", "Orig Contract",
-					FieldType.TEXT));
-
-		addNode(new FieldsNode(Id.reason_9, Id.done)
-			.addField("Reason for Change Order", "Reason", FieldType.TEXT));
+		addNode(Node.name(Id.name_9, Id.loc_9));
+		addNode(Node.loc(Id.loc_9, Id.orig_contract_num_9));
+		addNode(Node.origContractNum(Id.orig_contract_num_9, Id.reason_9));
+		addNode(Node.reason(Id.reason_9, Id.done));
 	}
 	
 	private void partiesAvailable() {
-		addNode(new ChoiceNode(Id.parties_avail_choice,
-				"Are all parties to the original contract available to sign?")
+		addNode(new ChoiceNode(Id.parties_avail_choice, Desc.parties_avail_choice)
 			.addChoice("Yes", Id.done)
 			.addChoice("No", Id.party_present_choice));
 
-		addNode(new ChoiceNode(Id.party_present_choice, "Who is present?")
+		addNode(new ChoiceNode(Id.party_present_choice, Desc.party_present_choice)
 			.addChoice("Party(s) to contract", Id.reason_party_unavail_choice)
 			.addChoice("Other", Id.consult_ad_note));
 
-		addNode(new NoteNode(Id.consult_ad_note, Id.done,
-				"Consult A.D. for requirements."));
+		addNode(new NoteNode(Id.consult_ad_note, Id.done, Desc.consult_ad_note));
 
 		reasonPartyUnavail();
 	}
 
 	private void reasonPartyUnavail() {
 		addNode(new ChoiceNode(Id.reason_party_unavail_choice,
-				"Why unavailable?")
+				Desc.reason_party_unavail_choice)
 			.addChoice("Death", Id.cfcs_burial_choice)
 			.addChoice("Relocation", Id.relocation_choice)
 			.addChoice("Can't locate", Id.reasonable_effort_choice));
 
-		addNode(new ChoiceNode(Id.cfcs_burial_choice,
-				"Are the deceased buried in a CFCS cemetery?")
+		addNode(new ChoiceNode(Id.cfcs_burial_choice, Desc.cfcs_burial_choice)
 			.addChoice("Yes", Id.burial_evidence_note)
 			.addChoice("No", Id.death_cert_note));
 
 		addNode(new NoteChecksABoxNode(Id.burial_evidence_note, Id.done,
-				"Evidence of Burial", "Evidence of burial required."));
+				Field.evidenceOfBurial, Desc.burial_evidence_note));
 
 		addNode(new NoteChecksABoxNode(Id.death_cert_note, Id.done,
-				"Death Certificate", "Death certificate required."));
+				Field.deathCertificate, Desc.death_cert_note));
 
-		addNode(new ChoiceNode(Id.relocation_choice,
-				"Will out-of-town parties be signing Change Order?")
+		addNode(new ChoiceNode(Id.relocation_choice, Desc.relocation_choice)
 			.addChoice("Yes", Id.notary_sig_note)
 			.addChoice("No", Id.notarized_release_note));
 
 		addNode(new NoteChecksABoxNode(Id.notary_sig_note, Id.done,
-				"Notary Signature", "Notary signature required."));
+				Field.notarySignature, Desc.notary_sig_note));
 
 		addNode(new NoteChecksABoxNode(Id.notarized_release_note, Id.done,
-				"Signed/Notarized Release",
-				"Signed, notarized release required."));
+				Field.signedNotarizedRelease, Desc.notarized_release_note));
 
 		addNode(new ChoiceNode(Id.reasonable_effort_choice,
-				"Have reasonable efforts been made to locate party(s)?")
+				Desc.reasonable_effort_choice)
 			.addChoice("Yes", Id.due_diligence_note)
 			.addChoice("No", Id.loc_all_parties_note));
 
 		addNode(new NoteChecksABoxNode(Id.due_diligence_note, Id.done,
-				"Statement of Due Diligence Form",
-				"Statement of due diligence form required."));
+				Field.statementOfDueDiligenceForm, Desc.due_diligence_note));
 
 		addNode(new NoteNode(Id.loc_all_parties_note, Id.due_diligence_note,
-				"Efforts must be made to locate all parties to the original "
-				+ "contract!"));
+				Desc.loc_all_parties_note));
 	}
 	
 	private static class Expr {
@@ -662,7 +541,6 @@ public class ChangeOrderForm extends CMSForm {
 	}
 
 	// Identifier of each node in the Change Order Form decision tree
-	@SuppressWarnings("unused")
 	private static class Id {
 		final static String prerequisites_note = "prerequisites_note";
 		final static String change_order_type_choice = "change_order_type_choice";
@@ -728,15 +606,12 @@ public class ChangeOrderForm extends CMSForm {
 		final static String calc_7 = "calc_7";
 		final static String transfer_type_choice = "transfer_type_choice";
 		final static String transfer_fee_note = "transfer_fee_note";
-		final static String transfer_donation = "transfer_donation";
 		final static String transfer_fee_waived_note = "transfer_fee_waived_note";
 		final static String assignee_info = "assignee_info";
 		final static String orig_contract_date_1 = "orig_contract_date_1";
 		final static String orig_contract_date_2 = "orig_contract_date_2";
 		final static String admin_fee_waived_1 = "admin_fee_waived_1";
 		final static String admin_fee_waived_2 = "admin_fee_waived_2";
-		final static String admin_fee_waived_3 = "admin_fee_waived_3";
-		final static String admin_fee_waived_4 = "admin_fee_waived_4";
 		final static String upgrade_exchg_choice_1 = "upgrade_exchg_choice_1";
 		final static String upgrade_exchg_choice_2 = "upgrade_exchg_choice_2";
 		final static String admin_fee_1 = "admin_fee_1";
@@ -771,101 +646,41 @@ public class ChangeOrderForm extends CMSForm {
 	}
 
 	// Description associated with each node in the decision tree
-	@SuppressWarnings("unused")
 	private static class Desc {
 		final static String prerequisites_note = "Before beginning the Change Order process, make sure you have the Patron’s original contract, and have performed all necessary verifications within HMIS (if applicable).";
 		final static String change_order_type_choice = "What does the patron wish to do?";
 		final static String curr_contract_value = "Is the original contract paid in full?";
-		private final static String currContractBalance = "Please enter the outstanding contract balance.";
-		final static String curr_contract_balance_1 = currContractBalance;
-		final static String curr_contract_balance_2 = currContractBalance;
-		final static String curr_contract_balance_3 = currContractBalance;
-		final static String paid_in_full_choice_1 = "paid_in_full_choice_1";
-		final static String paid_in_full_choice_2 = "paid_in_full_choice_2";
-		private final static String cashReceipt = "Since the contract must be paid in full for this type of transaction, a cash receipt reflecting the outstanding balance must be included with the change order packet.";
-		final static String cash_receipt_1 = cashReceipt;
-		final static String cash_receipt_2 = cashReceipt;
+		final static String curr_contract_balance = "Please enter the outstanding contract balance.";
+		final static String paid_in_full_choice = "paid_in_full_choice";
+		final static String cash_receipt = "Since the contract must be paid in full for this type of transaction, a cash receipt reflecting the outstanding balance must be included with the change order packet.";
 		final static String return_inv_choice = "Is cemetery inventory (plot, crypt, niche) to be returned?";
 		final static String property_owner_choice = "Does the property Owner(s) differ from the contract Patron(s)?";
 		final static String property_owner_sig_note = "Since a disinterment is subject to the discretion of the property owners, they must be the signatory(s) on the change order.";
 		final static String disint_type_choice = "Please select the type of disinterment that is to occur:";
-		private final static String disintFee = "A disinterment fee applies to this transaction.";
-		final static String disint_fee_1 = disintFee;
-		final static String disint_fee_2 = disintFee;
-		final static String disint_fee_3 = disintFee;
-		final static String disint_fee_4 = disintFee;
-		final static String name_1 = "name_1";
-		final static String name_2 = "name_2";
-		final static String name_3 = "name_3";
-		final static String name_4 = "name_4";
-		final static String name_5 = "name_5";
-		final static String name_6 = "name_6";
-		final static String name_7 = "name_7";
-		final static String name_8 = "name_8";
-		final static String name_9 = "name_9";
-		final static String loc_1 = "loc_1";
-		final static String loc_2 = "loc_2";
-		final static String loc_3 = "loc_3";
-		final static String loc_4 = "loc_4";
-		final static String loc_5 = "loc_5";
-		final static String loc_6 = "loc_6";
-		final static String loc_7 = "loc_7";
-		final static String loc_8 = "loc_8";
-		final static String loc_9 = "loc_9";
-		final static String orig_contract = "orig_contract_num_1";
-		final static String orig_contract_num_2 = "orig_contract_num_2";
-		final static String orig_contract_num_3 = "orig_contract_num_3";
-		final static String orig_contract_num_4 = "orig_contract_num_4";
-		final static String orig_contract_num_5 = "orig_contract_num_5";
-		final static String orig_contract_num_6 = "orig_contract_num_6";
-		final static String orig_contract_num_7 = "orig_contract_num_7";
-		final static String orig_contract_num_8 = "orig_contract_num_8";
-		final static String orig_contract_num_9 = "orig_contract_num_9";
+		final static String disint_fee = "A disinterment fee applies to this transaction.";
+		final static String name = "name";
+		final static String loc = "loc";
+		final static String orig_contract_num = "orig_contract_num";
 		final static String disint_info = "disint_info";
-		final static String reason_1 = "reason_1";
-		final static String reason_2 = "reason_2";
-		final static String reason_3 = "reason_3";
-		final static String reason_4 = "reason_4";
-		final static String reason_5 = "reason_5";
-		final static String reason_6 = "reason_6";
-		final static String reason_7 = "reason_7";
-		final static String reason_8 = "reason_8";
-		final static String reason_9 = "reason_9";
-		final static String calc_1 = "calc_1";
-		final static String calc_2 = "calc_2";
-		final static String calc_3 = "calc_3";
-		final static String calc_4 = "calc_4";
-		final static String calc_5 = "calc_5";
-		final static String calc_6 = "calc_6";
-		final static String calc_7 = "calc_7";
+		final static String reason = "reason";
 		final static String transfer_type_choice = "transfer_type_choice";
-		final static String transfer_fee_note = "transfer_fee_note";
-		final static String transfer_donation = "transfer_donation";
+		final static String transfer_fee_note = "A processing fee applies for any property transfer to a new owner.";
 		final static String transfer_fee_waived_note = "transfer_fee_waived_note";
 		final static String assignee_info = "assignee_info";
-		final static String orig_contract_date_1 = "orig_contract_date_1";
-		final static String orig_contract_date_2 = "orig_contract_date_2";
-		final static String admin_fee_waived_1 = "admin_fee_waived_1";
-		final static String admin_fee_waived_2 = "admin_fee_waived_2";
-		final static String admin_fee_waived_3 = "admin_fee_waived_3";
-		final static String admin_fee_waived_4 = "admin_fee_waived_4";
-		final static String upgrade_exchg_choice_1 = "upgrade_exchg_choice_1";
-		final static String upgrade_exchg_choice_2 = "upgrade_exchg_choice_2";
-		final static String admin_fee_1 = "admin_fee_1";
-		final static String admin_fee_2 = "admin_fee_2";
+		final static String orig_contract_date = "orig_contract_date";
+		final static String admin_fee_waived = "admin_fee_waived";
+		final static String upgrade_exchg_choice = "upgrade_exchg_choice";
+		final static String admin_fee = "admin_fee";
 		final static String return_int_rights_choice = "return_int_rights_choice";
 		final static String return_goods_choice = "return_goods_choice";
 		final static String gift_amount = "gift_amount";
-		final static String items_returned_1 = "items_returned_1";
-		final static String items_returned_2 = "items_returned_2";
-		final static String credits_discounts_1 = "credits_discounts_1";
-		final static String credits_discounts_2 = "credits_discounts_2";
+		final static String items_returned = "items_returned";
+		final static String credits_discounts = "credits_discounts";
 		final static String apply_credit_choice = "apply_credit_choice";
 		final static String new_contract_note = "new_contract_note";
 		final static String existing_contract_note = "existing_contract_note";
 		final static String refund_request_note = "refund_request_note";
-		final static String plot_fmv_1 = "plot_fmv_1";
-		final static String plot_fmv_2 = "plot_fmv_2";
+		final static String plot_fmv = "plot_fmv";
 		final static String parties_avail_choice = "parties_avail_choice";
 		final static String party_present_choice = "party_present_choice";
 		final static String consult_ad_note = "consult_ad_note";
@@ -883,7 +698,6 @@ public class ChangeOrderForm extends CMSForm {
 	}
 
 	// Names of fillable form fields in the Change Order form PDF
-	@SuppressWarnings("unused")
 	private static class Field {
 		final static String changeOrderType = "Change Order Type";
 		final static String return_ = "Return";
@@ -900,17 +714,7 @@ public class ChangeOrderForm extends CMSForm {
 		final static String contractBalance = "Contract Balance";
 		final static String reason = "Reason";
 		final static String itemCodeBase = "Item Code ";
-		final static String itemCode1 = itemCodeBase + "1";
-		final static String itemCode2 = itemCodeBase + "2";
-		final static String itemCode3 = itemCodeBase + "3";
-		final static String itemCode4 = itemCodeBase + "4";
-		final static String itemCode5 = itemCodeBase + "5";
 		final static String descriptionBase = "Description ";
-		final static String description1 = descriptionBase + "1";
-		final static String description2 = descriptionBase + "2";
-		final static String description3 = descriptionBase + "3";
-		final static String description4 = descriptionBase + "4";
-		final static String description5 = descriptionBase + "5";
 		final static String extendedPriceBase = "Extended Price ";
 		final static String extendedPrice1 = extendedPriceBase + "1";
 		final static String extendedPrice2 = extendedPriceBase + "2";
@@ -949,5 +753,74 @@ public class ChangeOrderForm extends CMSForm {
 		final static String statementOfDueDiligenceForm = "Statement of Due Diligence Form";
 		final static String evidenceOfBurial = "Evidence of Burial";
 		final static String newExistingContract = "New/Existing Contract";
+	}
+	
+	private static class Node {
+		static FieldsNode currContractBalance(String id, String idNext) {
+			return new FieldsNode(id, idNext)
+				.addField("Current Contract Balance", Field.contractBalance,
+					FieldType.NUMBER);
+		}
+
+		static NoteChecksABoxNode cashReceipt(String id, String idNext) {
+			return new NoteChecksABoxNode(id, idNext, ChangeOrderForm.Field.cashReceipt,
+					ChangeOrderForm.Desc.cash_receipt);
+		}
+
+		static ChoiceNode paidInFullChoice(String id, String idYes, String idNo) {
+			return new ChoiceNode(id, "Is the original contract paid in full?")
+				.addChoice("Yes", idYes)
+				.addChoice("No", idNo);
+		}
+
+		static FeeNode disintFee(String id, BigDecimal fee) {
+			return new FeeNode(id, ChangeOrderForm.Id.name_1, ChangeOrderForm.Desc.disint_fee,
+					ChangeOrderForm.Field.adminReturnFees, fee);
+		}
+
+		static FieldsNode name(String id, String idNext) {
+			return new FieldsNode(id, idNext)
+				.addField("Patron Name", ChangeOrderForm.Field.names, FieldType.TEXT);
+		}
+
+		static FieldsNode loc(String id, String idNext) {
+			return new FieldsNode(id, idNext)
+				.addField("Cemetery", ChangeOrderForm.Field.cemetery, FieldType.TEXT)
+				.addField("Location", ChangeOrderForm.Field.location, FieldType.TEXT);
+		}
+
+		static FieldsNode origContractNum(String id, String idNext) {
+			return new FieldsNode(id, idNext)
+				.addField("Original Contract Number", ChangeOrderForm.Field.origContractNum, FieldType.TEXT);
+		}
+
+		static FieldsNode reason(String id, String idNext) {
+			return new FieldsNode(id, idNext)
+				.addField("Reason for Change Order", ChangeOrderForm.Field.reason, FieldType.TEXT);
+		}
+
+		static ChoiceNode origContractDate(String id, String idWithin30Days, String idOutside30Days) {
+			return new ChoiceNode(id, ChangeOrderForm.Desc.orig_contract_date)
+				.addChoice("Within 30 days", idWithin30Days)
+				.addChoice("Outside 30 days", idOutside30Days);
+		}
+
+		static FeeNode adminFeeWaived(String id, String idNext) {
+			return new FeeNode(id, idNext, ChangeOrderForm.Desc.admin_fee_waived, 
+					ChangeOrderForm.Field.adminReturnFees, new BigDecimal("0.00"));
+		}
+
+		static FieldsNode creditsDiscounts(String id, String idNext) {
+			return new FieldsNode(id, idNext)
+				.addField("Credits & Discounts to be deducted",
+						ChangeOrderForm.Field.creditsDiscounts, FieldType.NUMBER);
+		}
+
+		static FieldTableNode itemsReturned(String id, String idNext) {
+			return new FieldTableNode(id, ChangeOrderForm.Desc.items_returned, 5, idNext)
+				.addColumn("Item Code", ChangeOrderForm.Field.itemCodeBase, FieldType.TEXT)
+				.addColumn("Description", ChangeOrderForm.Field.descriptionBase, FieldType.TEXT)
+				.addColumn("Extended Price (including tax)", ChangeOrderForm.Field.extendedPriceBase, FieldType.NUMBER);
+		}
 	}
 }
