@@ -1,6 +1,7 @@
 package models.tree.fields;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -12,15 +13,15 @@ import play.twirl.api.Html;
 public class FieldTableNode extends SingleTargetNode {
 
 	// Simple renaming of Field class
-	private static class Column extends Field {
+	public static class Column extends Field {
 		public Column(String header, String baseFieldName, FieldType type) {
 			super(header, baseFieldName, type);
 		}
 	}
-	
+
 	private ArrayList<Column> columns;
 	private int numRows;
-	
+
 	public FieldTableNode(String id, String description, int numRows,
 			String idNext) {
 		super(id, idNext, description, true);
@@ -65,11 +66,6 @@ public class FieldTableNode extends SingleTargetNode {
 	}
 
 	@Override
-	public Html renderSelectionAsHtml(String serializedSelection) {
-		return new Html("");
-	}
-
-	@Override
 	public String serializeInput(Map<String, String> input) {
 		ArrayList<StoredSelection.Field> fields = new ArrayList<>();
 		for (Column col : columns) {
@@ -78,7 +74,7 @@ public class FieldTableNode extends SingleTargetNode {
 				field.name = col.name + row;
 				String inputVal = input.get(field.name);
 				if (StringUtils.isEmpty(inputVal)) {
-					field.value = col.type.defaultVal();
+					field.value = col.fieldType.defaultVal();
 				} else {
 					field.value = inputVal;
 				}
@@ -91,29 +87,22 @@ public class FieldTableNode extends SingleTargetNode {
 		return serializeAsString(ss);
 	}
 
-	@Override
-	protected String getNodeHtml(String rawInput) {
-		// build header row
-		String html = "<table><tr>";
-		for (Column c : columns) {
-			html += "<th>" + c.description + "</th>";
+	/*
+	 * Returns a list of integers from 1..numRows. This workaround brought to
+	 * you by the irritating lack of support for counting loops in Scala
+	 * templates.
+	 */
+	private List<Integer> getRowNumbers() {
+		ArrayList<Integer> rows = new ArrayList<>(numRows);
+		for (int i = 1; i <= numRows; i++) {
+			rows.add(i);
 		}
-		html += "</tr>\n";
-		
-		// build rows of input fields
-		for (int row = 0; row < numRows; row++) {
-			html += "<tr>";
-			int numCols = columns.size();
-			for (int col = 0; col < numCols; col++) {
-				Column c = columns.get(col);
-				html += "<td>" + "<input type=\"" + c.type.toString()
-						+ "\" name=\"" + c.name + (row + 1) + "\"" + "></td>";
-			}
-			html += "</tr>\n";
-		}
-		html += "</table>\n";
-		
-		return html;
+		return rows;
 	}
 
+	@Override
+	public Html renderAsHtml(String rawInput) {
+		return views.html.questionnaire.fieldTable.render(getRowNumbers(),
+				columns);
+	}
 }

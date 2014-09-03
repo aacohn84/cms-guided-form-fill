@@ -1,0 +1,7 @@
+@(choices: Map[String, tree.ChoiceNode.Choice])
+
+@for(entry <- choices.entrySet()) {
+  @defining(entry.getValue().description) { description =>
+    <input type="radio" name="choice" value="@description">@description<br>
+  }
+}

@@ -33,7 +33,7 @@ public abstract class Node {
 		this.description = description;
 		this.isOutputNode = isOutputNode;
 	}
-	
+
 	public Node(String id, String description, boolean isOutputNode,
 			boolean isVisible) {
 		this.id = id;
@@ -65,7 +65,7 @@ public abstract class Node {
 
 		return new Decision(this, rawInput, nextNode);
 	}
-
+	
 	/**
 	 * Uses the given input to fill any form fields associated with this node.
 	 * The filled fields are returned in a map where the key is the name of the
@@ -91,16 +91,19 @@ public abstract class Node {
 	public abstract String getIdNextNode(Map<String, String> input);
 
 	/**
+	 * Returns true if, and only if, the node terminates the form.
+	 */
+	public boolean isTerminal() {
+		return false;
+	}
+
+	/**
 	 * Returns an HTML representation of the node for rendering in a template.
 	 * 
 	 * @param rawInput
 	 *            - the rawInput from the decision associated with this node.
 	 */
-	public final Html renderAsHtml(String rawInput) {
-		return new Html(getNodeHtml(rawInput));
-	}
-
-	public abstract Html renderSelectionAsHtml(String serializedSelection);
+	public abstract Html renderAsHtml(String rawInput);
 
 	/**
 	 * Converts the input to an object and serializes it as a String.
@@ -110,14 +113,6 @@ public abstract class Node {
 	 * @return Serialized object in String form
 	 */
 	public abstract String serializeInput(Map<String, String> input);
-
-	/**
-	 * Returns a String containing the HTML representation of the node.
-	 * 
-	 * @param rawInput
-	 *            - the rawInput from the decision associated with this node.
-	 */
-	protected abstract String getNodeHtml(String rawInput);
 
 	/**
 	 * Returns the deserialized object.

@@ -1,0 +1,16 @@
+@(rows: List[Integer], columns: List[tree.fields.FieldTableNode.Column])
+
+<table>
+  <tr>
+  @for(c <- columns) {
+    <th>@c.description</th>
+  }
+  </tr>
+  @for(r <- rows) {
+    <tr>
+    @for(c <- columns) {
+      <td><input type="@c.fieldType" name="@c.name@r" /></td>
+    }
+    </tr>
+  }
+</table>

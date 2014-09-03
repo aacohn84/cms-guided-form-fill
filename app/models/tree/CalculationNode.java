@@ -240,11 +240,6 @@ public class CalculationNode extends SingleTargetNode {
 	}
 
 	@Override
-	public Html renderSelectionAsHtml(String serializedSelection) {
-		return new Html(getNodeHtml(serializedSelection));
-	}
-
-	@Override
 	public String serializeInput(Map<String, String> input) {
 		// create a list of field names & values
 		List<StoredSelection.Field> fields = new ArrayList<>();
@@ -292,8 +287,7 @@ public class CalculationNode extends SingleTargetNode {
 		return super.createDecision(form, requestDataCopy, filledFormFields);
 	}
 	
-	@Override
-	protected String getNodeHtml(String rawInput) {
+	public Html renderAsHtml(String rawInput) {
 		String html = new String();
 		if (StringUtils.isNotEmpty(rawInput)) {
 			StoredSelection ss = (StoredSelection) recreateObject(rawInput);
@@ -302,6 +296,6 @@ public class CalculationNode extends SingleTargetNode {
 						+ "<br>";
 			}
 		}
-		return html;
+		return new Html(html);
 	}
 }

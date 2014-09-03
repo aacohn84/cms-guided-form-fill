@@ -56,31 +56,8 @@ public class FieldsNode extends SingleTargetNode {
 	}
 
 	@Override
-	public String getNodeHtml(String rawInput) {
-		String html = new String();
-		for (Field field : fields) {
-			String fieldHtml = "<input type=\"" + field.type + "\" name=\""
-					+ field.description + "\">";
-			if (isNotHidden(field)) {
-				fieldHtml = field.description + ": " + fieldHtml + "<br>";
-			}
-			html += fieldHtml;
-		}
-		return html;
-	}
-
-	private boolean isNotHidden(Field field) {
-		return !field.type.equals(FieldType.HIDDEN);
-	}
-
-	@Override
-	public Html renderSelectionAsHtml(String serializedSelection) {
-		String html = new String();
-		StoredSelection storedSelection = (StoredSelection) recreateObject(serializedSelection);
-		for (StoredSelection.Field field : storedSelection.fields) {
-			html += "<b>" + field.name + ":</b> " + field.value + "<br>";
-		}
-		return new Html(html);
+	public Html renderAsHtml(String rawInput) {
+		return views.html.questionnaire.fields.render(fields);
 	}
 
 	@Override

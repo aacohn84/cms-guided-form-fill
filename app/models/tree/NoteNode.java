@@ -27,15 +27,10 @@ public class NoteNode extends SingleTargetNode {
 	}
 
 	@Override
-	protected String getNodeHtml(@SuppressWarnings("unused") String rawInput) {
-		return note + "<br>";
+	public Html renderAsHtml(String rawInput) {
+		return views.html.questionnaire.note.render(note);
 	}
-
-	@Override
-	public Html renderSelectionAsHtml(String rawInput) {
-		return renderAsHtml(rawInput);
-	}
-
+	
 	@Override
 	public String serializeInput(
 			@SuppressWarnings("unused") Map<String, String> input) {

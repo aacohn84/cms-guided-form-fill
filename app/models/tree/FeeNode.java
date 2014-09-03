@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Map;
 
-import play.twirl.api.Html;
 import models.data.FilledFormFields;
+import play.twirl.api.Html;
 
 public class FeeNode extends SingleTargetNode {
 	static class StoredSelection implements Serializable {
@@ -33,10 +33,8 @@ public class FeeNode extends SingleTargetNode {
 	}
 
 	@Override
-	public Html renderSelectionAsHtml(String serializedSelection) {
-		StoredSelection ss = (StoredSelection) recreateObject(serializedSelection);
-		String html = "<strong>" + ss.fieldName + ": </strong>" + ss.fieldVal;
-		return new Html(html);
+	public Html renderAsHtml(String rawInput) {
+		return views.html.questionnaire.note.render(note);
 	}
 
 	@Override
@@ -46,10 +44,5 @@ public class FeeNode extends SingleTargetNode {
 		ss.fieldName = fieldName;
 		ss.fieldVal = fee.toString();
 		return serializeAsString(ss);
-	}
-
-	@Override
-	protected String getNodeHtml(@SuppressWarnings("unused") String rawInput) {
-		return note + "<br>";
 	}
 }

@@ -1,0 +1,13 @@
+@(fields: List[tree.fields.Field])
+
+@htmlRepr(field: tree.fields.Field) = {
+  <input type="@field.fieldType" name="@field.description" />
+}
+
+@for(field <- fields) {
+  @if(field.fieldType.equals(tree.fields.FieldType.HIDDEN)) {
+    @htmlRepr(field)
+  } else {
+    @field.description: @htmlRepr(field)<br>
+  }
+}

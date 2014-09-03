@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import models.data.FilledFormFields;
 import play.twirl.api.Html;
@@ -23,22 +22,22 @@ public class ChoiceNode extends Node {
 	 * 
 	 * @author Aaron Cohn
 	 */
-	private static class Choice {
+	public static class Choice {
 		/**
 		 * Description to be shown alongside the radio button in the
 		 * ChoiceNode's HTML representation.
 		 */
-		String description;
+		public String description;
 
 		/**
 		 * The name of the choice as used in the Adobe Acrobat form.
 		 */
-		String name;
+		public String name;
 
 		/**
 		 * ID of the node that comes after this one if this choice is selected.
 		 */
-		String targetId;
+		public String targetId;
 
 		public Choice(String description, String targetId) {
 			this.name = null;
@@ -118,8 +117,8 @@ public class ChoiceNode extends Node {
 	 *            - id of the node corresponding to the option.
 	 */
 	public ChoiceNode addChoice(String choiceDescription, String targetId) {
-		Choice option = new Choice(choiceDescription, targetId);
-		choices.put(choiceDescription, option);
+		Choice choice = new Choice(choiceDescription, targetId);
+		choices.put(choiceDescription, choice);
 		return this;
 	}
 
@@ -151,14 +150,6 @@ public class ChoiceNode extends Node {
 		formFields.fillField(fieldName, choice.name);
 	}
 
-	/**
-	 * Returns a list of choices to choose from.
-	 */
-	public List<String> getChoices() {
-		// TODO: Use or remove ChoiceNode#getChoices
-		return new ArrayList<String>(choices.keySet());
-	}
-
 	@Override
 	public String getIdNextNode(Map<String, String> input) {
 		if (input.containsKey("choice")) {
@@ -170,9 +161,8 @@ public class ChoiceNode extends Node {
 	}
 
 	@Override
-	public Html renderSelectionAsHtml(String serializedSelection) {
-		StoredSelection storedSelection = (StoredSelection) recreateObject(serializedSelection);
-		return new Html(storedSelection.choice);
+	public Html renderAsHtml(String rawInput) {
+		return views.html.questionnaire.choice.render(choices);
 	}
 
 	@Override
@@ -181,21 +171,4 @@ public class ChoiceNode extends Node {
 		StoredSelection storedSelection = new StoredSelection(choice);
 		return serializeAsString(storedSelection);
 	}
-
-	/**
-	 * Provides HTML code to display this ChoiceNode. It is represented as a
-	 * radio input, where {@link Choice#description} is used as both the name of
-	 * the choice and the text displayed beside the radio button.
-	 */
-	@Override
-	protected String getNodeHtml(String rawInput) {
-		String html = new String();
-		for (Entry<String, Choice> entry : choices.entrySet()) {
-			Choice choice = entry.getValue();
-			html += "<input type=\"radio\" name=\"choice\" value=\""
-					+ choice.description + "\">" + choice.description + "<br>";
-		}
-		return html;
-	}
-
 }

@@ -1,13 +1,13 @@
 package models.tree.fields;
 
 public class Field {
-	String description;
-	String name;
-	FieldType type;
+	public String description;
+	public String name;
+	public FieldType fieldType;
 
-	public Field(String description, String name, FieldType type) {
+	public Field(String description, String name, FieldType fieldType) {
 		this.description = description;
 		this.name = name;
-		this.type = type;
+		this.fieldType = fieldType;
 	}
 }
