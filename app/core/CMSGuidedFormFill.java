@@ -34,26 +34,30 @@ public class CMSGuidedFormFill {
 		// Get user's form data
 		FormDataStore formDataStore = InMemoryFormDataStore.getInstance();
 		FormData formData = formDataStore.getFormData(owner);
-		
+
 		// Convert FormData to PDF
 		File filledPdf = getFilledPdf(formData);
-		
+
 		return filledPdf;
 	}
-	
-	private static File getFilledPdf(FormData formData) {
-		// fill fields along the path the user took through the decision tree
-		DecisionMap decisions = formData.decisionMap;
-		FilledFormFields fields = new FilledFormFields();
-		for (Decision decision : decisions) {
-			Node context = decision.context;
-			if (context.isOutputNode) {
-				context.fillFormFields(decision.rawInput, fields);
-			}
-		}
+
+	public static Decision getPreviousDecision(String owner,
+			String idCurrentNode) {
+		/*
+		 * Retrieve the owner's form data first. We won't bother continuing if
+		 * this raises an exception.
+		 */
+		FormDataStore formDataStore = InMemoryFormDataStore.getInstance();
+		FormData formData = formDataStore.getFormData(owner);
+		DecisionMap decisionMap = formData.decisionMap;
+
 		CMSForm form = ChangeOrderForm.getInstance();
-		PDFFormFiller formFiller = new PDFFormFiller();
-		return formFiller.fillForm(form, fields);
+		Decision currDecision = decisionMap.getDecision(idCurrentNode);
+		Node prevNode = form.getNode(currDecision.previous.context.id);
+		if (!prevNode.isVisible) {
+			return getPreviousDecision(owner, prevNode.id);
+		}
+		return decisionMap.getDecision(prevNode.id);
 	}
 
 	/**
@@ -124,17 +128,19 @@ public class CMSGuidedFormFill {
 		return decision.next;
 	}
 
-	static void saveDecision(DecisionMap decisions, Decision decision) {
-		Decision existingDecision = decisions.getDecision(decision.context.id);
-		Decision decisionToSave;
-		if (existingDecision != null) {
-			existingDecision.next = decision.next;
-			existingDecision.rawInput = decision.rawInput;
-			decisionToSave = existingDecision;
-		} else {
-			decisionToSave = decision;
+	private static File getFilledPdf(FormData formData) {
+		// fill fields along the path the user took through the decision tree
+		DecisionMap decisions = formData.decisionMap;
+		FilledFormFields fields = new FilledFormFields();
+		for (Decision decision : decisions) {
+			Node context = decision.context;
+			if (context.isOutputNode) {
+				context.fillFormFields(decision.rawInput, fields);
+			}
 		}
-		decisions.putDecision(decisionToSave);
+		CMSForm form = ChangeOrderForm.getInstance();
+		PDFFormFiller formFiller = new PDFFormFiller();
+		return formFiller.fillForm(form, fields);
 	}
 
 	/*

@@ -1,18 +1,41 @@
 @(decision: data.Decision)
 
+@prevLink(isRoot: Boolean) = {
+  @if(!isRoot) {
+    <input type="submit" value="<< Previous" onclick="javascript:document.theForm.action='/prev'" />
+  }
+}
+
+@nextLink(isTerminal: Boolean) = {
+  @if(!isTerminal) {
+    <input type="submit" value="Next >>" onclick="javascript:document.theForm.action='/next'" /><br>
+  }
+}
+
 <!DOCTYPE HTML>
 <html>
   <head>
+    <script type="text/javascript">
+      function previous() {
+    	  var theForm = document.theForm;
+    	  theForm.action = "/prev";
+    	  theForm.submit();
+      }
+    </script>
     <meta charset="UTF-8" />
     <title>Change Order</title>
   </head>
   <body>
     <h3>@decision.context.description</h3>
-    <form action="/nextNode" name="theForm" method="POST">
-      <input type="hidden" name="@FormFill.RequestParams.CURRENT_NODE" value="@decision.context.id">
-      @decision.context.renderAsHtml(decision.rawInput)
-      <a href="javascript:theForm.submit()">Next >></a>
+    <form action="/next" name="theForm" method="POST">
+      <input type="hidden" name="@FormFill.RequestParams.CURRENT_NODE" value="@decision.context.id" />
+      <p>
+        @decision.context.renderAsHtml(decision.rawInput)
+        @nextLink(decision.context.isTerminal())@prevLink(decision.previous == null)
+      </p>
     </form>
-    <a href="/getFormOutput" target="_blank">[View Form Output]</a>
+    <p>
+      <a href="/forms">Save & Exit</a>
+    </p>
   </body>
 </html>

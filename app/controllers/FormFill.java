@@ -17,7 +17,7 @@ public class FormFill extends SecureController {
 	}
 
 	/*
-	 * Provides the root node of the requested form.
+	 * Provide root node of form.
 	 */
 	public static Result getForm() {
 		Decision firstDecision = CMSGuidedFormFill
@@ -26,7 +26,7 @@ public class FormFill extends SecureController {
 	}
 
 	/*
-	 * Provides a filled PDF for viewing/editing/printing
+	 * Provide filled PDF for viewing/editing/printing
 	 */
 	public static Result getFormOutput() {
 		String username = getUsername();
@@ -37,9 +37,9 @@ public class FormFill extends SecureController {
 	}
 
 	/*
-	 * Saves the decision and provides the next node of the change order form.
+	 * Save decision and provide next node in active path of form.
 	 */
-	public static Result getNextNode() {
+	public static Result next() {
 		// get current node
 		Map<String, String> requestData = Form.form().bindFromRequest().data();
 		String idCurrentNode = requestData.get(RequestParams.CURRENT_NODE);
@@ -51,4 +51,17 @@ public class FormFill extends SecureController {
 		return ok(backdrop.render(nextDecision));
 	}
 
+	/*
+	 * Provide previous node in active path of form.
+	 */
+	public static Result prev() {
+		Map<String, String> requestData = Form.form().bindFromRequest().data();
+		String idCurrentNode = requestData.get(RequestParams.CURRENT_NODE);
+		String username = getUsername();
+
+		Decision previousDecision = CMSGuidedFormFill.getPreviousDecision(
+				username, idCurrentNode);
+
+		return ok(backdrop.render(previousDecision));
+	}
 }
