@@ -11,14 +11,14 @@ import models.tree.CalculationNode.NumExpr;
 import models.tree.CalculationNode.Operators;
 import models.tree.CalculationNode.RefExpr;
 import models.tree.CalculationNode.nAryExpr;
-import models.tree.TerminalNode;
-import models.tree.fields.FieldTableNode;
-import models.tree.fields.FieldType;
-import models.tree.fields.FieldsNode;
 import models.tree.ChoiceNode;
 import models.tree.FeeNode;
 import models.tree.NoteChecksABoxNode;
 import models.tree.NoteNode;
+import models.tree.TerminalNode;
+import models.tree.fields.FieldTableNode;
+import models.tree.fields.FieldType;
+import models.tree.fields.FieldsNode;
 
 public class ChangeOrderForm extends CMSForm {
 	private static ChangeOrderForm instance;

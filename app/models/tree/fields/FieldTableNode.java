@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
-
 import models.data.FilledFormFields;
 import models.tree.SingleTargetNode;
+
+import org.apache.commons.lang3.StringUtils;
+
 import play.twirl.api.Html;
 
 public class FieldTableNode extends SingleTargetNode {

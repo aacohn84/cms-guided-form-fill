@@ -3,15 +3,16 @@ package models.pdf;
 import java.io.File;
 import java.io.IOException;
 
+import models.data.FilledFormFields;
+import models.data.FilledFormFields.FilledFormField;
+import models.forms.CMSForm;
+
 import org.apache.pdfbox.exceptions.COSVisitorException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDField;
 
 import play.Logger;
-import models.data.FilledFormFields;
-import models.data.FilledFormFields.FilledFormField;
-import models.forms.CMSForm;
 
 public class PDFFormFiller {
 	public File fillForm(CMSForm form, FilledFormFields formFields) {
