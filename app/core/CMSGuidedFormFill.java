@@ -14,17 +14,15 @@ import models.data.InMemoryFormDataStore;
 import models.forms.CMSForm;
 import models.forms.ChangeOrderForm;
 import models.pdf.PDFFormFiller;
-import models.tree.CalculationNode;
 import models.tree.Node;
 
 public class CMSGuidedFormFill {
-
 	public static Decision getFirstDecision(String owner) {
 		FormDataStore formDataStore = InMemoryFormDataStore.getInstance();
 		Node root = ChangeOrderForm.getInstance().getRoot();
 		if (!formDataStore.containsUsername(owner)) {
 			FormData formData = new FormData(owner);
-			Decision firstDecision = new Decision(root, null, null);
+			Decision firstDecision = new Decision().setContext(root);
 			formData.decisionMap.putDecision(firstDecision);
 			formDataStore.setFormData(owner, formData);
 		}
@@ -87,10 +85,9 @@ public class CMSGuidedFormFill {
 	 */
 	public static Decision makeDecision(String owner, String idCurrentNode,
 			Map<String, String> requestData) {
-
 		/*
-		 * Retrieve the owner's form data first. We won't bother continuing
-		 * if this raises an exception.
+		 * Retrieve the owner's form data first, since there's no point in doing
+		 * anything else if the form data doesn't exist.
 		 */
 		FormDataStore formDataStore = InMemoryFormDataStore.getInstance();
 		FormData formData = formDataStore.getFormData(owner);
@@ -103,11 +100,13 @@ public class CMSGuidedFormFill {
 
 		// create a decision based on the data available
 		FilledFormFields filledFormFields = formData.filledFormFields;
-		Decision decision = currentNode.createDecision(form, requestData,
+		Decision decision = currentNode.createDecision(requestData,
 				filledFormFields);
 
 		// save/update decision and fill/update form fields
-		prepNextDecision(formData.decisionMap, decision);
+		String idNextNode = currentNode.getIdNextNode(requestData);
+		Node nextNode = form.getNode(idNextNode);
+		prepNextDecision(formData.decisionMap, decision, nextNode);
 		saveDecision(formData.decisionMap, decision);
 		if (currentNode.isOutputNode) {
 			currentNode.fillFormFields(decision.rawInput, filledFormFields);
@@ -115,18 +114,14 @@ public class CMSGuidedFormFill {
 		// update the FormData in the FormDataStore
 		formDataStore.setFormData(owner, formData);
 
-		// return the decision associated with the next node
-		String idNextNode = currentNode.getIdNextNode(requestData);
-
 		/*
-		 * If the next node is a CalculationNode, process the calculation but do
-		 * not return its decision. Return the next one instead.
+		 * Return decision associated with next node. If next node not visible,
+		 * make decision for it and repeat.
 		 */
-		Node nextNode = form.getNode(idNextNode);
-		if (nextNode.isVisible) {
-			return formData.decisionMap.getDecision(idNextNode);
+		if (!nextNode.isVisible) {
+			return makeDecision(owner, decision.next.context.id, requestData);
 		}
-		return makeDecision(owner, idNextNode, requestData);
+		return decision.next;
 	}
 
 	static void saveDecision(DecisionMap decisions, Decision decision) {
@@ -143,24 +138,37 @@ public class CMSGuidedFormFill {
 	}
 
 	/*
-	 * Set the previous and context fields for the decision associated with the
-	 * next node in the sequence.
+	 * If there is no decision associated with the next node in the sequence,
+	 * create one. Set it's "previous" field to point back to the context of the
+	 * current node.
 	 * 
 	 * If the specified decision has a next node associated with it, this will
 	 * create or update the decision associated with the next node. This allows
 	 * the decision-tree to be traversed backwards.
 	 */
-	static void prepNextDecision(DecisionMap decisions, Decision decision) {
-		if (decision.next != null) {
-			Decision nextDecision = decisions.getDecision(decision.next.id);
-			if (nextDecision != null) {
-				nextDecision.previous = decision.context;
-			} else {
-				nextDecision = new Decision();
-				nextDecision.previous = decision.context;
-				nextDecision.context = decision.next;
-			}
-			decisions.putDecision(nextDecision);
+	private static void prepNextDecision(DecisionMap decisions,
+			Decision currDecision, Node nextNode) {
+		Decision nextDecision = currDecision.next;
+		if (nextDecision != null) {
+			nextDecision.previous = currDecision;
+		} else {
+			nextDecision = new Decision()
+				.setContext(nextNode)
+				.setPrevious(currDecision);
+			currDecision.next = nextDecision;
+			decisions.putDecision(currDecision.next);
+		}
+	}
+
+	private static void saveDecision(DecisionMap decisions, Decision decision) {
+		Decision existingDecision = decisions.getDecision(decision.context.id);
+		if (existingDecision != null) {
+			// update existing decision
+			existingDecision.next = decision.next;
+			existingDecision.rawInput = decision.rawInput;
+		} else {
+			// save new decision
+			decisions.putDecision(decision);
 		}
 	}
 }

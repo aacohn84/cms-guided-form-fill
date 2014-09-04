@@ -56,14 +56,16 @@ public abstract class Node {
 	 * @return a {@link Decision} prepared with all fields except
 	 *         {@link Decision#previous}
 	 */
-	public Decision createDecision(CMSForm form,
-			Map<String, String> requestData,
+	public Decision createDecision(Map<String, String> requestData,
 			@SuppressWarnings("unused") FilledFormFields filledFormFields) {
 		String rawInput = serializeInput(requestData);
 		String idNextNode = getIdNextNode(requestData);
-		Node nextNode = form.getNode(idNextNode);
 
-		return new Decision(this, rawInput, nextNode);
+		Decision decision = new Decision()
+			.setContext(this)
+			.setRawInput(rawInput);
+		
+		return decision;
 	}
 	
 	/**

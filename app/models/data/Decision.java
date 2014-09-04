@@ -14,49 +14,29 @@ import models.tree.Node;
  * @author Aaron Cohn
  */
 public class Decision {
-	public Node previous, next, context;
+	public Node context;
+	public Decision previous, next;
 	public String rawInput;
 
-	public Decision() {
+	public Decision() {}
+
+	public Decision setContext(Node context) {
+		this.context = context;
+		return this;
 	}
 
-	/**
-	 * Construct a Decision with the specified previous, next, context and
-	 * rawInput.
-	 * 
-	 * @param previous
-	 *            - Node preceding the one for which this decision applies.
-	 * @param next
-	 *            - Next node in the sequence as determined from the context and
-	 *            input.
-	 * @param context
-	 *            - Node for which the rawInput applies.
-	 * @param rawInput
-	 *            - String denoting what the user's input was for the specified
-	 *            context.
-	 */
-	public Decision(Node previous, Node next, Node context, String rawInput) {
+	public Decision setPrevious(Decision previous) {
 		this.previous = previous;
-		this.next = next;
-		this.context = context;
-		this.rawInput = rawInput;
+		return this;
 	}
 
-	/**
-	 * Construct a Decision with the specified context, rawInput, and next node.
-	 * 
-	 * @param context
-	 *            - Node for which the rawInput applies.
-	 * @param next
-	 *            - Next node in the sequence as determined from the context and
-	 *            input.
-	 * @param rawInput
-	 *            - String denoting what the user's input was for the specified
-	 *            node.
-	 */
-	public Decision(Node context, String rawInput, Node next) {
-		this.context = context;
-		this.rawInput = rawInput;
+	public Decision setNext(Decision next) {
 		this.next = next;
+		return this;
+	}
+
+	public Decision setRawInput(String rawInput) {
+		this.rawInput = rawInput;
+		return this;
 	}
 }

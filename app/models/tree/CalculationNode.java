@@ -261,8 +261,7 @@ public class CalculationNode extends SingleTargetNode {
 	 * {@link Decision}.
 	 */
 	@Override
-	public Decision createDecision(CMSForm form,
-			Map<String, String> requestData,
+	public Decision createDecision(Map<String, String> requestData,
 			FilledFormFields filledFormFields) {
 
 		// Copy input parameters to allow modification without side-effects
@@ -284,7 +283,7 @@ public class CalculationNode extends SingleTargetNode {
 			 */
 			requestDataCopy.put(calculatedField.name, fieldValue);
 		}
-		return super.createDecision(form, requestDataCopy, filledFormFields);
+		return super.createDecision(requestDataCopy, filledFormFields);
 	}
 	
 	public Html renderAsHtml(String rawInput) {
