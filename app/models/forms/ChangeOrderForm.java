@@ -11,6 +11,7 @@ import models.tree.CalculationNode.NumExpr;
 import models.tree.CalculationNode.Operators;
 import models.tree.CalculationNode.RefExpr;
 import models.tree.CalculationNode.nAryExpr;
+import models.tree.TerminalNode;
 import models.tree.fields.FieldTableNode;
 import models.tree.fields.FieldType;
 import models.tree.fields.FieldsNode;
@@ -52,7 +53,7 @@ public class ChangeOrderForm extends CMSForm {
 
 		partiesAvailable();
 
-		addNode(new NoteNode(Id.done, "none", "End of form."));
+		addNode(new TerminalNode(Id.done, Desc.done));
 	}
 
 	private void disinterment() {
@@ -173,7 +174,7 @@ public class ChangeOrderForm extends CMSForm {
 			/*
 			 *  Total Deductions = Admin/Return Fees
 			 */
-			.addCalculatedField(Field.totalDeductions, Expr.adminReturnFeesExpr)
+			.addCalculatedField(Field.totalDeductions, Expr.adminReturnFees)
 			/*
 			 * Credit/Balance = Total to be Returned - Total Deductions
 			 */
@@ -210,7 +211,7 @@ public class ChangeOrderForm extends CMSForm {
 			 *  Total Deductions = Admin/Return Fees
 			 */
 			.addCalculatedField(Field.totalDeductions,
-					Expr.adminReturnFeesExpr)
+					Expr.adminReturnFees)
 			/* 
 			 * Credit/Balance = Total to be Returned - Total Deductions
 			 */
@@ -286,10 +287,9 @@ public class ChangeOrderForm extends CMSForm {
 			 */
 			.addCalculatedField(Field.totalToBeReturned, Expr.contractAmountMinusBalanceExpr)
 			/*
-			 *  Total Deductions = Admin/Return Fees + Credits/Discounts
-			 *  TODO: Original spec for this calculation is incorrect -- need to ask Chris about it
+			 *  Total Deductions = Admin/Return Fees
 			 */
-			.addCalculatedField(Field.totalDeductions, Expr.adminFeesPlusCredits)
+			.addCalculatedField(Field.totalDeductions, Expr.adminReturnFees)
 			/*
 			 * Credit/Balance = Total to be Returned - Total Deductions
 			 */
@@ -345,7 +345,8 @@ public class ChangeOrderForm extends CMSForm {
 
 		// TODO: Make plot_fmv_1 check the Donation Letter box
 		addNode(new FieldsNode(Id.plot_fmv_1, Id.parties_avail_choice)
-			.addField("Donation", Field.donationAmount, FieldType.NUMBER));
+			.addField("Donation", Field.donationAmount, FieldType.NUMBER)
+			.addFilledField(Field.donationLetter, "Yes", FieldType.HIDDEN));
 	}
 
 	private void transfer() {
@@ -395,8 +396,9 @@ public class ChangeOrderForm extends CMSForm {
 
 	private void transferDonation() {
 		addNode(new FieldsNode(Id.plot_fmv_2, Id.name_8)
+			.addField("Donation", Field.donationAmount, FieldType.NUMBER)
 			.addFilledField(Field.adminReturnFees, "0.00", FieldType.HIDDEN)
-			.addField("Donation", Field.donationAmount, FieldType.NUMBER));
+			.addFilledField(Field.donationLetter, "Yes", FieldType.HIDDEN));
 
 		addNode(Node.name(Id.name_8, Id.loc_8));
 		addNode(Node.loc(Id.loc_8, Id.orig_contract_num_8));
@@ -532,10 +534,10 @@ public class ChangeOrderForm extends CMSForm {
 			contractBalance,
 			Operators.SUBTRACT);
 
-		static final RefExpr adminReturnFeesExpr = new RefExpr(Field.adminReturnFees);
+		static final RefExpr adminReturnFees = new RefExpr(Field.adminReturnFees);
 
 		static final BinaryExpr adminFeesPlusCredits = new BinaryExpr(
-			adminReturnFeesExpr,
+			adminReturnFees,
 			new RefExpr(Field.creditsDiscounts),
 			Operators.ADD);
 	}
