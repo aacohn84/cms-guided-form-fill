@@ -73,6 +73,19 @@ public class FieldsNode extends SingleTargetNode {
 
 	@Override
 	public Html renderAsHtml(String rawInput) {
+		if (StringUtils.isNotEmpty(rawInput)) {
+			StoredSelection ss = (StoredSelection) recreateObject(rawInput);
+			assert(ss.fields.length == fields.size());
+			int numFields = ss.fields.length;
+			ArrayList<Field> displayedFields = new ArrayList<>(numFields);
+			for (int i = 0; i < numFields; i++) {
+				StoredSelection.Field storedField = ss.fields[i];
+				Field displayedField = fields.get(i).clone();
+				displayedField.value = storedField.value;
+				displayedFields.add(displayedField);
+			}
+			return views.html.questionnaire.fields.render(displayedFields);
+		}
 		return views.html.questionnaire.fields.render(fields);
 	}
 

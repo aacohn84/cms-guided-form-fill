@@ -2,7 +2,7 @@ package models.tree.fields;
 
 import play.twirl.api.Html;
 
-public class Field {
+public class Field implements Cloneable {
 	public String label;
 	public String name;
 	public String value;
@@ -34,5 +34,14 @@ public class Field {
 	
 	public Html renderAsHtml() {
 		return views.html.questionnaire.fieldTypes.textField.render(this);
+	}
+	
+	@Override
+	public Field clone() {
+		try {
+			return (Field) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new AssertionError(); // Can't happen
+		}
 	}
 }
