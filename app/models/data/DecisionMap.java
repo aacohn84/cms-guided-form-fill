@@ -30,7 +30,7 @@ public class DecisionMap implements Iterable<Decision> {
 		Decision negativeOne; // empty decision, serves to start iteration
 
 		public DecisionMapIterator() {
-			negativeOne = new Decision().setContext(firstDecision.context);
+			negativeOne = new Decision().setNext(firstDecision);
 			current = negativeOne;
 		}
 
