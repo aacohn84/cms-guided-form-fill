@@ -1,8 +1,6 @@
 package core;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import models.data.Decision;
@@ -58,25 +56,6 @@ public class CMSGuidedFormFill {
 			return getPreviousDecision(owner, prevNode.id);
 		}
 		return decisionMap.getDecision(prevNode.id);
-	}
-
-	/**
-	 * Returns a list of decisions corresponding to the owner's path through the
-	 * decision tree. Only decisions that result in form output are listed.
-	 */
-	public static List<Decision> getTestOutput(String owner) {
-		FormDataStore formDataStore = InMemoryFormDataStore.getInstance();
-		FormData formData = formDataStore.getFormData(owner);
-		DecisionMap decisions = formData.decisionMap;
-
-		List<Decision> formOutput = new ArrayList<>();
-		for (Decision currDecision : decisions) {
-			Node currNode = currDecision.context;
-			if (currNode.isOutputNode) {
-				formOutput.add(currDecision);
-			}
-		}
-		return formOutput;
 	}
 
 	/**
