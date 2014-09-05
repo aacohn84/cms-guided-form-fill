@@ -1,8 +1,12 @@
 package models.tree;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
 
 import models.data.FilledFormFields;
 import play.twirl.api.Html;
@@ -67,9 +71,14 @@ public class ChoiceNode extends Node {
 	}
 
 	/**
-	 * A mapping of each option to the identifier of its target node.
+	 * A mapping of each choice to the identifier of its target node.
 	 */
-	Map<String, Choice> choices = new HashMap<>();
+	Map<String, Choice> choicesToTargetIds = new HashMap<>();
+
+	/**
+	 * A list of the choices in the order they were added to the node.
+	 */
+	List<Choice> orderedChoices = new ArrayList<>();
 
 	/**
 	 * The name of the form-field associated with this choice, as used in the
@@ -116,7 +125,8 @@ public class ChoiceNode extends Node {
 	 */
 	public ChoiceNode addChoice(String choiceDescription, String targetId) {
 		Choice choice = new Choice(choiceDescription, targetId);
-		choices.put(choiceDescription, choice);
+		choicesToTargetIds.put(choiceDescription, choice);
+		orderedChoices.add(choice);
 		return this;
 	}
 
@@ -137,14 +147,15 @@ public class ChoiceNode extends Node {
 	public ChoiceNode addChoice(String choiceDescription, String choiceName,
 			String targetId) {
 		Choice choice = new Choice(choiceDescription, choiceName, targetId);
-		choices.put(choiceDescription, choice);
+		choicesToTargetIds.put(choiceDescription, choice);
+		orderedChoices.add(choice);
 		return this;
 	}
 
 	@Override
 	public void fillFormFields(String serializedObj, FilledFormFields formFields) {
 		StoredSelection ss = (StoredSelection) recreateObject(serializedObj);
-		Choice choice = choices.get(ss.choice);
+		Choice choice = choicesToTargetIds.get(ss.choice);
 		formFields.fillField(fieldName, choice.name);
 	}
 
@@ -152,7 +163,7 @@ public class ChoiceNode extends Node {
 	public String getIdNextNode(Map<String, String> input) {
 		if (input.containsKey("choice")) {
 			String choice = input.get("choice");
-			return choices.get(choice).targetId;
+			return choicesToTargetIds.get(choice).targetId;
 		}
 		throw new RuntimeException(
 				"Input for a ChoiceNode did not contain a \"choice\" field.");
@@ -160,7 +171,12 @@ public class ChoiceNode extends Node {
 
 	@Override
 	public Html renderAsHtml(String rawInput) {
-		return views.html.questionnaire.choice.render(choices);
+		String choice = "";
+		if (StringUtils.isNotEmpty(rawInput)) {
+			StoredSelection ss = (StoredSelection) recreateObject(rawInput);
+			choice = ss.choice;
+		}
+		return views.html.questionnaire.choice.render(choice, orderedChoices);
 	}
 
 	@Override

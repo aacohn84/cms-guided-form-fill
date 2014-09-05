@@ -1,7 +1,13 @@
-@(choices: Map[String, tree.ChoiceNode.Choice])
+@(selection: String, choices: List[tree.ChoiceNode.Choice])
 
-@for(entry <- choices.entrySet()) {
-  @defining(entry.getValue().description) { description =>
-    <input type="radio" name="choice" value="@description">@description<br>
+@checkedIf(condition: Boolean) = {
+  @if(condition) {
+    checked
+  }
+}
+
+@for(choice <- choices) {
+  @defining(choice.description) { description =>
+    <input type="radio" name="choice" value="@description" @checkedIf(selection.equals(description))>@description<br>
   }
 }
