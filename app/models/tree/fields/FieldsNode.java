@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import models.data.FilledFormFields;
 import models.tree.SingleTargetNode;
 import play.twirl.api.Html;
@@ -16,6 +18,19 @@ import play.twirl.api.Html;
  * @author Aaron Cohn
  */
 public class FieldsNode extends SingleTargetNode {
+	private static Field newField(String label, String name, FieldType fieldType) {
+		Field field;
+		switch (fieldType) {
+			case NUMBER: field = new NumberField(); break;
+			case HIDDEN: field = new HiddenField(); break;
+			default: 	 field = new Field(); // text field
+		}
+		field.setLabel(label);
+		field.setName(name);
+		field.setFieldType(fieldType);
+		return field;
+	}
+
 	List<Field> fields = new ArrayList<>();
 
 	public FieldsNode(String id, String idNext) {
@@ -25,24 +40,25 @@ public class FieldsNode extends SingleTargetNode {
 	/**
 	 * Add an input field to this FieldsNode.
 	 * 
-	 * @param fieldDescription
+	 * @param label
 	 *            - the text to be displayed alongside the input field.
 	 * @param name
 	 *            - the name of the corresponding field in the Acrobat form.
-	 * @param type
+	 * @param fieldType
 	 *            - the type of input expected by this field
 	 * @return a reference to this FieldsNode so that calls to addField can be
 	 *         chained together.
 	 */
-	public FieldsNode addField(String fieldDescription, String name,
-			FieldType type) {
-		Field field = new Field(fieldDescription, name, type);
+	public FieldsNode addField(String label, String name, FieldType fieldType) {
+		Field field = newField(label, name, fieldType);
 		fields.add(field);
 		return this;
 	}
 
-	public FieldsNode addFilledField(String name, String value, FieldType type) {
-		Field field = new FilledField(name, value, type);
+	public FieldsNode addFilledField(String name, String value,
+			FieldType fieldType) {
+		Field field = newField(null, name, fieldType);
+		field.setValue(value);
 		fields.add(field);
 		return this;
 	}
@@ -67,10 +83,11 @@ public class FieldsNode extends SingleTargetNode {
 		for (Field field : fields) {
 			StoredSelection.Field storedField = new StoredSelection.Field();
 			storedField.name = field.name;
-			if (field instanceof FilledField) {
-				storedField.value = ((FilledField) field).value;
+			boolean isPrefilledField = StringUtils.isNotEmpty(field.value);
+			if (isPrefilledField) {
+				storedField.value = field.value;
 			} else {
-				storedField.value = input.get(field.description);
+				storedField.value = input.get(field.name);
 			}
 			storedFields.add(storedField);
 		}

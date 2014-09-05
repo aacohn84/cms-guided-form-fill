@@ -15,8 +15,10 @@ public class FieldTableNode extends SingleTargetNode {
 
 	// Simple renaming of Field class
 	public static class Column extends Field {
-		public Column(String header, String baseFieldName, FieldType type) {
-			super(header, baseFieldName, type);
+		public Column(String header, String baseFieldName, FieldType fieldType) {
+			setLabel(header);
+			setName(baseFieldName);
+			setFieldType(fieldType);
 		}
 	}
 
