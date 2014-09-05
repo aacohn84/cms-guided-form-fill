@@ -59,7 +59,6 @@ public abstract class Node {
 	public Decision createDecision(Map<String, String> requestData,
 			@SuppressWarnings("unused") FilledFormFields filledFormFields) {
 		String rawInput = serializeInput(requestData);
-		String idNextNode = getIdNextNode(requestData);
 
 		Decision decision = new Decision()
 			.setContext(this)

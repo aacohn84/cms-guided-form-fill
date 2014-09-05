@@ -95,6 +95,7 @@ public class CMSGuidedFormFill {
 		 */
 		FormDataStore formDataStore = InMemoryFormDataStore.getInstance();
 		FormData formData = formDataStore.getFormData(owner);
+		DecisionMap decisionMap = formData.decisionMap;
 
 		// retrieve the current node
 		CMSForm form = ChangeOrderForm.getInstance();
@@ -102,30 +103,37 @@ public class CMSGuidedFormFill {
 
 		// TODO: validate user input
 
-		// create a decision based on the data available
-		FilledFormFields filledFormFields = formData.filledFormFields;
-		Decision decision = currentNode.createDecision(requestData,
-				filledFormFields);
+		Decision currDecision = retrieveOrCreateCurrentDecision(idCurrentNode,
+				decisionMap, currentNode);
+		String rawInput = currentNode.serializeInput(requestData);
+		currDecision.setRawInput(rawInput);
 
-		// save/update decision and fill/update form fields
+		// link current decision and next decision to each other
 		String idNextNode = currentNode.getIdNextNode(requestData);
 		Node nextNode = form.getNode(idNextNode);
-		prepNextDecision(formData.decisionMap, decision, nextNode);
-		saveDecision(formData.decisionMap, decision);
+		Decision nextDecision = retrieveOrCreateNextDecision(decisionMap,
+				nextNode);
+		nextDecision.setPrevious(currDecision);
+		currDecision.setNext(nextDecision);
+
+		// save current and next decisions
+		decisionMap.putDecision(currDecision);
+		decisionMap.putDecision(nextDecision);
+
+		// fill/update form fields
+		FilledFormFields filledFormFields = formData.filledFormFields;
 		if (currentNode.isOutputNode) {
-			currentNode.fillFormFields(decision.rawInput, filledFormFields);
+			currentNode.fillFormFields(currDecision.rawInput, filledFormFields);
 		}
-		// update the FormData in the FormDataStore
-		formDataStore.setFormData(owner, formData);
 
 		/*
 		 * Return decision associated with next node. If next node not visible,
 		 * make decision for it and repeat.
 		 */
 		if (!nextNode.isVisible) {
-			return makeDecision(owner, decision.next.context.id, requestData);
+			return makeDecision(owner, currDecision.next.context.id, requestData);
 		}
-		return decision.next;
+		return currDecision.next;
 	}
 
 	private static File getFilledPdf(FormData formData) {
@@ -143,38 +151,21 @@ public class CMSGuidedFormFill {
 		return formFiller.fillForm(form, fields);
 	}
 
-	/*
-	 * If there is no decision associated with the next node in the sequence,
-	 * create one. Set it's "previous" field to point back to the context of the
-	 * current node.
-	 * 
-	 * If the specified decision has a next node associated with it, this will
-	 * create or update the decision associated with the next node. This allows
-	 * the decision-tree to be traversed backwards.
-	 */
-	private static void prepNextDecision(DecisionMap decisions,
-			Decision currDecision, Node nextNode) {
-		Decision nextDecision = currDecision.next;
-		if (nextDecision != null) {
-			nextDecision.previous = currDecision;
-		} else {
-			nextDecision = new Decision()
-				.setContext(nextNode)
-				.setPrevious(currDecision);
-			currDecision.next = nextDecision;
-			decisions.putDecision(currDecision.next);
+	private static Decision retrieveOrCreateCurrentDecision(
+			String idCurrentNode, DecisionMap decisionMap, Node currentNode) {
+		Decision decision = decisionMap.getDecision(idCurrentNode);
+		if (decision == null) {
+			decision = new Decision().setContext(currentNode);
 		}
+		return decision;
 	}
 
-	private static void saveDecision(DecisionMap decisions, Decision decision) {
-		Decision existingDecision = decisions.getDecision(decision.context.id);
-		if (existingDecision != null) {
-			// update existing decision
-			existingDecision.next = decision.next;
-			existingDecision.rawInput = decision.rawInput;
-		} else {
-			// save new decision
-			decisions.putDecision(decision);
+	private static Decision retrieveOrCreateNextDecision(DecisionMap decisions,
+			Node nextNode) {
+		Decision nextDecision = decisions.getDecision(nextNode.id);
+		if (nextDecision == null) {
+			nextDecision = new Decision().setContext(nextNode);
 		}
+		return nextDecision;
 	}
 }
