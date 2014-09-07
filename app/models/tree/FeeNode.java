@@ -8,10 +8,10 @@ import models.data.FilledFormFields;
 import play.twirl.api.Html;
 
 public class FeeNode extends SingleTargetNode {
-	static class StoredSelection implements Serializable {
+	public static class StoredSelection implements Serializable {
 		private static final long serialVersionUID = 4534391046499143699L;
-		String fieldName;
-		String fieldVal;
+		public String fieldName;
+		public String fieldVal;
 	}
 
 	BigDecimal fee;
@@ -28,7 +28,7 @@ public class FeeNode extends SingleTargetNode {
 
 	@Override
 	public void fillFormFields(String serializedObj, FilledFormFields formFields) {
-		StoredSelection ss = (StoredSelection) recreateObject(serializedObj);
+		StoredSelection ss = recreateObject(serializedObj, StoredSelection.class);
 		formFields.fillField(ss.fieldName, ss.fieldVal);
 	}
 

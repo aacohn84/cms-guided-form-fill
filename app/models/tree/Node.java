@@ -1,15 +1,13 @@
 package models.tree;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.Map;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 import models.data.Decision;
 import models.data.FilledFormFields;
 import models.forms.CMSForm;
+import play.libs.Json;
 import play.twirl.api.Html;
 
 /**
@@ -121,32 +119,15 @@ public abstract class Node {
 	 * @param serializedObj
 	 *            - a String containing a serialized object.
 	 */
-	protected final Object recreateObject(String serializedObj) {
-		Object obj = null;
-		try {
-			ByteArrayInputStream bytesIn = new ByteArrayInputStream(
-					serializedObj.getBytes());
-			ObjectInputStream objIn = new ObjectInputStream(bytesIn);
-			obj = objIn.readObject();
-		} catch (IOException | ClassNotFoundException e) {
-			throw new RuntimeException(e);
-		}
-		return obj;
+	protected final <A> A recreateObject(String serializedObj, Class<A> clazz) {
+		JsonNode jsonNode = Json.parse(serializedObj);
+		return Json.fromJson(jsonNode, clazz);
 	}
 
 	/**
 	 * Returns the serialized object as a String.
 	 */
 	protected final String serializeAsString(Object object) {
-		String serializedInput = "";
-		try {
-			ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
-			ObjectOutputStream objOut = new ObjectOutputStream(bytesOut);
-			objOut.writeObject(object);
-			serializedInput = bytesOut.toString();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		return serializedInput;
+		return Json.toJson(object).toString();
 	}
 }

@@ -60,14 +60,10 @@ public class ChoiceNode extends Node {
 	 * 
 	 * @author Aaron Cohn
 	 */
-	private static class StoredSelection implements Serializable {
+	public static class StoredSelection implements Serializable {
 		private static final long serialVersionUID = 3979783495632227041L;
 
 		public String choice;
-
-		public StoredSelection(String choice) {
-			this.choice = choice;
-		}
 	}
 
 	/**
@@ -154,7 +150,7 @@ public class ChoiceNode extends Node {
 
 	@Override
 	public void fillFormFields(String serializedObj, FilledFormFields formFields) {
-		StoredSelection ss = (StoredSelection) recreateObject(serializedObj);
+		StoredSelection ss = recreateObject(serializedObj, StoredSelection.class);
 		Choice choice = choicesToTargetIds.get(ss.choice);
 		formFields.fillField(fieldName, choice.name);
 	}
@@ -173,7 +169,7 @@ public class ChoiceNode extends Node {
 	public Html renderAsHtml(String rawInput) {
 		String choice = "";
 		if (StringUtils.isNotEmpty(rawInput)) {
-			StoredSelection ss = (StoredSelection) recreateObject(rawInput);
+			StoredSelection ss = recreateObject(rawInput, StoredSelection.class);
 			choice = ss.choice;
 		}
 		return views.html.questionnaire.choice.render(choice, orderedChoices);
@@ -182,7 +178,8 @@ public class ChoiceNode extends Node {
 	@Override
 	public String serializeInput(Map<String, String> input) {
 		String choice = input.get("choice");
-		StoredSelection storedSelection = new StoredSelection(choice);
+		StoredSelection storedSelection = new StoredSelection();
+		storedSelection.choice = choice;
 		return serializeAsString(storedSelection);
 	}
 }

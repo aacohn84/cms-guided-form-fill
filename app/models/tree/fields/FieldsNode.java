@@ -65,8 +65,8 @@ public class FieldsNode extends SingleTargetNode {
 
 	@Override
 	public void fillFormFields(String serializedObj, FilledFormFields formFields) {
-		StoredSelection ss = (StoredSelection) recreateObject(serializedObj);
-		for (StoredSelection.Field storedField : ss.fields) {
+		StoredSelection ss = recreateObject(serializedObj, StoredSelection.class);
+		for (StoredField storedField : ss.fields) {
 			formFields.fillField(storedField.name, storedField.value);
 		}
 	}
@@ -74,12 +74,12 @@ public class FieldsNode extends SingleTargetNode {
 	@Override
 	public Html renderAsHtml(String rawInput) {
 		if (StringUtils.isNotEmpty(rawInput)) {
-			StoredSelection ss = (StoredSelection) recreateObject(rawInput);
+			StoredSelection ss = recreateObject(rawInput, StoredSelection.class);
 			assert(ss.fields.length == fields.size());
 			int numFields = ss.fields.length;
 			ArrayList<Field> displayedFields = new ArrayList<>(numFields);
 			for (int i = 0; i < numFields; i++) {
-				StoredSelection.Field storedField = ss.fields[i];
+				StoredField storedField = ss.fields[i];
 				Field displayedField = fields.get(i).clone();
 				displayedField.value = storedField.value;
 				displayedFields.add(displayedField);
@@ -92,9 +92,9 @@ public class FieldsNode extends SingleTargetNode {
 	@Override
 	public String serializeInput(Map<String, String> input) {
 		// create a list of field names & values
-		List<StoredSelection.Field> storedFields = new ArrayList<>();
+		List<StoredField> storedFields = new ArrayList<>();
 		for (Field field : fields) {
-			StoredSelection.Field storedField = new StoredSelection.Field();
+			StoredField storedField = new StoredField();
 			storedField.name = field.name;
 			boolean isPrefilledField = StringUtils.isNotEmpty(field.value);
 			if (isPrefilledField) {
@@ -106,7 +106,7 @@ public class FieldsNode extends SingleTargetNode {
 		}
 		// convert list to plain array for storage
 		StoredSelection storedSelection = new StoredSelection();
-		storedSelection.fields = new StoredSelection.Field[storedFields.size()];
+		storedSelection.fields = new StoredField[storedFields.size()];
 		storedSelection.fields = storedFields.toArray(storedSelection.fields);
 
 		return serializeAsString(storedSelection);

@@ -8,15 +8,8 @@ import java.io.Serializable;
  * 
  * @author Aaron Cohn
  */
-class StoredSelection implements Serializable {
-	static class Field implements Serializable {
-		private static final long serialVersionUID = -4801158335261387855L;
-
-		public String name;
-		public String value;
-	}
-
+public class StoredSelection implements Serializable {
 	private static final long serialVersionUID = 1081518772940436931L;
 
-	StoredSelection.Field[] fields;
+	public StoredField[] fields;
 }

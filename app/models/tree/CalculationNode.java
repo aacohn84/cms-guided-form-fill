@@ -9,23 +9,17 @@ import java.util.Map;
 
 import models.data.Decision;
 import models.data.FilledFormFields;
+import models.tree.fields.StoredField;
 
 import org.apache.commons.lang3.StringUtils;
 
 import play.twirl.api.Html;
 
 public class CalculationNode extends SingleTargetNode {
-
-	static class StoredSelection implements Serializable {
-		static class Field implements Serializable {
-			private static final long serialVersionUID = -6883068056446837545L;
-			String name;
-			String value;
-		}
-		
+	public static class StoredSelection implements Serializable {
 		private static final long serialVersionUID = -4566260486738356572L;
-		
-		Field[] fields;
+
+		public StoredField[] fields;
 	}
 	
 	static class CalculatedField {
@@ -242,16 +236,16 @@ public class CalculationNode extends SingleTargetNode {
 	@Override
 	public String serializeInput(Map<String, String> input) {
 		// create a list of field names & values
-		List<StoredSelection.Field> fields = new ArrayList<>();
+		List<StoredField> fields = new ArrayList<>();
 		for (CalculatedField calculatedField : calculatedFields) {
-			StoredSelection.Field field = new StoredSelection.Field();
+			StoredField field = new StoredField();
 			field.name = calculatedField.name;
 			field.value = input.get(calculatedField.name);
 			fields.add(field);
 		}
 		// convert list to plain array for storage
 		StoredSelection ss = new StoredSelection();
-		ss.fields = new StoredSelection.Field[fields.size()];
+		ss.fields = new StoredField[fields.size()];
 		ss.fields = fields.toArray(ss.fields);
 		return serializeAsString(ss);
 	}
@@ -290,8 +284,8 @@ public class CalculationNode extends SingleTargetNode {
 	public Html renderAsHtml(String rawInput) {
 		String html = new String();
 		if (StringUtils.isNotEmpty(rawInput)) {
-			StoredSelection ss = (StoredSelection) recreateObject(rawInput);
-			for (StoredSelection.Field field : ss.fields) {
+			StoredSelection ss = recreateObject(rawInput, StoredSelection.class);
+			for (StoredField field : ss.fields) {
 				html += "<strong>" + field.name + ":</strong> " + field.value
 						+ "<br>";
 			}

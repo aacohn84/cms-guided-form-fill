@@ -14,11 +14,15 @@ import play.twirl.api.Html;
 public class FieldTableNode extends SingleTargetNode {
 
 	// Simple renaming of Field class
-	public static class Column extends Field {
+	public static class Column {
+		public String header;
+		public String baseFieldName;
+		public FieldType fieldType;
+		
 		public Column(String header, String baseFieldName, FieldType fieldType) {
-			setLabel(header);
-			setName(baseFieldName);
-			setFieldType(fieldType);
+			this.header = header;
+			this.baseFieldName = baseFieldName;
+			this.fieldType = fieldType;
 		}
 	}
 
@@ -50,7 +54,7 @@ public class FieldTableNode extends SingleTargetNode {
 	public FieldTableNode addColumn(String header, String baseFieldName,
 			FieldType type) {
 		for (Column c : columns) {
-			if (c.name.equals(baseFieldName)) {
+			if (c.baseFieldName.equals(baseFieldName)) {
 				throw new RuntimeException("Column with base field name \""
 						+ baseFieldName
 						+ "\" already exists in this FieldsTableNode.");
@@ -62,19 +66,19 @@ public class FieldTableNode extends SingleTargetNode {
 
 	@Override
 	public void fillFormFields(String serializedObj, FilledFormFields formFields) {
-		StoredSelection ss = (StoredSelection) recreateObject(serializedObj);
-		for (StoredSelection.Field field : ss.fields) {
+		StoredSelection ss = recreateObject(serializedObj, StoredSelection.class);
+		for (StoredField field : ss.fields) {
 			formFields.fillField(field.name, field.value);
 		}
 	}
 
 	@Override
 	public String serializeInput(Map<String, String> input) {
-		ArrayList<StoredSelection.Field> fields = new ArrayList<>();
+		ArrayList<StoredField> fields = new ArrayList<>();
 		for (Column col : columns) {
 			for (int row = 1; row <= numRows; row++) {
-				StoredSelection.Field field = new StoredSelection.Field();
-				field.name = col.name + row;
+				StoredField field = new StoredField();
+				field.name = col.baseFieldName + row;
 				String inputVal = input.get(field.name);
 				if (StringUtils.isEmpty(inputVal)) {
 					field.value = col.fieldType.defaultVal();
@@ -85,7 +89,7 @@ public class FieldTableNode extends SingleTargetNode {
 			}
 		}
 		StoredSelection ss = new StoredSelection();
-		ss.fields = new StoredSelection.Field[fields.size()];
+		ss.fields = new StoredField[fields.size()];
 		fields.toArray(ss.fields);
 		return serializeAsString(ss);
 	}

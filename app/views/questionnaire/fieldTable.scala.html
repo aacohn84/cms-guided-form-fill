@@ -3,13 +3,13 @@
 <table>
   <tr>
   @for(c <- columns) {
-    <th>@c.label</th>
+    <th>@c.header</th>
   }
   </tr>
   @for(r <- rows) {
     <tr>
     @for(c <- columns) {
-      <td><input type="@c.fieldType" name="@c.name@r" /></td>
+      <td><input type="@c.fieldType" name="@c.baseFieldName@r" /></td>
     }
     </tr>
   }
