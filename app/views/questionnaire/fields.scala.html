@@ -1,5 +1,9 @@
-@(fields: List[tree.fields.Field])
+@(detailDescription: String, fields: List[tree.fields.Field])
 
 @for(field <- fields) {
   @field.renderAsHtml()<br>
+}
+
+@if(detailDescription != null) {
+  <p>@detailDescription</p>
 }

@@ -31,10 +31,11 @@ public class FieldsNode extends SingleTargetNode {
 		return field;
 	}
 
+	String detailDescription;
 	List<Field> fields = new ArrayList<>();
 
-	public FieldsNode(String id, String idNext) {
-		super(id, idNext, "Please enter the following: ", true);
+	public FieldsNode(String id, String idNext, String description) {
+		super(id, idNext, description, true);
 	}
 
 	/**
@@ -73,20 +74,24 @@ public class FieldsNode extends SingleTargetNode {
 
 	@Override
 	public Html renderAsHtml(String rawInput) {
+		List<Field> fieldsToDisplay;
 		if (StringUtils.isNotEmpty(rawInput)) {
 			StoredSelection ss = recreateObject(rawInput, StoredSelection.class);
 			assert(ss.fields.length == fields.size());
 			int numFields = ss.fields.length;
-			ArrayList<Field> displayedFields = new ArrayList<>(numFields);
+			ArrayList<Field> fieldsWithValues = new ArrayList<>(numFields);
 			for (int i = 0; i < numFields; i++) {
 				StoredField storedField = ss.fields[i];
 				Field displayedField = fields.get(i).clone();
 				displayedField.value = storedField.value;
-				displayedFields.add(displayedField);
+				fieldsWithValues.add(displayedField);
 			}
-			return views.html.questionnaire.fields.render(displayedFields);
+			fieldsToDisplay = fieldsWithValues;
+		} else {
+			fieldsToDisplay = fields;
 		}
-		return views.html.questionnaire.fields.render(fields);
+		return views.html.questionnaire.fields.render(detailDescription,
+				fieldsToDisplay);
 	}
 
 	@Override
@@ -110,5 +115,10 @@ public class FieldsNode extends SingleTargetNode {
 		storedSelection.fields = storedFields.toArray(storedSelection.fields);
 
 		return serializeAsString(storedSelection);
+	}
+
+	public FieldsNode setDetailDescription(String detailDescription) {
+		this.detailDescription = detailDescription;
+		return this;
 	}
 }

@@ -98,7 +98,7 @@ public class ChangeOrderForm extends CMSForm {
 		addNode(Node.loc(Id.loc_1, Id.orig_contract_num_1));
 		addNode(Node.origContractNum(Id.orig_contract_num_1, Id.disint_info));
 
-		addNode(new FieldsNode(Id.disint_info, Id.reason_1)
+		addNode(new FieldsNode(Id.disint_info, Id.reason_1, Desc.disint_info)
 			.addField("Decedent(s)", Field.decedents, FieldType.TEXT)
 			.addField("Place of Final Disposition", Field.placeOfFinalDisposition, FieldType.TEXT)
 			.addField("CFCS Re-Interment Location", Field.cfcsReIntermentLocation, FieldType.TEXT)
@@ -112,7 +112,8 @@ public class ChangeOrderForm extends CMSForm {
 
 	private void returnExchg() {
 		addNode(new FieldsNode(Id.curr_contract_value,
-				Id.curr_contract_balance_2)
+				Id.curr_contract_balance_2, Desc.curr_contract_value)
+			.setDetailDescription(Desc.curr_contract_value_detail)
 			.addField("Current contract value", Field.contractAmount, FieldType.NUMBER));
 
 		addNode(Node.currContractBalance(Id.curr_contract_balance_2,
@@ -187,7 +188,7 @@ public class ChangeOrderForm extends CMSForm {
 		addNode(Node.loc(Id.loc_3, Id.orig_contract_num_3));
 		addNode(Node.origContractNum(Id.orig_contract_num_3, Id.gift_amount));
 		
-		addNode(new FieldsNode(Id.gift_amount, Id.reason_3)
+		addNode(new FieldsNode(Id.gift_amount, Id.reason_3, Desc.gift_amount)
 			.addField("Gift Amount", Field.giftAmount, FieldType.NUMBER));
 
 		addNode(Node.reason(Id.reason_3, Id.calc_3));
@@ -344,7 +345,8 @@ public class ChangeOrderForm extends CMSForm {
 				Desc.refund_request_note));
 
 		// TODO: Make plot_fmv_1 check the Donation Letter box
-		addNode(new FieldsNode(Id.plot_fmv_1, Id.parties_avail_choice)
+		addNode(new FieldsNode(Id.plot_fmv_1, Id.parties_avail_choice,
+				Desc.plot_fmv)
 			.addField("Donation", Field.donationAmount, FieldType.NUMBER)
 			.addFilledField(Field.donationLetter, "Yes", FieldType.HIDDEN));
 	}
@@ -381,7 +383,7 @@ public class ChangeOrderForm extends CMSForm {
 		addNode(Node.loc(Id.loc_7, Id.orig_contract_num_7));
 		addNode(Node.origContractNum(Id.orig_contract_num_7, Id.assignee_info));
 
-		addNode(new FieldsNode(Id.assignee_info, Id.reason_7)
+		addNode(new FieldsNode(Id.assignee_info, Id.reason_7, Desc.assignee_info)
 			.addField("Name", Field.assigneeNames, FieldType.TEXT)
 			.addField("Address", Field.assigneeAddress, FieldType.TEXT)
 			.addField("Phone", Field.assigneePhone, FieldType.TEXT)
@@ -395,7 +397,7 @@ public class ChangeOrderForm extends CMSForm {
 	}
 
 	private void transferDonation() {
-		addNode(new FieldsNode(Id.plot_fmv_2, Id.name_8)
+		addNode(new FieldsNode(Id.plot_fmv_2, Id.name_8, Desc.plot_fmv)
 			.addField("Donation", Field.donationAmount, FieldType.NUMBER)
 			.addFilledField(Field.adminReturnFees, "0.00", FieldType.HIDDEN)
 			.addFilledField(Field.donationLetter, "Yes", FieldType.HIDDEN));
@@ -470,6 +472,60 @@ public class ChangeOrderForm extends CMSForm {
 				Desc.loc_all_parties_note));
 	}
 	
+	// Description associated with each node in the decision tree
+	private static class Desc {
+		final static String prerequisites_note = "Before beginning the Change Order process, make sure you have the Patron’s original contract, and have performed all necessary verifications within HMIS (if applicable).";
+		final static String change_order_type_choice = "What does the patron wish to do?";
+		final static String curr_contract_value = "Please enter the current value of the contract.";
+		final static String curr_contract_value_detail = "The current value is the total value of the original contract, subtracting any goods/services that have been fulfilled.";
+		final static String curr_contract_balance = "Please enter the outstanding contract balance.";
+		final static String curr_contract_balance_detail = "The balance is the amount that the patron still has to pay before the contract is paid in full.";
+		final static String paid_in_full_choice = "Is the original contract paid in full?";
+		final static String cash_receipt = "Since the contract must be paid in full for this type of transaction, a cash receipt reflecting the outstanding balance must be included with the change order packet.";
+		final static String return_inv_choice = "Is cemetery inventory (plot, crypt, niche) to be returned?";
+		final static String property_owner_choice = "Does the property Owner(s) differ from the contract Patron(s)?";
+		final static String property_owner_sig_note = "Since a disinterment is subject to the discretion of the property owners, they must be the signatory(s) on the change order.";
+		final static String disint_type_choice = "Please select the type of disinterment that is to occur:";
+		final static String disint_fee = "A disinterment fee applies to this transaction.";
+		final static String name = "Please enter the names of all patrons that were parties to the original contract:";
+		final static String loc = "Please enter the cemetery, and the location of the interment space(s) that are subject to this change order:";
+		final static String orig_contract_num = "Please enter the original contract number:";
+		final static String disint_info = "Please provide the following information regarding the disinterment:";
+		final static String reason = "Please provide a brief description of the reason for this transaction:";
+		final static String transfer_type_choice = "Please select the type of transfer that the Patron wishes to perform:";
+		final static String transfer_fee_note = "A processing fee applies for any property transfer to a new owner.";
+		final static String transfer_fee_waived_note = "No transfer fee applies for a release of interest. Only those that are present are able to release their interest in the property.";
+		final static String assignee_info = "Please provide the following information regarding the person to receive the property:";
+		final static String orig_contract_date = "What is the date of the original contract?";
+		final static String admin_fee_waived = "Note: No administration fee applies to this transaction.";
+		final static String upgrade_exchg_choice = "Is the return/exchange part of the upgrade or even exchange?";
+		final static String admin_fee = "Note: An administration fee applies to this transaction. The fee amount will be reflected on the Change Order Form.";
+		final static String return_int_rights_choice = "Are all interment rights purchased to be returned?";
+		final static String return_goods_choice = "Are all Goods & Services purchased to be returned?";
+		final static String gift_amount = "Please enter the “Gift Amount,” as listed on the original contract:";
+		final static String items_returned = "Please list each of the items to be returned:";
+		final static String credits_discounts = "Were any credits or discounts provided at the time of the original sale? If so, please list:";
+		final static String apply_credit_choice = "How would the patron like any credits (if applicable) applied?";
+		final static String new_contract_note = "Note: A copy of the new contract will need to be included with the change order packet.";
+		final static String existing_contract_note = "Note: A copy of the existing contract will need to be included with the change order packet.";
+		final static String refund_request_note = "Note: The refund will be processed, and a check will be sent to the patron subject to any conditions listed on the original contract or return policy.";
+		final static String plot_fmv = "Note: A letter will be provided to the patron as evidence of the donation for tax purposes.";
+		final static String parties_avail_choice = "Are all parties to the original contract available to sign?";
+		final static String party_present_choice = "If all parties to the original contract are not currently available to sign the change order form, who is present?";
+		final static String consult_ad_note = "Note: Because no parties to the original contract are present, this change order is subject to management approval, as appropriate rules of succession must be followed. Please consult your manager before processing the change order packet.";
+		final static String reason_party_unavail_choice = "Why are other parties to the original contract unavailable?";
+		final static String cfcs_burial_choice = "Are all the deceased buried in a CFCS cemetery?";
+		final static String relocation_choice = "Will out-of-town parties be signing Change Order?";
+		final static String reasonable_effort_choice = "Have reasonable efforts been made to locate party(s)?";
+		final static String burial_evidence_note = "Note: Evidence of burial(s) must be included with the change order packet.";
+		final static String death_cert_note = "Note: Death certificates for any deceased party(s) must be included with the change order packet.";
+		final static String notary_sig_note = "Note: The signatures of out-of-town signatory(s) must be notarized in the area provided on the change order form.";
+		final static String notarized_release_note = "Note: A signed, notarized release of interest (change order) form must be completed separately, and included with this change order packet.";
+		final static String due_diligence_note = "Note: A signed “Statement of Due Diligence” form must be included with the change order packet.";
+		final static String loc_all_parties_note = "Note: Efforts must be made to locate all parties to the original contract!";
+		final static String done = "PROCESS COMPLETE!\r\n\r\nYour change order form is ready to be printed. You can access this form at any time through the main menu.";
+	}
+
 	private static class Expr {
 		static final NumExpr zero = new NumExpr(BigDecimal.ZERO);
 
@@ -491,9 +547,9 @@ public class ChangeOrderForm extends CMSForm {
 			public boolean isSatisfied(FilledFormFields filledFormFields) {
 				try {
 					// return true if (fee == 0.00), false otherwise
-					String adminReturnFees = filledFormFields
+					String adminReturnFeesVal = filledFormFields
 							.getFieldValue(Field.adminReturnFees);
-					BigDecimal returnFeeVal = new BigDecimal(adminReturnFees);
+					BigDecimal returnFeeVal = new BigDecimal(adminReturnFeesVal);
 					return (returnFeeVal.compareTo(BigDecimal.ZERO) == 0);
 				} catch (RuntimeException e) {
 					// field not filled (null); means the fee wasn't waived.
@@ -540,6 +596,64 @@ public class ChangeOrderForm extends CMSForm {
 			adminReturnFees,
 			new RefExpr(Field.creditsDiscounts),
 			Operators.ADD);
+	}
+
+	// Names of fillable form fields in the Change Order form PDF
+	private static class Field {
+		final static String changeOrderType = "Change Order Type";
+		final static String return_ = "Return";
+		final static String assignment = "Assignment";
+		final static String disinterment = "Disinterment";
+		final static String names = "Names";
+		final static String address = "Address";
+		final static String phone = "Phone";
+		final static String email = "Email";
+		final static String cemetery = "Cemetery";
+		final static String location = "Location";
+		final static String origContractNum = "Orig Contract";
+		final static String contractAmount = "Contract Amount";
+		final static String contractBalance = "Contract Balance";
+		final static String reason = "Reason";
+		final static String itemCodeBase = "Item Code ";
+		final static String descriptionBase = "Description ";
+		final static String extendedPriceBase = "Extended Price ";
+		final static String extendedPrice1 = extendedPriceBase + "1";
+		final static String extendedPrice2 = extendedPriceBase + "2";
+		final static String extendedPrice3 = extendedPriceBase + "3";
+		final static String extendedPrice4 = extendedPriceBase + "4";
+		final static String extendedPrice5 = extendedPriceBase + "5";
+		final static String giftAmount = "Gift Amount";
+		final static String adminReturnFees = "Admin/Return Fees";
+		final static String creditsDiscounts = "Credits/Discounts";
+		final static String totalToBeReturned = "Total to be Returned";
+		final static String applyCredit = "Apply Credit";
+		final static String newContract = "New Contract";
+		final static String existingContract = "Existing Contract";
+		final static String refund = "Refund";
+		final static String totalDeductions = "Total Deductions";
+		final static String creditBalance = "Credit/Balance";
+		final static String propertyAssignment = "Property Assignment";
+		final static String transferOfOwnership = "Transfer of Ownership";
+		final static String releaseOfInterest = "Release of Interest";
+		final static String donation = "Donation";
+		final static String donationAmount = "Donation Amount";
+		final static String assigneeNames = "Assignee Names";
+		final static String assigneeAddress = "Assignee Address";
+		final static String assigneePhone = "Assignee Phone";
+		final static String assigneeEmail = "Assignee Email";
+		final static String decedents = "Decedents";
+		final static String placeOfFinalDisposition = "Place of Final Disposition";
+		final static String cfcsReIntermentLocation = "CFCS ReInterment Location";
+		final static String cfcsReIntermentCemetery = "CFCS ReInterment Cemetery";
+		final static String notarySignature = "Notary Signature";
+		final static String originalContract = "Original Contract";
+		final static String deathCertificate = "Death Certificate";
+		final static String cashReceipt = "Cash Receipt";
+		final static String signedNotarizedRelease = "Signed/Notarized Release";
+		final static String donationLetter = "Donation Letter";
+		final static String statementOfDueDiligenceForm = "Statement of Due Diligence Form";
+		final static String evidenceOfBurial = "Evidence of Burial";
+		final static String newExistingContract = "New/Existing Contract";
 	}
 
 	// Identifier of each node in the Change Order Form decision tree
@@ -647,121 +761,11 @@ public class ChangeOrderForm extends CMSForm {
 		final static String done = "done";
 	}
 
-	// Description associated with each node in the decision tree
-	private static class Desc {
-		final static String prerequisites_note = "Before beginning the Change Order process, make sure you have the Patron’s original contract, and have performed all necessary verifications within HMIS (if applicable).";
-		final static String change_order_type_choice = "What does the patron wish to do?";
-		final static String curr_contract_value = "Please enter the current value of the contract.";
-		final static String curr_contract_value_detail = "The current value is the total value of the original contract, subtracting any goods/services that have been fulfilled.";
-		final static String curr_contract_balance = "Please enter the outstanding contract balance.";
-		final static String curr_contract_balance_detail = "The balance is the amount that the patron still has to pay before the contract is paid in full.";
-		final static String paid_in_full_choice = "Is the original contract paid in full?";
-		final static String cash_receipt = "Since the contract must be paid in full for this type of transaction, a cash receipt reflecting the outstanding balance must be included with the change order packet.";
-		final static String return_inv_choice = "Is cemetery inventory (plot, crypt, niche) to be returned?";
-		final static String property_owner_choice = "Does the property Owner(s) differ from the contract Patron(s)?";
-		final static String property_owner_sig_note = "Since a disinterment is subject to the discretion of the property owners, they must be the signatory(s) on the change order.";
-		final static String disint_type_choice = "Please select the type of disinterment that is to occur:";
-		final static String disint_fee = "A disinterment fee applies to this transaction.";
-		final static String name = "Please enter the names of all patrons that were parties to the original contract:";
-		final static String loc = "Please enter the cemetery, and the location of the interment space(s) that are subject to this change order:";
-		final static String orig_contract_num = "Please enter the original contract number:";
-		final static String disint_info = "Please provide the following information regarding the disinterment:";
-		final static String reason = "Please provide a brief description of the reason for this transaction:";
-		final static String transfer_type_choice = "Please select the type of transfer that the Patron wishes to perform:";
-		final static String transfer_fee_note = "A processing fee applies for any property transfer to a new owner.";
-		final static String transfer_fee_waived_note = "No transfer fee applies for a release of interest. Only those that are present are able to release their interest in the property.";
-		final static String assignee_info = "Please provide the following information regarding the person to receive the property:";
-		final static String orig_contract_date = "What is the date of the original contract?";
-		final static String admin_fee_waived = "Note: No administration fee applies to this transaction.";
-		final static String upgrade_exchg_choice = "Is the return/exchange part of the upgrade or even exchange?";
-		final static String admin_fee = "Note: An administration fee applies to this transaction. The fee amount will be reflected on the Change Order Form.";
-		final static String return_int_rights_choice = "Are all interment rights purchased to be returned?";
-		final static String return_goods_choice = "Are all Goods & Services purchased to be returned?";
-		final static String gift_amount = "Please enter the “Gift Amount,” as listed on the original contract:";
-		final static String items_returned = "Please list each of the items to be returned:";
-		final static String credits_discounts = "Were any credits or discounts provided at the time of the original sale? If so, please list:";
-		final static String apply_credit_choice = "How would the patron like any credits (if applicable) applied?";
-		final static String new_contract_note = "Note: A copy of the new contract will need to be included with the change order packet.";
-		final static String existing_contract_note = "Note: A copy of the existing contract will need to be included with the change order packet.";
-		final static String refund_request_note = "Note: The refund will be processed, and a check will be sent to the patron subject to any conditions listed on the original contract or return policy.";
-		final static String plot_fmv = "Note: A letter will be provided to the patron as evidence of the donation for tax purposes.";
-		final static String parties_avail_choice = "Are all parties to the original contract available to sign?";
-		final static String party_present_choice = "If all parties to the original contract are not currently available to sign the change order form, who is present?";
-		final static String consult_ad_note = "Note: Because no parties to the original contract are present, this change order is subject to management approval, as appropriate rules of succession must be followed. Please consult your manager before processing the change order packet.";
-		final static String reason_party_unavail_choice = "Why are other parties to the original contract unavailable?";
-		final static String cfcs_burial_choice = "Are all the deceased buried in a CFCS cemetery?";
-		final static String relocation_choice = "Will out-of-town parties be signing Change Order?";
-		final static String reasonable_effort_choice = "Have reasonable efforts been made to locate party(s)?";
-		final static String burial_evidence_note = "Note: Evidence of burial(s) must be included with the change order packet.";
-		final static String death_cert_note = "Note: Death certificates for any deceased party(s) must be included with the change order packet.";
-		final static String notary_sig_note = "Note: The signatures of out-of-town signatory(s) must be notarized in the area provided on the change order form.";
-		final static String notarized_release_note = "Note: A signed, notarized release of interest (change order) form must be completed separately, and included with this change order packet.";
-		final static String due_diligence_note = "Note: A signed “Statement of Due Diligence” form must be included with the change order packet.";
-		final static String loc_all_parties_note = "Note: Efforts must be made to locate all parties to the original contract!";
-		final static String done = "PROCESS COMPLETE!\r\n\r\nYour change order form is ready to be printed. You can access this form at any time through the main menu.";
-	}
-
-	// Names of fillable form fields in the Change Order form PDF
-	private static class Field {
-		final static String changeOrderType = "Change Order Type";
-		final static String return_ = "Return";
-		final static String assignment = "Assignment";
-		final static String disinterment = "Disinterment";
-		final static String names = "Names";
-		final static String address = "Address";
-		final static String phone = "Phone";
-		final static String email = "Email";
-		final static String cemetery = "Cemetery";
-		final static String location = "Location";
-		final static String origContractNum = "Orig Contract";
-		final static String contractAmount = "Contract Amount";
-		final static String contractBalance = "Contract Balance";
-		final static String reason = "Reason";
-		final static String itemCodeBase = "Item Code ";
-		final static String descriptionBase = "Description ";
-		final static String extendedPriceBase = "Extended Price ";
-		final static String extendedPrice1 = extendedPriceBase + "1";
-		final static String extendedPrice2 = extendedPriceBase + "2";
-		final static String extendedPrice3 = extendedPriceBase + "3";
-		final static String extendedPrice4 = extendedPriceBase + "4";
-		final static String extendedPrice5 = extendedPriceBase + "5";
-		final static String giftAmount = "Gift Amount";
-		final static String adminReturnFees = "Admin/Return Fees";
-		final static String creditsDiscounts = "Credits/Discounts";
-		final static String totalToBeReturned = "Total to be Returned";
-		final static String applyCredit = "Apply Credit";
-		final static String newContract = "New Contract";
-		final static String existingContract = "Existing Contract";
-		final static String refund = "Refund";
-		final static String totalDeductions = "Total Deductions";
-		final static String creditBalance = "Credit/Balance";
-		final static String propertyAssignment = "Property Assignment";
-		final static String transferOfOwnership = "Transfer of Ownership";
-		final static String releaseOfInterest = "Release of Interest";
-		final static String donation = "Donation";
-		final static String donationAmount = "Donation Amount";
-		final static String assigneeNames = "Assignee Names";
-		final static String assigneeAddress = "Assignee Address";
-		final static String assigneePhone = "Assignee Phone";
-		final static String assigneeEmail = "Assignee Email";
-		final static String decedents = "Decedents";
-		final static String placeOfFinalDisposition = "Place of Final Disposition";
-		final static String cfcsReIntermentLocation = "CFCS ReInterment Location";
-		final static String cfcsReIntermentCemetery = "CFCS ReInterment Cemetery";
-		final static String notarySignature = "Notary Signature";
-		final static String originalContract = "Original Contract";
-		final static String deathCertificate = "Death Certificate";
-		final static String cashReceipt = "Cash Receipt";
-		final static String signedNotarizedRelease = "Signed/Notarized Release";
-		final static String donationLetter = "Donation Letter";
-		final static String statementOfDueDiligenceForm = "Statement of Due Diligence Form";
-		final static String evidenceOfBurial = "Evidence of Burial";
-		final static String newExistingContract = "New/Existing Contract";
-	}
-	
+	// Common node definitions as reusable functions
 	private static class Node {
 		static FieldsNode currContractBalance(String id, String idNext) {
-			return new FieldsNode(id, idNext)
+			return new FieldsNode(id, idNext, Desc.curr_contract_balance)
+				.setDetailDescription(Desc.curr_contract_balance_detail)
 				.addField("Current Contract Balance", Field.contractBalance,
 					FieldType.NUMBER);
 		}
@@ -783,23 +787,23 @@ public class ChangeOrderForm extends CMSForm {
 		}
 
 		static FieldsNode name(String id, String idNext) {
-			return new FieldsNode(id, idNext)
+			return new FieldsNode(id, idNext, Desc.name)
 				.addField("Patron Name", ChangeOrderForm.Field.names, FieldType.TEXT);
 		}
 
 		static FieldsNode loc(String id, String idNext) {
-			return new FieldsNode(id, idNext)
+			return new FieldsNode(id, idNext, Desc.loc)
 				.addField("Cemetery", ChangeOrderForm.Field.cemetery, FieldType.TEXT)
 				.addField("Location", ChangeOrderForm.Field.location, FieldType.TEXT);
 		}
 
 		static FieldsNode origContractNum(String id, String idNext) {
-			return new FieldsNode(id, idNext)
+			return new FieldsNode(id, idNext, Desc.orig_contract_num)
 				.addField("Original Contract Number", ChangeOrderForm.Field.origContractNum, FieldType.TEXT);
 		}
 
 		static FieldsNode reason(String id, String idNext) {
-			return new FieldsNode(id, idNext)
+			return new FieldsNode(id, idNext, Desc.reason)
 				.addField("Reason for Change Order", ChangeOrderForm.Field.reason, FieldType.TEXT);
 		}
 
@@ -815,7 +819,7 @@ public class ChangeOrderForm extends CMSForm {
 		}
 
 		static FieldsNode creditsDiscounts(String id, String idNext) {
-			return new FieldsNode(id, idNext)
+			return new FieldsNode(id, idNext, Desc.credits_discounts)
 				.addField("Credits & Discounts to be deducted",
 						ChangeOrderForm.Field.creditsDiscounts, FieldType.NUMBER);
 		}
