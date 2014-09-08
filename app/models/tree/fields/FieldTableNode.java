@@ -94,22 +94,56 @@ public class FieldTableNode extends SingleTargetNode {
 		return serializeAsString(ss);
 	}
 
-	/*
-	 * Returns a list of integers from 1..numRows. This workaround brought to
-	 * you by the irritating lack of support for counting loops in Scala
-	 * templates.
-	 */
-	private List<Integer> getRowNumbers() {
-		ArrayList<Integer> rows = new ArrayList<>(numRows);
-		for (int i = 1; i <= numRows; i++) {
-			rows.add(i);
+	public static class DisplayRows {
+		public List<DisplayColumns> rows = new ArrayList<>();
+		public void add(DisplayColumns dc) {
+			rows.add(dc);
 		}
-		return rows;
+		public DisplayColumns get(int i) {
+			return rows.get(i);
+		}
 	}
-
+	
+	public static class DisplayColumns {
+		public List<Field> cols = new ArrayList<>();
+		public void add(Field f) {
+			cols.add(f);
+		}
+		public Field get(int i) {
+			return cols.get(i);
+		}
+	}
+	
 	@Override
 	public Html renderAsHtml(String rawInput) {
-		return views.html.questionnaire.fieldTable.render(getRowNumbers(),
-				columns);
+		// create empty table
+		DisplayRows fieldTable = new DisplayRows();
+		for (int rowNum = 1; rowNum <= numRows; rowNum++) {
+			DisplayColumns displayColumns = new DisplayColumns();
+			for (Column c : columns) {
+				Field field = new Field();
+				field.name = c.baseFieldName + rowNum;
+				field.fieldType = c.fieldType;
+				displayColumns.add(field);
+			}
+			fieldTable.add(displayColumns);
+		}
+		// fill in values from existing data if possible
+		if (StringUtils.isNotEmpty(rawInput)) {
+			StoredSelection ss = recreateObject(rawInput, StoredSelection.class);
+			if (ss.fields != null) {
+				int numCols = columns.size();
+				assert(ss.fields.length == numRows * numCols - 1);
+				int i = 0;
+				for (int col = 0; col < numCols; col++) {
+					for (int row = 0; row < numRows; row++) {
+						String storedValue = ss.fields[i].value;
+						fieldTable.get(row).get(col).value = storedValue;
+						i++;
+					}
+				}
+			}
+		}
+		return views.html.questionnaire.fieldTable.render(fieldTable, columns);
 	}
 }

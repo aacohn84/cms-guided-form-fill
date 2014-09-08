@@ -1,4 +1,13 @@
-@(rows: List[Integer], columns: List[tree.fields.FieldTableNode.Column])
+@(rows: tree.fields.FieldTableNode.DisplayRows,
+  columns: List[tree.fields.FieldTableNode.Column])
+
+@displayValue(value: String) = @{
+  if (value != null) {
+    value
+  } else {
+    ""
+  }
+}
 
 <table>
   <tr>
@@ -6,10 +15,10 @@
     <th>@c.header</th>
   }
   </tr>
-  @for(r <- rows) {
+  @for(r <- rows.rows) {
     <tr>
-    @for(c <- columns) {
-      <td><input type="@c.fieldType" name="@c.baseFieldName@r" /></td>
+    @for(c <- r.cols) {
+      <td><input type="@c.fieldType" name="@c.name" value="@displayValue(c.value)" /></td>
     }
     </tr>
   }
