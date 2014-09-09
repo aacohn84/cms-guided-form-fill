@@ -2,13 +2,23 @@
 
 @prevLink(isRoot: Boolean) = {
   @if(!isRoot) {
-    <input type="submit" value="<< Previous" onclick="javascript:document.theForm.action='/prev'" />
+    <input
+      id="back-button"
+      type="submit"
+      value="<< Previous"
+      onclick="javascript:modifyTheForm('/prev', true);"
+     />
   }
 }
 
 @nextLink(isTerminal: Boolean) = {
   @if(!isTerminal) {
-    <input type="submit" value="Next >>" onclick="javascript:document.theForm.action='/next'" /><br>
+    <input
+      id="next-button"
+      type="submit"
+      value="Next >>"
+      onclick="javascript:modifyTheForm('/next', false);"
+    />
   }
 }
 
@@ -17,10 +27,10 @@
   <head>
     <link type="text/css" href="@routes.Assets.at("stylesheets/default-stylesheet.css")" rel="stylesheet">
     <script type="text/javascript">
-      function previous() {
+      function modifyTheForm(action, noValidate) {
     	  var theForm = document.theForm;
-    	  theForm.action = "/prev";
-    	  theForm.submit();
+    	  theForm.action = action;
+    	  theForm.noValidate = noValidate;
       }
     </script>
     <meta charset="UTF-8" />
