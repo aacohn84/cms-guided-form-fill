@@ -35,8 +35,9 @@ public class ChangeOrderForm extends CMSForm {
 		super("Change_Order_Form.pdf");
 
 		// decision tree definition
-		root = new NoteNode(Id.prerequisites_note,
-				Id.change_order_type_choice, Desc.prerequisites_note);
+		root = new NoteChecksABoxNode(Id.prerequisites_note,
+				Id.change_order_type_choice, Field.originalContract,
+				Desc.prerequisites_note);
 		addNode(root);
 		
 		addNode(new ChoiceNode(Id.change_order_type_choice,
@@ -53,7 +54,7 @@ public class ChangeOrderForm extends CMSForm {
 
 		partiesAvailable();
 
-		addNode(new TerminalNode(Id.done, Desc.done));
+		addNode(new TerminalNode(Id.done, Desc.done, Desc.done_detail));
 	}
 
 	private void disinterment() {
@@ -344,7 +345,6 @@ public class ChangeOrderForm extends CMSForm {
 		addNode(new NoteNode(Id.refund_request_note, Id.parties_avail_choice,
 				Desc.refund_request_note));
 
-		// TODO: Make plot_fmv_1 check the Donation Letter box
 		addNode(new FieldsNode(Id.plot_fmv_1, Id.parties_avail_choice,
 				Desc.plot_fmv)
 			.addField("Donation", Field.donationAmount, FieldType.NUMBER)
@@ -523,7 +523,8 @@ public class ChangeOrderForm extends CMSForm {
 		final static String notarized_release_note = "Note: A signed, notarized release of interest (change order) form must be completed separately, and included with this change order packet.";
 		final static String due_diligence_note = "Note: A signed “Statement of Due Diligence” form must be included with the change order packet.";
 		final static String loc_all_parties_note = "Note: Efforts must be made to locate all parties to the original contract!";
-		final static String done = "PROCESS COMPLETE!\r\n\r\nYour change order form is ready to be printed. You can access this form at any time through the main menu.";
+		final static String done = "PROCESS COMPLETE!";
+		final static String done_detail = "Your change order form is ready to be printed. You can access this form at any time through the main menu.";
 	}
 
 	private static class Expr {
@@ -788,7 +789,10 @@ public class ChangeOrderForm extends CMSForm {
 
 		static FieldsNode name(String id, String idNext) {
 			return new FieldsNode(id, idNext, Desc.name)
-				.addField("Patron Name", ChangeOrderForm.Field.names, FieldType.TEXT);
+				.addField("Name(s)", ChangeOrderForm.Field.names, FieldType.TEXT)
+				.addField("Address", Field.address, FieldType.TEXT)
+				.addField("Phone", Field.phone, FieldType.TEL)
+				.addField("Email", Field.email, FieldType.EMAIL);
 		}
 
 		static FieldsNode loc(String id, String idNext) {
@@ -804,7 +808,7 @@ public class ChangeOrderForm extends CMSForm {
 
 		static FieldsNode reason(String id, String idNext) {
 			return new FieldsNode(id, idNext, Desc.reason)
-				.addField("Reason for Change Order", ChangeOrderForm.Field.reason, FieldType.TEXT);
+				.addField("Reason for Change Order", ChangeOrderForm.Field.reason, FieldType.TEXTAREA);
 		}
 
 		static ChoiceNode origContractDate(String id, String idWithin30Days, String idOutside30Days) {

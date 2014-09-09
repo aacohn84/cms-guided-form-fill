@@ -1,0 +1,12 @@
+@(field: tree.fields.Field)
+
+@import views.html.questionnaire.fieldTypes.helpers._
+
+@fieldLabel(field.label)<br>
+<textarea
+  rows="10"
+  cols="100"
+  style="font-size: 12pt; font-family: "Lucida Console", Lucida, monospace;"
+  name="@field.name"
+  @required(field.isRequired)
+>@field.value</textarea>

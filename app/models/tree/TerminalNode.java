@@ -6,8 +6,11 @@ import models.data.FilledFormFields;
 import play.twirl.api.Html;
 
 public class TerminalNode extends Node {
-	public TerminalNode(String id, String description) {
+	public String detailDescription;
+	
+	public TerminalNode(String id, String description, String detailDescription) {
 		super(id, description);
+		this.detailDescription = detailDescription;
 	}
 	
 	@Override
@@ -31,7 +34,7 @@ public class TerminalNode extends Node {
 	@Override
 	@SuppressWarnings("unused")
 	public Html renderAsHtml(String rawInput) {
-		return views.html.questionnaire.terminal.render();
+		return views.html.questionnaire.terminal.render(detailDescription);
 	}
 	
 	@Override

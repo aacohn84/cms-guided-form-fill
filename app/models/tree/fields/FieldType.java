@@ -1,7 +1,12 @@
 package models.tree.fields;
 
 public enum FieldType {
-	NUMBER("0.00"), TEXT(""), HIDDEN("");
+	EMAIL(""),
+	HIDDEN(""),
+	NUMBER("0.00"),
+	TEL(""),
+	TEXT(""),
+	TEXTAREA("");
 
 	private String defaultVal;
 	

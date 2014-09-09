@@ -1,10 +1,6 @@
 package models.forms;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map.Entry;
-
 import models.tree.Node;
 
 public class CMSForm {
@@ -28,30 +24,16 @@ public class CMSForm {
 				+ " does not exist in this form.");
 	}
 
-	/**
-	 * Returns a list nodes for which the <code>isOutputNode</code> field is set
-	 * to <code>true</code>.
-	 */
-	public List<Node> getOutputNodes() {
-		List<Node> outputNodes = new ArrayList<>();
-		for (Entry<String, Node> entry : nodes.entrySet()) {
-			Node node = entry.getValue();
-			if (node.isOutputNode) {
-				outputNodes.add(node);
-			}
-		}
-		return outputNodes;
-	}
-
 	public Node getRoot() {
 		return root;
 	}
 
-	void addNode(Node node) {
+	Node addNode(Node node) {
 		if (nodes.containsKey(node.id)) {
-			throw new RuntimeException("A node with the name " + node.id
+			throw new RuntimeException("A node with id " + node.id
 					+ " already exists in this form.");
 		}
 		nodes.put(node.id, node);
+		return node;
 	}
 }

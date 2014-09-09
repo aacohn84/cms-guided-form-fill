@@ -8,6 +8,12 @@
 
 @for(choice <- choices) {
   @defining(choice.description) { description =>
-    <input type="radio" name="choice" value="@description" @checkedIf(selection.equals(description))>@description<br>
+    <input
+      type="radio"
+      name="choice"
+      value="@description"
+      @checkedIf(selection.equals(description))
+      required
+    >@description<br><br>
   }
 }

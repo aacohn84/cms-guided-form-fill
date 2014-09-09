@@ -17,6 +17,13 @@ public class Field implements Cloneable {
 		}
 	}
 
+	public static class TextAreaField extends Field {
+		@Override
+		public Html renderAsHtml() {
+			return views.html.questionnaire.fieldTypes.textAreaField.render(this);
+		}
+	}
+
 	public static Field newField(FieldType fieldType) {
 		return newField("", "", fieldType);
 	}
@@ -26,6 +33,7 @@ public class Field implements Cloneable {
 		switch (fieldType) {
 			case NUMBER:	field = new NumberField(); break;
 			case HIDDEN:	field = new HiddenField(); break;
+			case TEXTAREA:	field = new TextAreaField(); break;
 			default:		field = new Field(); // text-variant
 		}
 		field.setLabel(label);
@@ -58,7 +66,7 @@ public class Field implements Cloneable {
 	}
 
 	public Html renderAsHtml() {
-		return views.html.questionnaire.fieldTypes.textField.render(this);
+		return views.html.questionnaire.fieldTypes.textVariantField.render(this);
 	}
 
 	public final Field setFieldType(FieldType fieldType) {

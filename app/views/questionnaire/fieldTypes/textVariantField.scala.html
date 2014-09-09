@@ -1,0 +1,11 @@
+@(field: tree.fields.Field)
+
+@import views.html.questionnaire.fieldTypes.helpers._
+
+@fieldLabel(field.label)
+<input
+  type="@field.fieldType"
+  name="@field.name"
+  value="@field.value"
+  @required(field.isRequired)
+/>
