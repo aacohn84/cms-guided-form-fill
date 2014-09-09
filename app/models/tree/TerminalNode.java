@@ -11,13 +11,16 @@ public class TerminalNode extends Node {
 	}
 	
 	@Override
+	@SuppressWarnings("unused")
 	public void fillFormFields(String serializedObj, FilledFormFields formFields) {
 
 	}
 
 	@Override
+	@SuppressWarnings("unused")
 	public String getIdNextNode(Map<String, String> input) {
-		return null;
+		throw new RuntimeException(
+				"Method getIdNextNode not implemented in TerminalNode.");
 	}
 
 	@Override
@@ -26,12 +29,15 @@ public class TerminalNode extends Node {
 	}
 
 	@Override
+	@SuppressWarnings("unused")
 	public Html renderAsHtml(String rawInput) {
 		return views.html.questionnaire.terminal.render();
 	}
 	
 	@Override
+	@SuppressWarnings("unused")
 	public String serializeInput(Map<String, String> input) {
-		return null;
+		throw new RuntimeException(
+				"Method serializeInput not implemented in TerminalNode.");
 	}
 }

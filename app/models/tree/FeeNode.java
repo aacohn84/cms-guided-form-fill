@@ -33,13 +33,14 @@ public class FeeNode extends SingleTargetNode {
 	}
 
 	@Override
+	@SuppressWarnings("unused")
 	public Html renderAsHtml(String rawInput) {
 		return views.html.questionnaire.note.render(note);
 	}
 
 	@Override
-	public String serializeInput(
-			@SuppressWarnings("unused") Map<String, String> input) {
+	@SuppressWarnings("unused")
+	public String serializeInput(Map<String, String> input) {
 		StoredSelection ss = new StoredSelection();
 		ss.fieldName = fieldName;
 		ss.fieldVal = fee.toString();

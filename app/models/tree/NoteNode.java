@@ -27,6 +27,7 @@ public class NoteNode extends SingleTargetNode {
 	}
 
 	@Override
+	@SuppressWarnings("unused")
 	public Html renderAsHtml(String rawInput) {
 		return views.html.questionnaire.note.render(note);
 	}

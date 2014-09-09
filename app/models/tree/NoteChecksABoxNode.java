@@ -29,12 +29,13 @@ public class NoteChecksABoxNode extends SingleTargetNode {
 	}
 
 	@Override
-	public String serializeInput(
-			@SuppressWarnings("unused") Map<String, String> input) {
+	@SuppressWarnings("unused")
+	public String serializeInput(Map<String, String> input) {
 		return null;
 	}
 
 	@Override
+	@SuppressWarnings("unused")
 	public Html renderAsHtml(String rawInput) {
 		return views.html.questionnaire.note.render(note);
 	}

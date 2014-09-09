@@ -15,6 +15,16 @@ import models.pdf.PDFFormFiller;
 import models.tree.Node;
 
 public class CMSGuidedFormFill {
+	
+	/**
+	 * Starts the form-filling process for the specified owner.
+	 * 
+	 * @param owner
+	 *            - the logged-in user who owns the data created and stored
+	 *            during this form-filling session.
+	 * @return the Decision associated with the root node of the decision tree.
+	 *         If a Decision doesn't exist yet, it will be created.
+	 */
 	public static Decision getFirstDecision(String owner) {
 		FormDataStore formDataStore = InMemoryFormDataStore.getInstance();
 		Node root = ChangeOrderForm.getInstance().getRoot();
