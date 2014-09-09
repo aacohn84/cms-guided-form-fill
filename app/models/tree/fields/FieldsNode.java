@@ -18,19 +18,6 @@ import play.twirl.api.Html;
  * @author Aaron Cohn
  */
 public class FieldsNode extends SingleTargetNode {
-	private static Field newField(String label, String name, FieldType fieldType) {
-		Field field;
-		switch (fieldType) {
-			case NUMBER: field = new NumberField(); break;
-			case HIDDEN: field = new HiddenField(); break;
-			default: 	 field = new Field(); // text field
-		}
-		field.setLabel(label);
-		field.setName(name);
-		field.setFieldType(fieldType);
-		return field;
-	}
-
 	String detailDescription;
 	List<Field> fields = new ArrayList<>();
 
@@ -51,14 +38,14 @@ public class FieldsNode extends SingleTargetNode {
 	 *         chained together.
 	 */
 	public FieldsNode addField(String label, String name, FieldType fieldType) {
-		Field field = newField(label, name, fieldType);
+		Field field = Field.newField(label, name, fieldType);
 		fields.add(field);
 		return this;
 	}
 
 	public FieldsNode addFilledField(String name, String value,
 			FieldType fieldType) {
-		Field field = newField(null, name, fieldType);
+		Field field = Field.newField(null, name, fieldType);
 		field.setValue(value);
 		fields.add(field);
 		return this;

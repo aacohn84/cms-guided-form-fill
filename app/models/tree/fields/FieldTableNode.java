@@ -121,9 +121,11 @@ public class FieldTableNode extends SingleTargetNode {
 		for (int rowNum = 1; rowNum <= numRows; rowNum++) {
 			DisplayColumns displayColumns = new DisplayColumns();
 			for (Column c : columns) {
-				Field field = new Field();
-				field.name = c.baseFieldName + rowNum;
-				field.fieldType = c.fieldType;
+				Field field = Field.newField(c.fieldType);
+				field.setName(c.baseFieldName + rowNum);
+				if (rowNum > 1) {
+					field.setRequired(false);
+				}
 				displayColumns.add(field);
 			}
 			fieldTable.add(displayColumns);

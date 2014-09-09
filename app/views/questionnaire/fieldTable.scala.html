@@ -18,7 +18,7 @@
   @for(r <- rows.rows) {
     <tr>
     @for(c <- r.cols) {
-      <td><input type="@c.fieldType" name="@c.name" value="@displayValue(c.value)" /></td>
+      <td>@c.renderAsHtml()</td>
     }
     </tr>
   }
