@@ -6,25 +6,18 @@
   }
 }
 
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>CMS Forms Login</title>  
-  </head>
-  <body>
-    @if(globalLoginError() == true) {
-      <p style="color: red">@loginForm.globalError.message</p>
-    }
-    <form action="/authenticate" method="POST">
-      <fieldset>
-        <legend>Log in</legend>
-        <label for="username">User name:</label>
-        <input type="text" name="username" id="username" required><br>
-        <label for="password">Password:</label>
-        <input type="password" name="password" id="password" required><br>
-        <input type="submit" value="Log in">
-      </fieldset>
-    </form>
-  </body>
-</html>
+@main("CMS Forms Login") {
+  <form action="/authenticate" method="POST">
+    <fieldset>
+      <legend>Log in</legend>
+      <label for="username">User name:</label>
+      <input type="text" name="username" id="username" required><br>
+      <label for="password">Password:</label>
+      <input type="password" name="password" id="password" required><br>
+      <input type="submit" value="Log in">
+    </fieldset>
+  </form>
+  @if(globalLoginError() == true) {
+    <p style="color: red">@loginForm.globalError.message</p>
+  }
+}

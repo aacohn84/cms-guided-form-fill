@@ -49,11 +49,11 @@
         </div>
         <div class="content-area">
           <form action="/next" name="theForm" method="POST">
-            <fieldset style="border: 1px solid #cbab7a; width: 975px; height: 330px; border-bottom-right-radius: 10px;  border-bottom-left-radius: 10px;">
-              <legend style="font-family: Times New Roman, Times, serif; text-align: left; font-size: 16pt; color: #560f03; letter-spacing: 1px;">
+            <fieldset style="height: 330px;">
+              <legend>
                 &nbsp;&nbsp;@decision.context.description&nbsp;&nbsp;
               </legend>
-              <div style="padding: 10px; font-size: 14pt">
+              <div style="padding: 20px 10px 10px 10px; font-size: 14pt">
                 <input type="hidden" name="@FormFill.RequestParams.CURRENT_NODE" value="@decision.context.id" />
                 @decision.context.renderAsHtml(decision.rawInput)
               </div>
