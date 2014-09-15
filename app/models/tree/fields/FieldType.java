@@ -17,4 +17,9 @@ public enum FieldType {
 	public String defaultVal() {
 		return this.defaultVal;
 	}
+	
+	@Override
+	public String toString() {
+		return super.toString().toLowerCase();
+	}
 }

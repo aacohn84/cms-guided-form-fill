@@ -6,7 +6,7 @@
       id="back-button"
       type="submit"
       value="<< Previous"
-      onclick="javascript:modifyTheForm('/prev', true);"
+      onclick="javascript:prevClickHandler();"
      />
   }
 }
@@ -17,7 +17,6 @@
       id="next-button"
       type="submit"
       value="Next >>"
-      onclick="javascript:modifyTheForm('/next', false);"
     />
   }
 }
@@ -25,16 +24,38 @@
 <!DOCTYPE HTML>
 <html>
   <head>
-    <link type="text/css" href="@routes.Assets.at("stylesheets/default-stylesheet.css")" rel="stylesheet">
-    <script type="text/javascript">
-      function modifyTheForm(action, noValidate) {
-    	  var theForm = document.theForm;
-    	  theForm.action = action;
-    	  theForm.noValidate = noValidate;
-      }
-    </script>
     <meta charset="UTF-8" />
     <title>Change Order</title>
+    <script type="text/javascript" src="@routes.Assets.at("javascripts/jquery-1.11.1.min.js")"></script>
+    <script type="text/javascript" src="@routes.Assets.at("javascripts/parsley.js")"></script>
+    <script type="text/javascript">
+      function prevClickHandler() {
+    	  var theForm = document.theForm;
+    	  theForm.noValidate = "true";
+    	  $("#theForm").parsley().destroy();
+    	  document.theForm.action = "/prev";
+      }
+    </script>
+    <link type="text/css" href="@routes.Assets.at("stylesheets/default-stylesheet.css")" rel="stylesheet">
+    <style type="text/css">
+      .node-content {
+        padding: 20px 10px 10px 10px;
+        font-size: 14pt;
+      }
+      .parsley-error {
+        color: #B94A48;
+        background-color: #F2DEDE;
+        border: 1px solid #EED3D7;
+      }
+      ul.parsley-errors-list {
+          font-size: 12px;
+          margin: 2px;
+          list-style-type: none; 
+      }
+      ul.parsley-errors-list li {
+          line-height: 12px;
+      }
+    </style>
   </head>
   <body>
     <div class="top-background">
@@ -48,12 +69,12 @@
           </div>
         </div>
         <div class="content-area">
-          <form action="/next" name="theForm" method="POST">
+          <form action="/next" id="theForm" name="theForm" method="POST" data-parsley-validate>
             <fieldset style="height: 330px;">
               <legend>
                 &nbsp;&nbsp;@decision.context.description&nbsp;&nbsp;
               </legend>
-              <div style="padding: 20px 10px 10px 10px; font-size: 14pt">
+              <div class="node-content">
                 <input type="hidden" name="@FormFill.RequestParams.CURRENT_NODE" value="@decision.context.id" />
                 @decision.context.renderAsHtml(decision.rawInput)
               </div>
