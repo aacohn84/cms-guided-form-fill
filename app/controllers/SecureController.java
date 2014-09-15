@@ -7,7 +7,6 @@ import controllers.CMSSession.SessionKey;
 
 @Authenticated(Authenticator.class)
 public class SecureController extends Controller {
-	
 	public static String getUsername() {
 		return CMSSession.get(SessionKey.USERNAME);
 	}

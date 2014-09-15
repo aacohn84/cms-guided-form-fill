@@ -42,8 +42,9 @@ public class InMemoryFormDataStore implements FormDataStore {
 	public void removeFormData(String username) throws NoSuchUserException {
 		if (formDataStore.containsKey(username)) {
 			formDataStore.remove(username);
+		} else {
+			throw new NoSuchUserException(username);
 		}
-		throw new NoSuchUserException(username);
 	}
 
 }

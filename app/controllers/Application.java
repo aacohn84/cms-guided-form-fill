@@ -13,19 +13,8 @@ import views.html.login;
 
 public class Application extends Controller {
 
-	/*
-	 * Serve the forms page for a logged-in user; login page for a user who is
-	 * not logged in.
-	 */
-    public static Result index() {
-    	if (CMSSession.isAuthenticated()) {
-    		return redirect("/forms");
-    	}
-        return ok(login.render(null));
-    }
+	final static Form<User> loginForm = form(User.class);
 
-    final static Form<User> loginForm = form(User.class);
-    
     /*
      * Authenticate a user who is attempting to log in.
      */
@@ -45,13 +34,24 @@ public class Application extends Controller {
     	filledLoginForm.reject("Something wasn't right with your username or password.");
     	return badRequest(login.render(filledLoginForm));
     }
-    
+
     /*
      * Display the landing page. (requires authentication)
      */
     @Authenticated(Authenticator.class)
     public static Result forms() {
     	return ok(views.html.forms.render());
+    }
+    
+    /*
+	 * Serve the forms page for a logged-in user; login page for a user who is
+	 * not logged in.
+	 */
+    public static Result index() {
+    	if (CMSSession.isAuthenticated()) {
+    		return redirect("/forms");
+    	}
+        return ok(login.render(null));
     }
     
     public static Result logout() {
