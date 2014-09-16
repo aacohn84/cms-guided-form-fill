@@ -6,6 +6,8 @@
 GET     /                           controllers.Application.index()
 GET		/forms						controllers.Application.forms()
 GET		/logout						controllers.Application.logout()
+
+GET		/clearSavedChoices			controllers.FormFill.clearSavedChoices()
 GET		/form						controllers.FormFill.getForm()
 POST	/next						controllers.FormFill.next()
 POST	/prev						controllers.FormFill.prev()

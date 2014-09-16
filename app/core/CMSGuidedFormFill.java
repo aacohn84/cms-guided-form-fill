@@ -15,6 +15,12 @@ import models.pdf.PDFFormFiller;
 import models.tree.Node;
 
 public class CMSGuidedFormFill {
+	public static void clearDecisions(String owner) {
+		FormDataStore formDataStore = InMemoryFormDataStore.getInstance();
+		if (formDataStore.containsUsername(owner)) {
+			formDataStore.removeFormData(owner);
+		}
+	}
 	
 	/**
 	 * Starts the form-filling process for the specified owner.

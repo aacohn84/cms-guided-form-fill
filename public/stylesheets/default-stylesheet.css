@@ -9,13 +9,13 @@ body {
   margin-bottom: 0;
 }
 
-ul.nav {
+ul.nav-inline {
   list-style-type: none;
   padding: 0;
   margin: 0;
   display: flex; /* renders <li>'s inline without space between them */
 }
-ul.nav li {
+ul.nav-inline li {
   padding: 0 9px 0 10px;
   border-right-style: solid;
   border-right-width: 1.2px;
@@ -23,29 +23,62 @@ ul.nav li {
   font-style: normal;
   font-size: 14pt;
   font-family: Georgia, "Times New Roman", Times, serif;
-  letter-spacing:1px;
+  letter-spacing: 1px;
   color: #464646;
 }
-ul.nav li:first-child {
+ul.nav-inline li:first-child {
   padding: 0 9px 0 0;
 }
-ul.nav li:last-child {
+ul.nav-inline li:last-child {
   padding: 0 0 0 10px;
   border: none;
 }
-ul.nav li a:link {
+ul.nav-inline li a:link {
   color: #676767;
   text-decoration: none;
 }
-ul.nav li a:visited {
+ul.nav-inline li a:visited {
   color: #676767;
   text-decoration: none;
 }
-ul.nav li a:hover {
+ul.nav-inline li a:hover {
   color: #b77115;
   text-decoration: underline;
 }
-ul.nav li a:active {
+ul.nav-inline li a:active {
+  color: #b77115;
+  text-decoration: none;
+}
+
+ul.nav-block {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  position: relative;
+}
+ul.nav-block li {
+  display: table;
+  margin: 0 auto;
+  padding: 5px 0;
+  font-style: normal;
+  font-size: 14pt;
+  font-family: Georgia, "Times New Roman", Times, serif;
+  letter-spacing:1px;
+  color: #464646;
+}
+ul.nav-block li a:link {
+  color: #676767;
+  text-decoration: none;
+}
+ul.nav-block li a:visited {
+  color: #676767;
+  text-decoration: none;
+}
+ul.nav-block li a:hover {
+  color: #b77115;
+  text-decoration: underline;
+}
+ul.nav-block li a:active {
   color: #b77115;
   text-decoration: none;
 }

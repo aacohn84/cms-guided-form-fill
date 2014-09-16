@@ -17,6 +17,16 @@ public class FormFill extends SecureController {
 	}
 
 	/*
+	 * Deletes the user's saved decisions.
+	 */
+	public static Result clearSavedChoices() {
+		String username = getUsername();
+		CMSGuidedFormFill.clearDecisions(username);
+		flash().put("clearSavedChoices", "");
+		return redirect(routes.Application.forms());
+	}
+	
+	/*
 	 * Provide root node of form.
 	 */
 	public static Result getForm() {

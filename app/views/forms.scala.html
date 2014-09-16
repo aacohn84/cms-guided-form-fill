@@ -1,13 +1,26 @@
 @main("Forms") {
-  <div style="
-    display: table;
-    margin: 0 auto;
-    padding: 150px 0 0 0;
-  ">
-    <ul class="nav">
-      <li><a href="/form">Change Orders</a></li>
-      <li><a href="javascript:alert('not implemented');">Admin</a></li>
+  <script type="text/javascript">
+  	function clearSavedChoicesHandler() {
+  		var choice = confirm("This will clear all choices made for the current user." + 
+  				"\n\nAny data lost will need to be re-entered.")
+  		if (choice == true)
+  			window.location="/clearSavedChoices";
+  	}
+  </script>
+  <div style="margin: 150px 0 0 0;">
+    <ul class="nav-block">
+      <li><a href="/form">Start/Continue Change Order</a></li>
+      <li><a href="javascript:clearSavedChoicesHandler();">Clear Saved Choices</a></li>
+      <!-- <li><a href="javascript:alert('not implemented');">Change Constants</a></li> -->
       <li><a href="/logout">Log out</a></li>
     </ul>
   </div>
+  @if(flash.get("clearSavedChoices") != null) {
+    <div style="
+      display: table;
+      margin: 20px auto 0 auto;
+    ">
+      <h1 style="color: green;">Choices cleared.</h1>
+    </div>
+  }
 }
