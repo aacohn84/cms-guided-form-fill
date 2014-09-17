@@ -19,7 +19,6 @@ import models.tree.Node;
  * @author Aaron Cohn
  */
 public class DecisionMap implements Iterable<Decision> {
-
 	/**
 	 * Traverses the active path through the DecisionMap.
 	 * 

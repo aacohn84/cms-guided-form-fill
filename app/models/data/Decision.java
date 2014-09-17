@@ -3,12 +3,17 @@ package models.data;
 import models.tree.Node;
 
 /**
- * Represents a decision made by the user while traversing a decision tree.
+ * Represents a decision made by the user while filling out a form.
  * <p>
- * It is comprised of an input, and a context in which that input was given. A
- * Decision also knows which node is associated with the previous decision, and
- * which node is associated with the next decision, so that a sequence of
- * decisions is formed.
+ * Each decision is composed of a context and an input. {@link Decision#context}
+ * is the node that the input applies to. {@link Decision#rawInput} is a string
+ * which usually contains a serialized object created by the context node.
+ * </p>
+ * <p>
+ * Each decision is part of a sequence. If this decision is first in the
+ * sequence, then {@link Decision#previous} will be <code>null</code>. If this
+ * decision is last in the sequence, then {@link Decision#next} will be
+ * <code>null</code>.
  * </p>
  * 
  * @author Aaron Cohn
@@ -17,8 +22,6 @@ public class Decision {
 	public Node context;
 	public Decision previous, next;
 	public String rawInput;
-
-	public Decision() {}
 
 	public Decision setContext(Node context) {
 		this.context = context;
