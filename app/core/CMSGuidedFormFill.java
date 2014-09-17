@@ -31,7 +31,7 @@ public class CMSGuidedFormFill {
 	 * @return the Decision associated with the root node of the decision tree.
 	 *         If a Decision doesn't exist yet, it will be created.
 	 */
-	public static Decision getFirstDecision(String owner) {
+	public static Decision startOrContinueForm(String owner) {
 		FormDataStore formDataStore = InMemoryFormDataStore.getInstance();
 		Node root = ChangeOrderForm.getInstance().getRoot();
 		if (!formDataStore.containsUsername(owner)) {

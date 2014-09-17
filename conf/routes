@@ -8,7 +8,7 @@ GET		/forms						controllers.Application.forms()
 GET		/logout						controllers.Application.logout()
 
 GET		/clearSavedChoices			controllers.FormFill.clearSavedChoices()
-GET		/form						controllers.FormFill.getForm()
+GET		/form						controllers.FormFill.startOrContinueForm()
 POST	/next						controllers.FormFill.next()
 POST	/prev						controllers.FormFill.prev()
 GET		/getFormOutput				controllers.FormFill.getFormOutput()

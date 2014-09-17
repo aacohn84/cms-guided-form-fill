@@ -29,9 +29,9 @@ public class FormFill extends SecureController {
 	/*
 	 * Provide root node of form.
 	 */
-	public static Result getForm() {
+	public static Result startOrContinueForm() {
 		Decision firstDecision = CMSGuidedFormFill
-				.getFirstDecision(getUsername());
+				.startOrContinueForm(getUsername());
 		return ok(backdrop.render(firstDecision));
 	}
 
