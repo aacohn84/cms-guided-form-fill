@@ -2,7 +2,6 @@ package controllers;
 
 import static play.data.Form.form;
 import models.data.AuthStore;
-import models.data.MySQLAuthStore;
 import models.data.User;
 import play.data.Form;
 import play.mvc.Controller;
@@ -23,11 +22,11 @@ public class Application extends Controller {
     	if (filledLoginForm.hasErrors()) {
     		return badRequest(login.render(filledLoginForm));
     	}
-    	AuthStore authDataStore = new MySQLAuthStore();
+    	AuthStore authStore = new AuthStore();
     	User user = filledLoginForm.get();
     	String username = user.getUsername();
-    	if (authDataStore.credentialsAreValid(username, user.getPassword())) {
-    		user.setPermissionLevel(authDataStore.getPermissionLevel(username));
+    	if (authStore.credentialsAreValid(username, user.getPassword())) {
+    		user.setPermissionLevel(authStore.getPermissionLevel(username));
     		CMSSession.authenticate(user);
     		return redirect("/forms");
     	}
