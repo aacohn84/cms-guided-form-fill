@@ -166,10 +166,10 @@ input[type="tel"] {
   margin: 2px;
 }
 
-div.input-row input[type="radio"] {
+input[type="radio"] {
   width: 18px;
   height: 18px;
-  margin: 10px 0px;
+  margin: 0 10px 0 0;
 }
 
 .login-btn {
