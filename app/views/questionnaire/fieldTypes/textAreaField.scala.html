@@ -2,9 +2,12 @@
 
 @import views.html.questionnaire.fieldTypes.helpers._
 
-<label style="display: block;" for="@field.name">@field.label</label>
-<textarea style="display: block; margin: 10px 0 0 0;"
-  name="@field.name"
-  data-parsley-trigger="change"
-  @required(field.isRequired)
->@field.value</textarea>
+@defining(field.name.replaceAll("\\s+", "")) { id =>
+  <label style="display: block;" for="@id">@field.label</label>
+  <textarea style="display: block; margin: 10px 0 0 0;"
+    name="@field.name"
+    id="@id"
+    data-parsley-trigger="change"
+    @required(field.isRequired)
+  >@field.value</textarea>
+}

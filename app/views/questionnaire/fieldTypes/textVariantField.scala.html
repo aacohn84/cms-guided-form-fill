@@ -2,11 +2,14 @@
 
 @import views.html.questionnaire.fieldTypes.helpers._
 
-@fieldLabel(field.label, field.name)
-<input
-  type="@field.fieldType"
-  name="@field.name"
-  value="@field.value"
-  data-parsley-trigger="change"
-  @required(field.isRequired)
-/>
+@defining(field.name.replaceAll("\\s+", "")) { id =>
+  @fieldLabel(field.label, id)
+  <input
+    type="@field.fieldType"
+    name="@field.name"
+    id="@id"
+    value="@field.value"
+    data-parsley-trigger="change"
+    @required(field.isRequired)
+  />
+}
