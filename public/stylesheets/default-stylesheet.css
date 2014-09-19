@@ -143,7 +143,12 @@ div.input-row {
 }
 
 div.input-row
-label,
+label {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+div.input-row
 input {
   display: table-cell;
   vertical-align: middle;
