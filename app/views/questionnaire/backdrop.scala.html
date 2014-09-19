@@ -3,6 +3,7 @@
 @prevLink(isRoot: Boolean) = {
   @if(!isRoot) {
     <input
+      class="bottom-button previous"
       id="back-button"
       type="submit"
       value="<< Previous"
@@ -14,6 +15,7 @@
 @nextLink(isTerminal: Boolean) = {
   @if(!isTerminal) {
     <input
+      class="bottom-button next"
       id="next-button"
       type="submit"
       value="Next >>"
@@ -80,8 +82,8 @@
               </div>
             </fieldset>
             <div class="bottom-buttons">
-              <div class="next">@nextLink(decision.context.isTerminal())</div>
-              <div class="back">@prevLink(decision.previous == null)</div>
+              @nextLink(decision.context.isTerminal())
+              @prevLink(decision.previous == null)
             </div>
           </form>
         </div><!-- /content-area -->

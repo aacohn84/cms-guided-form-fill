@@ -1,5 +1,5 @@
-@(label: String)
+@(label: String, name: String)
 
 @if(label != null && !label.equals("")) {
-  @label:
+  <label for="@name">@label:</label>
 }

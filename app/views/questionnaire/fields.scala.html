@@ -1,9 +1,9 @@
 @(detailDescription: String, fields: List[tree.fields.Field])
 
 @for(field <- fields) {
-<div>
-  @field.renderAsHtml()
-</div>
+  <div class="input-row">
+    @field.renderAsHtml()
+  </div>
 }
 
 @if(detailDescription != null) {

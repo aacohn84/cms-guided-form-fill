@@ -3,88 +3,11 @@ body {
   background-image: url(../images/bg-flowers.png);
   background-repeat: no-repeat;
   background-position: top;
-  margin-left: 0;
-  margin-top: 0;
-  margin-right: 0;
-  margin-bottom: 0;
+  font-family: Arial, Verdana, Geneva, sans-serif;
 }
 
-ul.nav-inline {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-  display: flex; /* renders <li>'s inline without space between them */
-}
-ul.nav-inline li {
-  padding: 0 9px 0 10px;
-  border-right-style: solid;
-  border-right-width: 1.2px;
-  border-right-color: #464646;
-  font-style: normal;
-  font-size: 14pt;
-  font-family: Georgia, "Times New Roman", Times, serif;
-  letter-spacing: 1px;
-  color: #464646;
-}
-ul.nav-inline li:first-child {
-  padding: 0 9px 0 0;
-}
-ul.nav-inline li:last-child {
-  padding: 0 0 0 10px;
-  border: none;
-}
-ul.nav-inline li a:link {
-  color: #676767;
-  text-decoration: none;
-}
-ul.nav-inline li a:visited {
-  color: #676767;
-  text-decoration: none;
-}
-ul.nav-inline li a:hover {
-  color: #b77115;
-  text-decoration: underline;
-}
-ul.nav-inline li a:active {
-  color: #b77115;
-  text-decoration: none;
-}
-
-ul.nav-block {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-  position: relative;
-}
-ul.nav-block li {
-  display: table;
-  margin: 0 auto;
-  padding: 5px 0;
-  font-style: normal;
-  font-size: 14pt;
-  font-family: Georgia, "Times New Roman", Times, serif;
-  letter-spacing:1px;
-  color: #464646;
-}
-ul.nav-block li a:link {
-  color: #676767;
-  text-decoration: none;
-}
-ul.nav-block li a:visited {
-  color: #676767;
-  text-decoration: none;
-}
-ul.nav-block li a:hover {
-  color: #b77115;
-  text-decoration: underline;
-}
-ul.nav-block li a:active {
-  color: #b77115;
-  text-decoration: none;
-}
 
 h1 {
-  font-family: "Times New Roman", Times, serif;
   font-size: 16pt;
   font-variant: small-caps;
   color: #cbab7a;
@@ -94,8 +17,8 @@ h1 {
   padding: 0px 5px 0 5px;
   margin: 0;
 }
+
 h3 {
-  font-family: "Times New Roman", Times, serif;
   font-size: 14pt;
   color: #9a661a;
   text-align: left;
@@ -104,8 +27,8 @@ h3 {
   padding: 5px 5px 20px 20px;
   margin: 0;
 }
+
 h5 {
-  font-family: "Times New Roman", Times, serif;
   font-size: 14pt;
   color: #9a661a;
   text-align: left;
@@ -114,8 +37,8 @@ h5 {
   padding: 5px 5px 5px 5px;
   margin: 0;
 }
+
 h6 {
-  font-family: Arial, Verdana, Geneva, sans-serif;
   font-size: 8pt;
   color: #02557b;
   text-align: left;
@@ -124,29 +47,146 @@ h6 {
   padding: 5px 0 0 0;
   margin: 0;
 }
-/* FIELDSET STYLE */
+
 fieldset {
-  border: 1px solid #cbab7a; 
-  width: 975px;
-  border-bottom-right-radius: 10px; 
+  border: 1px solid #cbab7a;
+  max-width: 97.5%;
+  border-bottom-right-radius: 10px;
   border-bottom-left-radius: 10px;
 }
 
 legend {
-  font-family: Times New Roman, Times, serif; 
-  text-align: left; 
-  font-size: 16pt; 
-  color: #560f03; 
+  text-align: left;
+  font-size: 16pt;
+  color: #560f03;
   letter-spacing: 1px;
+  max-width: 100%;
 }
+
+textarea {
+  width: 480px;
+  height: 200px;
+  font-family: Arial, Verdana, Geneva, sans-serif, "Lucida Console", Monaco, monospace;
+  font-size: 12pt;
+}
+
+a:link {
+  color: #676767;
+  text-decoration: none;
+}
+
+a:visited {
+  color: #676767;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #b77115;
+  text-decoration: underline;
+}
+
+a:active {
+  color: #b77115;
+  text-decoration: none;
+}
+
+ul.nav-inline {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  display: flex; /* renders <li>'s inline without space between them */
+}
+
+ul.nav-inline
+li {
+  padding: 0 9px 0 10px;
+  border-right-style: solid;
+  border-right-width: 1.2px;
+  border-right-color: #464646;
+  font-style: normal;
+  font-size: 14pt;
+  letter-spacing: 1px;
+  color: #464646;
+}
+
+ul.nav-inline
+li:first-child {
+  padding: 0 9px 0 0;
+}
+
+ul.nav-inline
+li:last-child {
+  padding: 0 0 0 10px;
+  border: none;
+}
+
+ul.nav-block {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  position: relative;
+}
+
+ul.nav-block
+li {
+  display: table;
+  margin: 0 auto;
+  padding: 5px 0;
+  font-style: normal;
+  font-size: 14pt;
+  letter-spacing: 1px;
+  color: #464646;
+}
+
+div.input-row {
+  display: table-row;
+}
+
+div.input-row
+label,
+input {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+div.input-row
+label {
+  height: 14px;
+  padding: 1px 0;
+}
+
+div.input-row
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="tel"] {
+  width: 152px;
+  height: 14px;
+  padding: 1px;
+  margin: 2px;
+}
+
+div.input-row input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  margin: 10px 0px;
+}
+
+.login-btn {
+  padding: 1px 6px;
+  margin: 2px;
+}
+
 .top-background {
   height: 100%;
   width: 100%;
   background-repeat: no-repeat;
-  background-position: 0% 0%;
+  background-position: 0 0;
 }
+
 .outer-container {
-  width: 1000px;
+  max-width: 1000px;
+  min-width: 640px;
   height: 100%;
   margin: 20px auto;
   padding: 10px 10px 10px 10px;
@@ -158,7 +198,9 @@ legend {
   border-bottom-right-radius: 10px;
   border-bottom-left-radius: 10px;
   opacity: 0.90;
+  height: 100%;
 }
+
 header.main {
   max-width: 100%;
   min-width: 721px;
@@ -167,54 +209,56 @@ header.main {
   background: #cbab7a;
   padding: 0 0 10px 0;
 }
+
 .content-area {
-  width: 100%;
+  max-width: 100%;
   height: 395px;
   border: 0 solid #ff0000;
   padding: 0;
   margin: 0;
   position: relative;
 }
+
 .top-button {
-  width: 100%;
+  max-width: 100%;
   height: 30px;
   border: 0 solid #cbab7a;
   padding: 0;
-  margin: 10px 0 0 0 ;
+  margin: 10px 0 0 0;
 }
+
 .save-exit {
   width: 125px;
   height: 25px;
   border: 0 solid #cbab7a;
-  padding:  2px 0 2px 0;
+  padding: 2px 0 2px 0;
   margin: 0;
   float: right;
 }
+
 .bottom-buttons {
-  width: 100%;
+  max-width: 100%;
   height: 30px;
   border: 0 solid #cbab7a;
   padding: 0;
   margin: 10px 0 10px 0;
-  border-bottom-right-radius: 10px; 
+  border-bottom-right-radius: 10px;
   border-bottom-left-radius: 10px;
 }
-.back {
+
+.bottom-button {
   width: 100px;
-  height: 25px;
-  border: 0 solid #cbab7a;
-  padding:  2px 0 2px 0;
-  margin: 0;
+  height: 30px;
+}
+
+.previous {
   float: left;
 }
+
 .next {
-  width: 100px;
-  height: 25px;
-  border: 0 solid #cbab7a;
-  padding:  2px 0 2px 0;
-  margin: 0;
   float: right;
 }
+
 footer.main {
   width: 100%;
   height: 85px;
@@ -222,18 +266,6 @@ footer.main {
   background-color: #f7efe0;
   padding: 10px 0 10px 0;
   margin: 0;
-  border-bottom-right-radius: 10px; 
+  border-bottom-right-radius: 10px;
   border-bottom-left-radius: 10px;
-}
-
- /* Float Clearing http://nicolasgallagher.com/micro-clearfix-hack */
-
-.group:after {
-  content: " "; 
-  display: table;
-  clear: both;
-}
-/* Clearfix */
-.group {
-  *zoom: 1;
 }

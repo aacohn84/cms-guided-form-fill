@@ -2,7 +2,7 @@
 
 @import views.html.questionnaire.fieldTypes.helpers._
 
-@fieldLabel(field.label)
+@fieldLabel(field.label, field.name)
 <input
   type="@field.fieldType"
   name="@field.name"

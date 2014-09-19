@@ -6,14 +6,18 @@
   }
 }
 
+<div class="input-fields">
 @for(choice <- choices) {
   @defining(choice.description) { description =>
-    <input
-      type="radio"
-      name="choice"
-      value="@description"
-      @checkedIf(selection.equals(description))
-      required
-    >@description<br><br>
+    <div class="input-row">
+      <input
+        type="radio"
+        name="choice"
+        value="@description"
+        @checkedIf(selection.equals(description))
+        required
+      ><label for="choice#@description">@description</label>
+    </div>
   }
 }
+</div>

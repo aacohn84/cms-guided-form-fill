@@ -10,11 +10,18 @@
   <form action="/authenticate" method="POST">
     <fieldset>
       <legend>Log in</legend>
-      <label for="username">User name:</label>
-      <input type="text" name="username" id="username" required><br>
-      <label for="password">Password:</label>
-      <input type="password" name="password" id="password" required><br>
-      <input type="submit" value="Log in">
+      <div class="input-row">
+        <label for="username">User name:</label>
+        <input type="text" name="username" id="username" required>
+      </div>
+      <div class="input-row">
+        <label for="password">Password:</label>
+        <input type="password" name="password" id="password" required>
+      </div>
+      <div class="input-row">
+        <label>@*Empty column to align submit button with input fields*@</label>
+        <input class="login-btn" type="submit" value="Log in">
+      </div>
     </fieldset>
   </form>
   @if(globalLoginError() == true) {
