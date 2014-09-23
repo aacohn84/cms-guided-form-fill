@@ -25,28 +25,7 @@ public class FieldsNode extends SingleTargetNode {
 		super(id, idNext, description, true);
 	}
 
-	/**
-	 * Add an input field to this FieldsNode.
-	 * 
-	 * @param label
-	 *            - the text to be displayed alongside the input field.
-	 * @param name
-	 *            - the name of the corresponding field in the Acrobat form.
-	 * @param fieldType
-	 *            - the type of input expected by this field
-	 * @return a reference to this FieldsNode so that calls to addField can be
-	 *         chained together.
-	 */
-	public FieldsNode addField(String label, String name, FieldType fieldType) {
-		Field field = Field.newField(label, name, fieldType);
-		fields.add(field);
-		return this;
-	}
-
-	public FieldsNode addFilledField(String name, String value,
-			FieldType fieldType) {
-		Field field = Field.newField(null, name, fieldType);
-		field.setValue(value);
+	public FieldsNode addField(Field field) {
 		fields.add(field);
 		return this;
 	}

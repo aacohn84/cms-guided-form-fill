@@ -1,16 +1,14 @@
-@(field: tree.fields.NumberField)
+@(field: tree.fields.EmailField)
 
 @import views.html.questionnaire.fieldTypes.helpers._
 
 @defining(field.name.replaceAll("\\s+", "")) { id =>
   @fieldLabel(field.label, id)
   <input
-    type="number"
+    type="email"
     name="@field.name"
     id="@id"
     value="@field.value"
-    step="0.01"
-    min="0.00"
     data-parsley-trigger="change"
     @required(field.isRequired)
   />

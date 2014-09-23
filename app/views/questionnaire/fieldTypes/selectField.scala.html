@@ -1,15 +1,18 @@
-@(field: tree.fields.Field)
+@(field: tree.fields.SelectField)
 
 @import views.html.questionnaire.fieldTypes.helpers._
 
 @defining(field.name.replaceAll("\\s+", "")) { id =>
   @fieldLabel(field.label, id)
-  <input
-    type="@field.fieldType"
+  <select
     name="@field.name"
     id="@id"
     value="@field.value"
     data-parsley-trigger="change"
     @required(field.isRequired)
-  />
+  >
+    @for(option <- field.options) {
+      <option value="@option">@option</option>
+    }
+  </select>
 }
