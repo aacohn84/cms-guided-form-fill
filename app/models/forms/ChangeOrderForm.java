@@ -600,15 +600,17 @@ public class ChangeOrderForm extends CMSForm {
 
 	// Field definitions
 	private static class Field {
+		private static final String[] locations = new String[] {
+				"Location 1", "Location 2", "Location 3"};
+		private static final String[] cemeteries = new String[] {
+				"Cemetery 1", "Cemetery 2", "Cemetery 3"};
 		private final static boolean required = true;
 		final static TextField names = new TextField(PDFField.names, required, "Name(s)");
 		final static TextField address = new TextField(PDFField.address, required, "Address");
 		final static TextField phone = new TextField(PDFField.phone, required, "Phone");
 		final static EmailField email = new EmailField(PDFField.email, required, "Email");
-		final static SelectField cemetery = new SelectField(PDFField.cemetery, required, "Cemetery", new String[] {
-				"Cemetery 1", "Cemetery 2", "Cemetery 3"});
-		final static SelectField location = new SelectField(PDFField.location, required, "Location", new String[] {
-				"Location 1", "Location 2", "Location 3"});
+		final static SelectField cemetery = new SelectField(PDFField.cemetery, required, "Cemetery/Funeral Home", cemeteries);
+		final static SelectField location = new SelectField(PDFField.location, required, "Plot Location", locations);
 		final static TextField origContractNum = new TextField(PDFField.origContractNum, required, "Original Contract Number");
 		final static NumberField contractAmount = new NumberField(PDFField.contractAmount, required, "Current Contract Value");
 		final static NumberField contractBalance = new NumberField(PDFField.contractBalance, required, "Current Contract Balance");
@@ -622,10 +624,8 @@ public class ChangeOrderForm extends CMSForm {
 		final static EmailField assigneeEmail = new EmailField(PDFField.assigneeEmail, required, "Email");
 		final static TextField decedents = new TextField(PDFField.decedents, required, "Decedent(s)");
 		final static TextField placeOfFinalDisposition = new TextField(PDFField.placeOfFinalDisposition, required, "Place of Final Disposition");
-		final static SelectField cfcsReIntermentCemetery = new SelectField(PDFField.cfcsReIntermentCemetery, required, "Re-interment Cemetery", new String[] {
-				"Cemetery 1", "Cemetery 2", "Cemetery 3"});
-		final static SelectField cfcsReIntermentLocation = new SelectField(PDFField.cfcsReIntermentLocation, required, "CFCS Re-Interment Location", new String[] {
-				"Location 1", "Location 2", "Location 3"});
+		final static SelectField cfcsReIntermentCemetery = new SelectField(PDFField.cfcsReIntermentCemetery, required, "Re-interment Cemetery", cemeteries);
+		final static SelectField cfcsReIntermentLocation = new SelectField(PDFField.cfcsReIntermentLocation, required, "CFCS Re-Interment Location", locations);
 	}
 	
 	// Identifier of each node in the Change Order Form decision tree
