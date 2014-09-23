@@ -27,12 +27,12 @@ public class PDFFormFiller {
 			for (FilledFormField formField : formFields) {
 				PDField pdField = acroForm.getField(formField.name);
 				if (pdField == null) {
-					throw new RuntimeException("The specified field ["
-							+ formField.name
+					Logger.error("The specified field [" + formField.name
 							+ "] does not exist within this form ["
-							+ formFileName + "]");
+							+ formFileName + "]. The field will be ignored.");
+				} else {
+					pdField.setValue(formField.value);
 				}
-				pdField.setValue(formField.value);
 			}
 			temp = File.createTempFile("Change_Order_Form_Filled", ".pdf");
 			pdfDoc.save(temp);
