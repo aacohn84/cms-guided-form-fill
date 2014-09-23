@@ -7,16 +7,14 @@
 }
 
 @for(choice <- choices) {
-  @defining(choice.description) { description =>
-    @defining(choice.description.replaceAll("\\s+","")) { id =>
+  @defining(choice.label.replaceAll("\\s+", "")) { id =>
     <input
       type="radio"
       name="choice"
-      value="@description"
+      value="@choice.label"
       id="@id"
-      @checkedIf(selection.equals(description))
+      @checkedIf(selection.equals(choice.label))
       required
-    ><label for="@id">@description</label><br><br>
-    }
+    ><label for="@id">@choice.label</label><br><br>
   }
 }

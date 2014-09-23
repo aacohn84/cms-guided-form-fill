@@ -26,10 +26,10 @@ public class ChoiceNode extends Node {
 	 */
 	public static class Choice {
 		/**
-		 * Description to be shown alongside the radio button in the
-		 * ChoiceNode's HTML representation.
+		 * Label to be shown alongside the radio button in the ChoiceNode's HTML
+		 * representation.
 		 */
-		public String description;
+		public String label;
 
 		/**
 		 * The name of the choice as used in the Adobe Acrobat form.
@@ -41,14 +41,14 @@ public class ChoiceNode extends Node {
 		 */
 		public String targetId;
 
-		public Choice(String description, String targetId) {
+		public Choice(String label, String targetId) {
 			this.name = null;
-			this.description = description;
+			this.label = label;
 			this.targetId = targetId;
 		}
 
-		public Choice(String description, String choiceName, String targetId) {
-			this.description = description;
+		public Choice(String label, String choiceName, String targetId) {
+			this.label = label;
 			this.name = choiceName;
 			this.targetId = targetId;
 		}
@@ -114,14 +114,14 @@ public class ChoiceNode extends Node {
 	/**
 	 * Adds a choice that points to the target node.
 	 * 
-	 * @param choiceDescription
+	 * @param label
 	 *            - text describing the choice.
 	 * @param targetId
 	 *            - id of the node corresponding to the option.
 	 */
-	public ChoiceNode addChoice(String choiceDescription, String targetId) {
-		Choice choice = new Choice(choiceDescription, targetId);
-		choicesToTargetIds.put(choiceDescription, choice);
+	public ChoiceNode addChoice(String label, String targetId) {
+		Choice choice = new Choice(label, targetId);
+		choicesToTargetIds.put(label, choice);
 		orderedChoices.add(choice);
 		return this;
 	}
@@ -129,7 +129,7 @@ public class ChoiceNode extends Node {
 	/**
 	 * Adds an option that points to the target node.
 	 * 
-	 * @param choiceDescription
+	 * @param label
 	 *            - text describing this choice.
 	 * @param choiceName
 	 *            - name of the form field associated with this choice.
@@ -140,17 +140,18 @@ public class ChoiceNode extends Node {
 	 * @return a reference to this ChoiceNode so that calls to addChoice can be
 	 *         chained together.
 	 */
-	public ChoiceNode addChoice(String choiceDescription, String choiceName,
+	public ChoiceNode addChoice(String label, String choiceName,
 			String targetId) {
-		Choice choice = new Choice(choiceDescription, choiceName, targetId);
-		choicesToTargetIds.put(choiceDescription, choice);
+		Choice choice = new Choice(label, choiceName, targetId);
+		choicesToTargetIds.put(label, choice);
 		orderedChoices.add(choice);
 		return this;
 	}
 
 	@Override
 	public void fillFormFields(String serializedObj, FilledFormFields formFields) {
-		StoredSelection ss = recreateObject(serializedObj, StoredSelection.class);
+		StoredSelection ss = recreateObject(serializedObj,
+				StoredSelection.class);
 		Choice choice = choicesToTargetIds.get(ss.choice);
 		formFields.fillField(fieldName, choice.name);
 	}
