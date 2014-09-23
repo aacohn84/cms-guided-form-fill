@@ -195,6 +195,7 @@ public class ChangeOrderForm extends CMSForm {
 		addNode(Node.origContractNum(Id.orig_contract_num_3, Id.gift_amount));
 		
 		addNode(new FieldsNode(Id.gift_amount, Id.reason_3, Desc.gift_amount)
+			.setDetailDescription(Desc.gift_amount_detail)
 			.addField(Field.giftAmount));
 
 		addNode(Node.reason(Id.reason_3, Id.calc_3));
@@ -502,6 +503,7 @@ public class ChangeOrderForm extends CMSForm {
 		final static String return_int_rights_choice = "Are all interment rights purchased to be returned?";
 		final static String return_goods_choice = "Are all Goods & Services purchased to be returned?";
 		final static String gift_amount = "Please enter the “Gift Amount,” as listed on the original contract:";
+		final static String gift_amount_detail = "IMPORTANT: If Change Order is an upgrade, an even exchange, or if the purchase occurred within the last 30 days, enter \"0\" or leave as-is.";
 		final static String items_returned = "Please list each of the items to be returned:";
 		final static String credits_discounts = "Were any credits or discounts provided at the time of the original sale? If so, please list:";
 		final static String apply_credit_choice = "How would the patron like any credits (if applicable) applied?";
