@@ -602,8 +602,6 @@ public class ChangeOrderForm extends CMSForm {
 
 	// Field definitions
 	private static class Field {
-		private static final String[] locations = new String[] {
-				"Location 1", "Location 2", "Location 3"};
 		private static final String[] cemeteries = new String[] {
 				"St. Mary Cemetery", "Calvary Cemetery", "All Souls Cemetery",
 				"George L. Klumpp Chapel of Flowers", "Misc./Parish Cemetery" };
@@ -613,7 +611,7 @@ public class ChangeOrderForm extends CMSForm {
 		final static TextField phone = new TextField(PDFField.phone, required, "Phone");
 		final static EmailField email = new EmailField(PDFField.email, required, "Email");
 		final static SelectField cemetery = new SelectField(PDFField.cemetery, required, "Cemetery/Funeral Home", cemeteries);
-		final static SelectField location = new SelectField(PDFField.location, required, "Plot Location", locations);
+		final static TextField location = new TextField(PDFField.location, required, "Plot Location");
 		final static TextField origContractNum = new TextField(PDFField.origContractNum, required, "Original Contract Number");
 		final static NumberField contractAmount = new NumberField(PDFField.contractAmount, required, "Current Contract Value");
 		final static NumberField contractBalance = new NumberField(PDFField.contractBalance, required, "Current Contract Balance");
@@ -628,7 +626,7 @@ public class ChangeOrderForm extends CMSForm {
 		final static TextField decedents = new TextField(PDFField.decedents, required, "Decedent(s)");
 		final static TextField placeOfFinalDisposition = new TextField(PDFField.placeOfFinalDisposition, required, "Place of Final Disposition");
 		final static SelectField cfcsReIntermentCemetery = new SelectField(PDFField.cfcsReIntermentCemetery, required, "Re-interment Cemetery", cemeteries);
-		final static SelectField cfcsReIntermentLocation = new SelectField(PDFField.cfcsReIntermentLocation, required, "CFCS Re-Interment Location", locations);
+		final static TextField cfcsReIntermentLocation = new TextField(PDFField.cfcsReIntermentLocation, required, "CFCS Re-Interment Location");
 	}
 	
 	// Identifier of each node in the Change Order Form decision tree
