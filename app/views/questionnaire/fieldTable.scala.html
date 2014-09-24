@@ -17,8 +17,8 @@
   </tr>
   @for(r <- rows.rows) {
     <tr>
-    @for(c <- r.cols) {
-      <td>@c.renderAsHtml()</td>
+    @for(field <- r.fields) {
+      <td>@field.renderAsHtml()</td>
     }
     </tr>
   }

@@ -36,14 +36,14 @@ public class FieldTableNode extends SingleTargetNode {
 	 * makes iterating over a matrix-like structure a pain in the ass.
 	 */
 	public static class DisplayRow {
-		public List<Field> row = new ArrayList<>();
+		public List<Field> fields = new ArrayList<>();
 
 		public void add(Field f) {
-			row.add(f);
+			fields.add(f);
 		}
 
 		public Field get(int i) {
-			return row.get(i);
+			return fields.get(i);
 		}
 	}
 
