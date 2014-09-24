@@ -605,7 +605,8 @@ public class ChangeOrderForm extends CMSForm {
 		private static final String[] locations = new String[] {
 				"Location 1", "Location 2", "Location 3"};
 		private static final String[] cemeteries = new String[] {
-				"Cemetery 1", "Cemetery 2", "Cemetery 3"};
+				"St. Mary Cemetery", "Calvary Cemetery", "All Souls Cemetery",
+				"George L. Klumpp Chapel of Flowers", "Misc./Parish Cemetery" };
 		private final static boolean required = true;
 		final static TextField names = new TextField(PDFField.names, required, "Name(s)");
 		final static TextField address = new TextField(PDFField.address, required, "Address");
