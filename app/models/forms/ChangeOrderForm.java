@@ -36,20 +36,19 @@ public class ChangeOrderForm extends CMSForm {
 	}
 
 	private ChangeOrderForm() {
-		// file name associated with this form
+		// Name of PDF file associated with this form
 		super("Change_Order_Form.pdf");
 
 		// decision tree definition
-		root = new NoteChecksABoxNode(Id.prerequisites_note,
-				Id.change_order_type_choice, PDFField.originalContract,
-				Desc.prerequisites_note);
-		addNode(root);
-		
+		root = addNode(new NoteChecksABoxNode(Id.prerequisites_note,
+				Id.change_order_type_choice, PDFieldName.originalContract,
+				Desc.prerequisites_note));
+
 		addNode(new ChoiceNode(Id.change_order_type_choice,
-				Desc.change_order_type_choice, PDFField.changeOrderType)
-			.addChoice("Return/Exch", PDFField.return_, Id.curr_contract_value)
-			.addChoice("Transfer", PDFField.assignment, Id.paid_in_full_choice_2)
-			.addChoice("Disinterment", PDFField.disinterment, Id.paid_in_full_choice_1));
+				Desc.change_order_type_choice, PDFieldName.changeOrderType)
+			.addChoice("Return/Exch", PDFieldName.return_, Id.curr_contract_value)
+			.addChoice("Transfer", PDFieldName.assignment, Id.paid_in_full_choice_2)
+			.addChoice("Disinterment", PDFieldName.disinterment, Id.paid_in_full_choice_1));
 
 		returnExchg();
 
@@ -113,7 +112,7 @@ public class ChangeOrderForm extends CMSForm {
 		addNode(Node.reason(Id.reason_1, Id.calc_1));
 
 		addNode(new CalculationNode(Id.calc_1, Id.parties_avail_choice)
-			.addCalculatedField(PDFField.creditBalance, new RefExpr(PDFField.adminReturnFees)));
+			.addCalculatedField(PDFieldName.creditBalance, new RefExpr(PDFieldName.adminReturnFees)));
 	}
 
 	private void returnExchg() {
@@ -170,22 +169,22 @@ public class ChangeOrderForm extends CMSForm {
 			/*
 			 *  Total to be Returned = Contract Amount - Contract Balance
 			 */
-			.addCalculatedField(PDFField.totalToBeReturned,
+			.addCalculatedField(PDFieldName.totalToBeReturned,
 				Expr.contractAmountMinusBalanceExpr)
 			/* 
 			 * If fee applies, then
 			 * Admin/Return Fees = Contract Amount * 20%
 			 */
-			.addCalculatedField(PDFField.adminReturnFees,
+			.addCalculatedField(PDFieldName.adminReturnFees,
 				Expr.conditionalAdminReturnFees)
 			/*
 			 *  Total Deductions = Admin/Return Fees
 			 */
-			.addCalculatedField(PDFField.totalDeductions, Expr.adminReturnFees)
+			.addCalculatedField(PDFieldName.totalDeductions, Expr.adminReturnFees)
 			/*
 			 * Credit/Balance = Total to be Returned - Total Deductions
 			 */
-			.addCalculatedField(PDFField.creditBalance,
+			.addCalculatedField(PDFieldName.creditBalance,
 				Expr.amtReturnedMinusDeductions));
 	}
 
@@ -204,26 +203,26 @@ public class ChangeOrderForm extends CMSForm {
 			/* 
 			 * Total to be Returned = Contract Amt - Contract Bal - Gift Amt
 			 */
-			.addCalculatedField(PDFField.totalToBeReturned,
+			.addCalculatedField(PDFieldName.totalToBeReturned,
 				new BinaryExpr(
 					Expr.contractAmountMinusBalanceExpr,
-					new RefExpr(PDFField.giftAmount),
+					new RefExpr(PDFieldName.giftAmount),
 					Operators.SUBTRACT))
 			/*
 			 * If fee applies, then
 			 * Admin/Return Fees = Contract Amount * 0.20
 			 */
-			.addCalculatedField(PDFField.adminReturnFees,
+			.addCalculatedField(PDFieldName.adminReturnFees,
 				Expr.conditionalAdminReturnFees)
 			/*
 			 *  Total Deductions = Admin/Return Fees
 			 */
-			.addCalculatedField(PDFField.totalDeductions,
+			.addCalculatedField(PDFieldName.totalDeductions,
 					Expr.adminReturnFees)
 			/* 
 			 * Credit/Balance = Total to be Returned - Total Deductions
 			 */
-			.addCalculatedField(PDFField.creditBalance,
+			.addCalculatedField(PDFieldName.creditBalance,
 				Expr.amtReturnedMinusDeductions));
 	}
 
@@ -239,12 +238,12 @@ public class ChangeOrderForm extends CMSForm {
 			/*
 			 *  Total to be Returned = Items to be Returned - Contract Balance
 			 */
-			.addCalculatedField(PDFField.totalToBeReturned, Expr.sumItemsReturnedMinusContractBalance)
+			.addCalculatedField(PDFieldName.totalToBeReturned, Expr.sumItemsReturnedMinusContractBalance)
 			/* 
 			 * If admin fee applies, then
 			 * Admin/Return Fees = Items to be Returned * 20%
 			 */
-			.addCalculatedField(PDFField.adminReturnFees, new ConditionalExpr(
+			.addCalculatedField(PDFieldName.adminReturnFees, new ConditionalExpr(
 					Expr.zero,
 					new BinaryExpr(
 						Expr.sumItemsReturned,
@@ -254,11 +253,11 @@ public class ChangeOrderForm extends CMSForm {
 			/*
 			 *  Total Deductions = Admin/Return Fees + Credits/Discounts
 			 */
-			.addCalculatedField(PDFField.totalDeductions, Expr.adminFeesPlusCredits)
+			.addCalculatedField(PDFieldName.totalDeductions, Expr.adminFeesPlusCredits)
 			/*
 			 * Credit/Balance = Total to be Returned - Total Deductions
 			 */
-			.addCalculatedField(PDFField.creditBalance, Expr.amtReturnedMinusDeductions));
+			.addCalculatedField(PDFieldName.creditBalance, Expr.amtReturnedMinusDeductions));
 	}
 
 	private void returnInventoryNo() {
@@ -293,15 +292,15 @@ public class ChangeOrderForm extends CMSForm {
 			/*
 			 *  Total to be Returned = Contract Amount - Contract Balance
 			 */
-			.addCalculatedField(PDFField.totalToBeReturned, Expr.contractAmountMinusBalanceExpr)
+			.addCalculatedField(PDFieldName.totalToBeReturned, Expr.contractAmountMinusBalanceExpr)
 			/*
 			 *  Total Deductions = Admin/Return Fees
 			 */
-			.addCalculatedField(PDFField.totalDeductions, Expr.adminReturnFees)
+			.addCalculatedField(PDFieldName.totalDeductions, Expr.adminReturnFees)
 			/*
 			 * Credit/Balance = Total to be Returned - Total Deductions
 			 */
-			.addCalculatedField(PDFField.creditBalance, Expr.amtReturnedMinusDeductions));
+			.addCalculatedField(PDFieldName.creditBalance, Expr.amtReturnedMinusDeductions));
 	}
 
 	private void returnGoodsNo() {
@@ -316,30 +315,30 @@ public class ChangeOrderForm extends CMSForm {
 			/*
 			 *  Total to be Returned = Items to be Returned - Contract Balance
 			 */
-			.addCalculatedField(PDFField.totalToBeReturned, Expr.sumItemsReturnedMinusContractBalance)
+			.addCalculatedField(PDFieldName.totalToBeReturned, Expr.sumItemsReturnedMinusContractBalance)
 			/*
 			 *  Total Deductions = Admin/Return Fees + Credits/Discounts
 			 */
-			.addCalculatedField(PDFField.totalDeductions, Expr.adminFeesPlusCredits)
+			.addCalculatedField(PDFieldName.totalDeductions, Expr.adminFeesPlusCredits)
 			/*
 			 * Credit/Balance = Total to be Returned - Total Deductions
 			 */
-			.addCalculatedField(PDFField.creditBalance, Expr.amtReturnedMinusDeductions));
+			.addCalculatedField(PDFieldName.creditBalance, Expr.amtReturnedMinusDeductions));
 	}
 
 	private void applyCredit() {
-		addNode(new ChoiceNode(Id.apply_credit_choice, Desc.apply_credit_choice, PDFField.applyCredit)
-			.addChoice(PDFField.newContract, PDFField.newContract, Id.new_contract_note)
-			.addChoice(PDFField.existingContract, PDFField.existingContract, Id.existing_contract_note)
-			.addChoice(PDFField.refund, PDFField.refund, Id.refund_request_note)
-			.addChoice(PDFField.donation, PDFField.donation, Id.plot_fmv_1));
+		addNode(new ChoiceNode(Id.apply_credit_choice, Desc.apply_credit_choice, PDFieldName.applyCredit)
+			.addChoice(PDFieldName.newContract, PDFieldName.newContract, Id.new_contract_note)
+			.addChoice(PDFieldName.existingContract, PDFieldName.existingContract, Id.existing_contract_note)
+			.addChoice(PDFieldName.refund, PDFieldName.refund, Id.refund_request_note)
+			.addChoice(PDFieldName.donation, PDFieldName.donation, Id.plot_fmv_1));
 
 		addNode(new NoteChecksABoxNode(Id.new_contract_note,
-				Id.parties_avail_choice, PDFField.newExistingContract,
+				Id.parties_avail_choice, PDFieldName.newExistingContract,
 				Desc.new_contract_note));
 
 		addNode(new NoteChecksABoxNode(Id.existing_contract_note,
-				Id.parties_avail_choice, PDFField.newExistingContract,
+				Id.parties_avail_choice, PDFieldName.newExistingContract,
 				Desc.existing_contract_note));
 
 		addNode(new NoteNode(Id.refund_request_note, Id.parties_avail_choice,
@@ -348,7 +347,7 @@ public class ChangeOrderForm extends CMSForm {
 		addNode(new FieldsNode(Id.plot_fmv_1, Id.parties_avail_choice,
 				Desc.plot_fmv)
 			.addField(Field.donationAmount)
-			.addField(new HiddenField(PDFField.donationLetter, "Yes")));
+			.addField(new HiddenField(PDFieldName.donationLetter, "Yes")));
 	}
 
 	private void transfer() {
@@ -362,10 +361,10 @@ public class ChangeOrderForm extends CMSForm {
 		addNode(Node.cashReceipt(Id.cash_receipt_2, Id.transfer_type_choice));
 
 		addNode(new ChoiceNode(Id.transfer_type_choice, Desc.transfer_type_choice,
-				PDFField.propertyAssignment)
-			.addChoice(PDFField.transferOfOwnership, "Transfer of Ownership", Id.transfer_fee_note)
-			.addChoice(PDFField.donation, "Donation", Id.plot_fmv_2)
-			.addChoice(PDFField.releaseOfInterest, "Release of Interest", Id.transfer_fee_waived_note));
+				PDFieldName.propertyAssignment)
+			.addChoice(PDFieldName.transferOfOwnership, "Transfer of Ownership", Id.transfer_fee_note)
+			.addChoice(PDFieldName.donation, "Donation", Id.plot_fmv_2)
+			.addChoice(PDFieldName.releaseOfInterest, "Release of Interest", Id.transfer_fee_waived_note));
 
 		transferTransfer();
 
@@ -376,7 +375,7 @@ public class ChangeOrderForm extends CMSForm {
 
 	private void transferTransfer() {
 		addNode(new FeeNode(Id.transfer_fee_note, Id.name_7, 
-				Desc.transfer_fee_note, PDFField.adminReturnFees,
+				Desc.transfer_fee_note, PDFieldName.adminReturnFees,
 				new BigDecimal("300.00")));
 
 		addNode(Node.name(Id.name_7, Id.loc_7));
@@ -399,8 +398,8 @@ public class ChangeOrderForm extends CMSForm {
 	private void transferDonation() {
 		addNode(new FieldsNode(Id.plot_fmv_2, Id.name_8, Desc.plot_fmv)
 			.addField(Field.donationAmount)
-			.addField(new HiddenField(PDFField.adminReturnFees, "0.00"))
-			.addField(new HiddenField(PDFField.donationLetter, "Yes")));
+			.addField(new HiddenField(PDFieldName.adminReturnFees, "0.00"))
+			.addField(new HiddenField(PDFieldName.donationLetter, "Yes")));
 
 		addNode(Node.name(Id.name_8, Id.loc_8));
 		addNode(Node.loc(Id.loc_8, Id.orig_contract_num_8));
@@ -410,7 +409,7 @@ public class ChangeOrderForm extends CMSForm {
 
 	private void transferRelease() {
 		addNode(new FeeNode(Id.transfer_fee_waived_note, Id.name_9,
-				Desc.transfer_fee_waived_note, PDFField.adminReturnFees,
+				Desc.transfer_fee_waived_note, PDFieldName.adminReturnFees,
 				new BigDecimal("0.00")));
 
 		addNode(Node.name(Id.name_9, Id.loc_9));
@@ -445,20 +444,20 @@ public class ChangeOrderForm extends CMSForm {
 			.addChoice("No", Id.death_cert_note));
 
 		addNode(new NoteChecksABoxNode(Id.burial_evidence_note, Id.done,
-				PDFField.evidenceOfBurial, Desc.burial_evidence_note));
+				PDFieldName.evidenceOfBurial, Desc.burial_evidence_note));
 
 		addNode(new NoteChecksABoxNode(Id.death_cert_note, Id.done,
-				PDFField.deathCertificate, Desc.death_cert_note));
+				PDFieldName.deathCertificate, Desc.death_cert_note));
 
 		addNode(new ChoiceNode(Id.relocation_choice, Desc.relocation_choice)
 			.addChoice("Yes", Id.notary_sig_note)
 			.addChoice("No", Id.notarized_release_note));
 
 		addNode(new NoteChecksABoxNode(Id.notary_sig_note, Id.done,
-				PDFField.notarySignature, Desc.notary_sig_note));
+				PDFieldName.notarySignature, Desc.notary_sig_note));
 
 		addNode(new NoteChecksABoxNode(Id.notarized_release_note, Id.done,
-				PDFField.signedNotarizedRelease, Desc.notarized_release_note));
+				PDFieldName.signedNotarizedRelease, Desc.notarized_release_note));
 
 		addNode(new ChoiceNode(Id.reasonable_effort_choice,
 				Desc.reasonable_effort_choice)
@@ -466,7 +465,7 @@ public class ChangeOrderForm extends CMSForm {
 			.addChoice("No", Id.loc_all_parties_note));
 
 		addNode(new NoteChecksABoxNode(Id.due_diligence_note, Id.done,
-				PDFField.statementOfDueDiligenceForm, Desc.due_diligence_note));
+				PDFieldName.statementOfDueDiligenceForm, Desc.due_diligence_note));
 
 		addNode(new NoteNode(Id.loc_all_parties_note, Id.due_diligence_note,
 				Desc.loc_all_parties_note));
@@ -534,12 +533,12 @@ public class ChangeOrderForm extends CMSForm {
 		static final NumExpr twentyPercent = new NumExpr(new BigDecimal("0.20"));
 		
 		static final BinaryExpr amtReturnedMinusDeductions = new BinaryExpr(
-			new RefExpr(PDFField.totalToBeReturned),
-			new RefExpr(PDFField.totalDeductions),
+			new RefExpr(PDFieldName.totalToBeReturned),
+			new RefExpr(PDFieldName.totalDeductions),
 			Operators.SUBTRACT);
 		
 		static final BinaryExpr twentyPercentOfContractAmount = new BinaryExpr(
-			new RefExpr(PDFField.contractAmount),
+			new RefExpr(PDFieldName.contractAmount),
 			Expr.twentyPercent,
 			Operators.MULTIPLY);
 		
@@ -550,7 +549,7 @@ public class ChangeOrderForm extends CMSForm {
 				try {
 					// return true if (fee == 0.00), false otherwise
 					String adminReturnFeesVal = filledFormFields
-							.getFieldValue(PDFField.adminReturnFees);
+							.getFieldValue(PDFieldName.adminReturnFees);
 					BigDecimal returnFeeVal = new BigDecimal(adminReturnFeesVal);
 					return (returnFeeVal.compareTo(BigDecimal.ZERO) == 0);
 				} catch (RuntimeException e) {
@@ -574,16 +573,16 @@ public class ChangeOrderForm extends CMSForm {
 				adminReturnFeesCondition);
 
 		static final nAryExpr sumItemsReturned = new nAryExpr(Operators.ADD)
-			.addExpr(new RefExpr(PDFField.extendedPrice1))
-			.addExpr(new RefExpr(PDFField.extendedPrice2))
-			.addExpr(new RefExpr(PDFField.extendedPrice3))
-			.addExpr(new RefExpr(PDFField.extendedPrice4))
-			.addExpr(new RefExpr(PDFField.extendedPrice5));
+			.addExpr(new RefExpr(PDFieldName.extendedPrice1))
+			.addExpr(new RefExpr(PDFieldName.extendedPrice2))
+			.addExpr(new RefExpr(PDFieldName.extendedPrice3))
+			.addExpr(new RefExpr(PDFieldName.extendedPrice4))
+			.addExpr(new RefExpr(PDFieldName.extendedPrice5));
 
-		static final RefExpr contractBalance = new RefExpr(PDFField.contractBalance);
+		static final RefExpr contractBalance = new RefExpr(PDFieldName.contractBalance);
 
 		static final BinaryExpr contractAmountMinusBalanceExpr = new BinaryExpr(
-			new RefExpr(ChangeOrderForm.PDFField.contractAmount),
+			new RefExpr(PDFieldName.contractAmount),
 			contractBalance,
 			Operators.SUBTRACT);
 
@@ -592,11 +591,11 @@ public class ChangeOrderForm extends CMSForm {
 			contractBalance,
 			Operators.SUBTRACT);
 
-		static final RefExpr adminReturnFees = new RefExpr(PDFField.adminReturnFees);
+		static final RefExpr adminReturnFees = new RefExpr(PDFieldName.adminReturnFees);
 
 		static final BinaryExpr adminFeesPlusCredits = new BinaryExpr(
 			adminReturnFees,
-			new RefExpr(PDFField.creditsDiscounts),
+			new RefExpr(PDFieldName.creditsDiscounts),
 			Operators.ADD);
 	}
 
@@ -606,27 +605,27 @@ public class ChangeOrderForm extends CMSForm {
 				"St. Mary Cemetery", "Calvary Cemetery", "All Souls Cemetery",
 				"George L. Klumpp Chapel of Flowers", "Misc./Parish Cemetery" };
 		private final static boolean required = true;
-		final static TextField names = new TextField(PDFField.names, required, "Name(s)");
-		final static TextField address = new TextField(PDFField.address, required, "Address");
-		final static TextField phone = new TextField(PDFField.phone, required, "Phone");
-		final static EmailField email = new EmailField(PDFField.email, required, "Email");
-		final static SelectField cemetery = new SelectField(PDFField.cemetery, required, "Cemetery/Funeral Home", cemeteries);
-		final static TextField location = new TextField(PDFField.location, required, "Plot Location");
-		final static TextField origContractNum = new TextField(PDFField.origContractNum, required, "Original Contract Number");
-		final static NumberField contractAmount = new NumberField(PDFField.contractAmount, required, "Current Contract Value");
-		final static NumberField contractBalance = new NumberField(PDFField.contractBalance, required, "Current Contract Balance");
-		final static TextAreaField reason = new TextAreaField(PDFField.reason, required, "Reason for Change Order");
-		final static NumberField giftAmount = new NumberField(PDFField.giftAmount, required, "Gift Amount");
-		final static NumberField creditsDiscounts = new NumberField(PDFField.creditsDiscounts, required, "Credits & Discounts to be deducted");
-		final static NumberField donationAmount = new NumberField(PDFField.donationAmount, required, "Donation");
-		final static TextField assigneeNames = new TextField(PDFField.assigneeNames, required, "Name(s)");
-		final static TextField assigneeAddress = new TextField(PDFField.assigneeAddress, required, "Address");
-		final static TextField assigneePhone = new TextField(PDFField.assigneePhone, required, "Phone");
-		final static EmailField assigneeEmail = new EmailField(PDFField.assigneeEmail, required, "Email");
-		final static TextField decedents = new TextField(PDFField.decedents, required, "Decedent(s)");
-		final static TextField placeOfFinalDisposition = new TextField(PDFField.placeOfFinalDisposition, required, "Place of Final Disposition");
-		final static SelectField cfcsReIntermentCemetery = new SelectField(PDFField.cfcsReIntermentCemetery, required, "Re-interment Cemetery", cemeteries);
-		final static TextField cfcsReIntermentLocation = new TextField(PDFField.cfcsReIntermentLocation, required, "CFCS Re-Interment Location");
+		final static TextField names = new TextField(PDFieldName.names, required, "Name(s)");
+		final static TextField address = new TextField(PDFieldName.address, required, "Address");
+		final static TextField phone = new TextField(PDFieldName.phone, required, "Phone");
+		final static EmailField email = new EmailField(PDFieldName.email, required, "Email");
+		final static SelectField cemetery = new SelectField(PDFieldName.cemetery, required, "Cemetery/Funeral Home", cemeteries);
+		final static TextField location = new TextField(PDFieldName.location, required, "Plot Location");
+		final static TextField origContractNum = new TextField(PDFieldName.origContractNum, required, "Original Contract Number");
+		final static NumberField contractAmount = new NumberField(PDFieldName.contractAmount, required, "Current Contract Value");
+		final static NumberField contractBalance = new NumberField(PDFieldName.contractBalance, required, "Current Contract Balance");
+		final static TextAreaField reason = new TextAreaField(PDFieldName.reason, required, "Reason for Change Order");
+		final static NumberField giftAmount = new NumberField(PDFieldName.giftAmount, required, "Gift Amount");
+		final static NumberField creditsDiscounts = new NumberField(PDFieldName.creditsDiscounts, required, "Credits & Discounts to be deducted");
+		final static NumberField donationAmount = new NumberField(PDFieldName.donationAmount, required, "Donation");
+		final static TextField assigneeNames = new TextField(PDFieldName.assigneeNames, required, "Name(s)");
+		final static TextField assigneeAddress = new TextField(PDFieldName.assigneeAddress, required, "Address");
+		final static TextField assigneePhone = new TextField(PDFieldName.assigneePhone, required, "Phone");
+		final static EmailField assigneeEmail = new EmailField(PDFieldName.assigneeEmail, required, "Email");
+		final static TextField decedents = new TextField(PDFieldName.decedents, required, "Decedent(s)");
+		final static TextField placeOfFinalDisposition = new TextField(PDFieldName.placeOfFinalDisposition, required, "Place of Final Disposition");
+		final static SelectField cfcsReIntermentCemetery = new SelectField(PDFieldName.cfcsReIntermentCemetery, required, "Re-interment Cemetery", cemeteries);
+		final static TextField cfcsReIntermentLocation = new TextField(PDFieldName.cfcsReIntermentLocation, required, "CFCS Re-Interment Location");
 	}
 	
 	// Identifier of each node in the Change Order Form decision tree
@@ -734,7 +733,7 @@ public class ChangeOrderForm extends CMSForm {
 		final static String done = "done";
 	}
 
-	// Common node definitions as reusable functions
+	// Functions for commonly used node patterns
 	private static class Node {
 		static FieldsNode currContractBalance(String id, String idNext) {
 			return new FieldsNode(id, idNext, Desc.curr_contract_balance)
@@ -743,7 +742,7 @@ public class ChangeOrderForm extends CMSForm {
 		}
 
 		static NoteChecksABoxNode cashReceipt(String id, String idNext) {
-			return new NoteChecksABoxNode(id, idNext, ChangeOrderForm.PDFField.cashReceipt,
+			return new NoteChecksABoxNode(id, idNext, PDFieldName.cashReceipt,
 					ChangeOrderForm.Desc.cash_receipt);
 		}
 
@@ -755,7 +754,7 @@ public class ChangeOrderForm extends CMSForm {
 
 		static FeeNode disintFee(String id, BigDecimal fee) {
 			return new FeeNode(id, ChangeOrderForm.Id.name_1, ChangeOrderForm.Desc.disint_fee,
-					ChangeOrderForm.PDFField.adminReturnFees, fee);
+					PDFieldName.adminReturnFees, fee);
 		}
 
 		static FieldsNode name(String id, String idNext) {
@@ -790,7 +789,7 @@ public class ChangeOrderForm extends CMSForm {
 
 		static FeeNode adminFeeWaived(String id, String idNext) {
 			return new FeeNode(id, idNext, ChangeOrderForm.Desc.admin_fee_waived, 
-					ChangeOrderForm.PDFField.adminReturnFees, new BigDecimal("0.00"));
+					PDFieldName.adminReturnFees, new BigDecimal("0.00"));
 		}
 
 		static FieldsNode creditsDiscounts(String id, String idNext) {
@@ -800,14 +799,14 @@ public class ChangeOrderForm extends CMSForm {
 
 		static FieldTableNode itemsReturned(String id, String idNext) {
 			return new FieldTableNode(id, ChangeOrderForm.Desc.items_returned, 5, idNext)
-				.addColumn("Item Code", ChangeOrderForm.PDFField.itemCodeBase, TextField.class, "")
-				.addColumn("Description", ChangeOrderForm.PDFField.descriptionBase, TextField.class, "")
-				.addColumn("Extended Price (including tax)", ChangeOrderForm.PDFField.extendedPriceBase, NumberField.class, "0.00");
+				.addColumn("Item Code", PDFieldName.itemCodeBase, TextField.class, "")
+				.addColumn("Description", PDFieldName.descriptionBase, TextField.class, "")
+				.addColumn("Extended Price (including tax)", PDFieldName.extendedPriceBase, NumberField.class, "0.00");
 		}
 	}
 
 	// Names of fillable form fields in the Change Order form PDF
-	private static class PDFField {
+	private static class PDFieldName {
 		final static String changeOrderType = "Change Order Type";
 		final static String return_ = "Return";
 		final static String assignment = "Assignment";
@@ -825,11 +824,11 @@ public class ChangeOrderForm extends CMSForm {
 		final static String itemCodeBase = "Item Code ";
 		final static String descriptionBase = "Description ";
 		final static String extendedPriceBase = "Extended Price ";
-		final static String extendedPrice1 = extendedPriceBase + "1";
-		final static String extendedPrice2 = extendedPriceBase + "2";
-		final static String extendedPrice3 = extendedPriceBase + "3";
-		final static String extendedPrice4 = extendedPriceBase + "4";
-		final static String extendedPrice5 = extendedPriceBase + "5";
+		final static String extendedPrice1 = "Extended Price 1";
+		final static String extendedPrice2 = "Extended Price 2";
+		final static String extendedPrice3 = "Extended Price 3";
+		final static String extendedPrice4 = "Extended Price 4";
+		final static String extendedPrice5 = "Extended Price 5";
 		final static String giftAmount = "Gift Amount";
 		final static String adminReturnFees = "Admin/Return Fees";
 		final static String creditsDiscounts = "Credits/Discounts";
