@@ -328,10 +328,10 @@ public class ChangeOrderForm extends CMSForm {
 
 	private void applyCredit() {
 		addNode(new ChoiceNode(Id.apply_credit_choice, Desc.apply_credit_choice, Field.APPLY_CREDIT.name)
-			.addChoice(Field.NEW_CONTRACT.name, Field.NEW_CONTRACT.name, Id.new_contract_note)
-			.addChoice(Field.EXISTING_CONTRACT.name, Field.EXISTING_CONTRACT.name, Id.existing_contract_note)
-			.addChoice(Field.REFUND.name, Field.REFUND.name, Id.refund_request_note)
-			.addChoice(Field.DONATION.name, Field.DONATION.name, Id.plot_fmv_1));
+			.addChoice("New Contract", Field.NEW_CONTRACT.name, Id.new_contract_note)
+			.addChoice("Existing Contract", Field.EXISTING_CONTRACT.name, Id.existing_contract_note)
+			.addChoice("Refund", Field.REFUND.name, Id.refund_request_note)
+			.addChoice("Donation", Field.DONATION.name, Id.plot_fmv_1));
 
 		addNode(new NoteChecksABoxNode(Id.new_contract_note,
 				Id.parties_avail_choice, Field.NEW_EXISTING_CONTRACT.name,
@@ -362,9 +362,9 @@ public class ChangeOrderForm extends CMSForm {
 
 		addNode(new ChoiceNode(Id.transfer_type_choice, Desc.transfer_type_choice,
 				Field.PROPERTY_ASSIGNMENT.name)
-			.addChoice(Field.TRANSFER_OF_OWNERSHIP.name, "Transfer of Ownership", Id.transfer_fee_note)
-			.addChoice(Field.DONATION.name, "Donation", Id.plot_fmv_2)
-			.addChoice(Field.RELEASE_OF_INTEREST.name, "Release of Interest", Id.transfer_fee_waived_note));
+			.addChoice("Transfer of Ownership", Field.TRANSFER_OF_OWNERSHIP.name, Id.transfer_fee_note)
+			.addChoice("Donation", Field.DONATION.name, Id.plot_fmv_2)
+			.addChoice("Release of Interest", Field.RELEASE_OF_INTEREST.name, Id.transfer_fee_waived_note));
 
 		transferTransfer();
 
@@ -383,7 +383,8 @@ public class ChangeOrderForm extends CMSForm {
 		addNode(Node.origContractNum(Id.orig_contract_num_7, Id.assignee_info));
 
 		addNode(new FieldsNode(Id.assignee_info, Id.reason_7, Desc.assignee_info)
-			.addField(Field.ASSIGNEE_NAMES.htmlFieldDef)
+			.addField(Field.ASSIGNEE_NAME_1.htmlFieldDef)
+			.addField(Field.ASSIGNEE_NAME_2.htmlFieldDef)
 			.addField(Field.ASSIGNEE_ADDRESS.htmlFieldDef)
 			.addField(Field.ASSIGNEE_PHONE.htmlFieldDef)
 			.addField(Field.ASSIGNEE_EMAIL.htmlFieldDef));
@@ -604,75 +605,75 @@ public class ChangeOrderForm extends CMSForm {
 		"George L. Klumpp Chapel of Flowers", "Misc./Parish Cemetery" };
 	
 	private static enum Field {
-		CHANGE_ORDER_TYPE("Change Order Type", "Change_Order_Type", null),
-		RETURN("Return", null, null),
-		ASSIGNMENT("Assignment", null, null),
-		DISINTERMENT("Disinterment", null, null),
-		NAMES("Names", "Names", new TextField("Names", true, "Name(s)")),
-		ADDRESS("Address", "Address", new TextField("Address", true, "Address")),
-		PHONE("Phone", "Phone", new TextField("Phone", true, "Phone")),
-		EMAIL("Email", "Email", new EmailField("Email", true, "Email")),
-		CEMETERY("Cemetery", "Cemetery", new SelectField("Cemetery", true, "Cemetery/Funeral Home", cemeteries)),
-		LOCATION("Location", "Location", new TextField("Location", true, "Plot Location")),
-		ORIG_CONTRACT_NUM("Orig Contract", "Orig_Contract", new TextField("Orig Contract", true, "Original Contract Number")),
-		CONTRACT_AMOUNT("Contract Amount", "Contract_Amount", new NumberField("Contract Amount", true, "Current Contract Value")),
-		CONTRACT_BALANCE("Contract Balance", "Contract_Balance", new NumberField("Contract Balance", true, "Current Contract Balance")),
-		REASON("Reason", "Reason", new TextAreaField("Reason", true, "Reason for Change Order")),
-		ITEM_CODE_1("Item Code 1", "Item_Code_1", null),
-		ITEM_CODE_2("Item Code 2", "Item_Code_2", null),
-		ITEM_CODE_3("Item Code 3", "Item_Code_3", null),
-		ITEM_CODE_4("Item Code 4", "Item_Code_4", null),
-		ITEM_CODE_5("Item Code 5", "Item_Code_5", null),
-		DESCRIPTION_1("Description 1", "Description_1", null),
-		DESCRIPTION_2("Description 2", "Description_2", null),
-		DESCRIPTION_3("Description 3", "Description_3", null),
-		DESCRIPTION_4("Description 4", "Description_4", null),
-		DESCRIPTION_5("Description 5", "Description_5", null),
-		EXTENDED_PRICE_1("Extended Price 1", "Extended_Price_1", null),
-		EXTENDED_PRICE_2("Extended Price 2", "Extended_Price_2", null),
-		EXTENDED_PRICE_3("Extended Price 3", "Extended_Price_3", null),
-		EXTENDED_PRICE_4("Extended Price 4", "Extended_Price_4", null),
-		EXTENDED_PRICE_5("Extended Price 5", "Extended_Price_5", null),
-		GIFT_AMOUNT("Gift Amount", "Gift_Amount", new NumberField("Gift Amount", true, "Gift Amount")),
-		ADMIN_RETURN_FEES("Admin/Return Fees", "Admin_Return_Fees", null),
-		CREDITS_DISCOUNTS("Credits/Discounts", "Credits_Discounts", new NumberField("Credits/Discounts", true, "Credits & Discounts to be deducted")),
-		TOTAL_TO_BE_RETURNED("Total to be Returned", "Total_to_be_Returned", null),
-		APPLY_CREDIT("Apply Credit", "Apply_Credit", null),
-		NEW_CONTRACT("New Contract", null, null),
-		EXISTING_CONTRACT("Existing Contract", null, null),
-		REFUND("Refund", null, null),
-		TOTAL_DEDUCTIONS("Total Deductions", "Total_Deductions", null),
-		CREDIT_BALANCE("Credit/Balance", "Credit_Balance", null),
-		PROPERTY_ASSIGNMENT("Property Assignment", "Property_Assignment", null),
-		TRANSFER_OF_OWNERSHIP("Transfer of Ownership", null, null),
-		RELEASE_OF_INTEREST("Release of Interest", null, null),
-		DONATION("Donation", null, null),
-		DONATION_AMOUNT("Donation Amount", "Donation_Amount", new NumberField("Donation Amount", true, "Donation")),
-		ASSIGNEE_NAMES("Assignee Names", "Assignee_Names", new TextField("Assignee Names", true, "Name(s)")),
-		ASSIGNEE_ADDRESS("Assignee Address", "Assignee_Address", new TextField("Assignee Address", true, "Address")),
-		ASSIGNEE_PHONE("Assignee Phone", "Assignee_Phone", new TextField("Assignee Phone", true, "Phone")),
-		ASSIGNEE_EMAIL("Assignee Email", "Assignee_Email", new EmailField("Assignee Email", true, "Email")),
-		DECEDENTS("Decedents", "Decedents", new TextField("Decedents", true, "Decedent(s)")),
-		PLACE_OF_FINAL_DISPOSITION("Place of Final Disposition", "Place_of_Final_Disposition", new TextField("Place of Final Disposition", true, "Place of Final Disposition")),
-		CFCS_REINTERMENT_CEMETERY("CFCS ReInterment Cemetery", "CFCS_ReInterment_Cemetery", new SelectField("CFCS ReInterment Cemetery", true, "Re-interment Cemetery", cemeteries)),
-		CFCS_REINTERMENT_LOCATION("CFCS ReInterment Location", "CFCS_ReInterment_Location", new TextField("CFCS ReInterment Location", true, "CFCS Re-Interment Location")),
-		NOTARY_SIGNATURE("Notary Signature", "Notary_Signature", null),
-		ORIGINAL_CONTRACT("Original Contract", "Original_Contract", null),
-		DEATH_CERTIFICATE("Death Certificate", "Death_Certificate", null),
-		CASH_RECEIPT("Cash Receipt", "Cash Receipt", null),
-		SIGNED_NOTARIZED_RELEASE("Signed/Notarized Release", "Signed_Notarized_Release", null),
-		DONATION_LETTER("Donation Letter", "Donation_Letter", null),
-		STATEMENT_OF_DUE_DILIGENCE_FORM("Statement of Due Diligence Form", "Statement_of_Due_Diligence_Form", null),
-		EVIDENCE_OF_BURIAL("Evidence of Burial", "Evidence_of_Burial", null),
-		NEW_EXISTING_CONTRACT("New/Existing Contract", "New_Existing_Contract", null);
+		CHANGE_ORDER_TYPE("change_order_type", null),
+		RETURN("Return", null),
+		ASSIGNMENT("Assignment", null),
+		DISINTERMENT("Disinterment", null),
+		NAME_1("name_1", new TextField("name_1", true, "Name")),
+		NAME_2("name_2", new TextField("name_2", false, "Add'l Name")),
+		ADDRESS("address", new TextField("address", true, "Address")),
+		PHONE("phone", new TextField("phone", true, "Phone")),
+		EMAIL("email", new EmailField("email", true, "Email")),
+		CEMETERY("cemetery", new SelectField("cemetery", true, "Cemetery/Funeral Home", cemeteries)),
+		LOCATION("location", new TextField("location", true, "Plot Location")),
+		ORIG_CONTRACT_NUM("orig_contract_num", new TextField("orig_contract_num", true, "Original Contract Number")),
+		CONTRACT_AMOUNT("contract_amount", new NumberField("contract_amount", true, "Current Contract Value")),
+		CONTRACT_BALANCE("contract_balance", new NumberField("contract_balance", true, "Current Contract Balance")),
+		REASON("reason", new TextAreaField("reason", true, "Reason for Change Order")),
+		ITEM_CODE_1("item_code_1", null),
+		ITEM_CODE_2("item_code_2", null),
+		ITEM_CODE_3("item_code_3", null),
+		ITEM_CODE_4("item_code_4", null),
+		ITEM_CODE_5("item_code_5", null),
+		DESCRIPTION_1("description_1", null),
+		DESCRIPTION_2("description_2", null),
+		DESCRIPTION_3("description_3", null),
+		DESCRIPTION_4("description_4", null),
+		DESCRIPTION_5("description_5", null),
+		EXTENDED_PRICE_1("extended_price_1", null),
+		EXTENDED_PRICE_2("extended_price_2", null),
+		EXTENDED_PRICE_3("extended_price_3", null),
+		EXTENDED_PRICE_4("extended_price_4", null),
+		EXTENDED_PRICE_5("extended_price_5", null),
+		GIFT_AMOUNT("gift_amount", new NumberField("gift amount", true, "Gift Amount")),
+		ADMIN_RETURN_FEES("admin_return_fees", null),
+		CREDITS_DISCOUNTS("credits_discounts", new NumberField("credits_discounts", true, "Credits & Discounts to be deducted")),
+		TOTAL_TO_BE_RETURNED("total_to_be_returned", null),
+		APPLY_CREDIT("apply_credit", null),
+		NEW_CONTRACT("New Contract", null),
+		EXISTING_CONTRACT("Existing Contract", null),
+		REFUND("Refund", null),
+		TOTAL_DEDUCTIONS("total_deductions", null),
+		CREDIT_BALANCE("credit_balance", null),
+		PROPERTY_ASSIGNMENT("property_assignment", null),
+		TRANSFER_OF_OWNERSHIP("Transfer of Ownership", null),
+		RELEASE_OF_INTEREST("Release of Interest", null),
+		DONATION("Donation", null),
+		DONATION_AMOUNT("donation_amount", new NumberField("donation_amount", true, "Donation")),
+		ASSIGNEE_NAME_1("assignee_name_1", new TextField("assignee_name_1", true, "Name")),
+		ASSIGNEE_NAME_2("assignee_name_2", new TextField("assignee_name_2", false, "Add'l Name")),
+		ASSIGNEE_ADDRESS("assignee_address", new TextField("assignee_address", true, "Address")),
+		ASSIGNEE_PHONE("assignee_phone", new TextField("assignee_phone", true, "Phone")),
+		ASSIGNEE_EMAIL("assignee_email", new EmailField("assignee_email", true, "Email")),
+		DECEDENTS("decedents", new TextField("decedents", true, "Decedent(s)")),
+		PLACE_OF_FINAL_DISPOSITION("place_final_disposition", new TextField("place_final_disposition", true, "Place of Final Disposition")),
+		CFCS_REINTERMENT_CEMETERY("reinterment_cemetery", new SelectField("reinterment_cemetery", true, "Re-interment Cemetery", cemeteries)),
+		CFCS_REINTERMENT_LOCATION("reinterment_location", new TextField("reinterment_location", true, "CFCS Re-Interment Location")),
+		NOTARY_SIGNATURE("notary_signature", null),
+		ORIGINAL_CONTRACT("original_contract", null),
+		DEATH_CERTIFICATE("death_certificate", null),
+		CASH_RECEIPT("cash_receipt", null),
+		SIGNED_NOTARIZED_RELEASE("signed_notarized_release", null),
+		DONATION_LETTER("donation_letter", null),
+		STATEMENT_OF_DUE_DILIGENCE_FORM("statement_due_diligence", null),
+		EVIDENCE_OF_BURIAL("evidence_of_burial", null),
+		NEW_EXISTING_CONTRACT("new_existing_contract", null);
 		
 		final String name; /* name of the PDF field */
-		final String dbColName; /* name of the corresponding database column */
 		final models.tree.fields.Field htmlFieldDef;
 
-		private Field(String name, String dbColName, models.tree.fields.Field htmlFieldDef) {
+		private Field(String name, models.tree.fields.Field htmlFieldDef) {
 			this.name = name;
-			this.dbColName = dbColName;
 			this.htmlFieldDef = htmlFieldDef;
 		}
 	}
@@ -808,7 +809,8 @@ public class ChangeOrderForm extends CMSForm {
 
 		static FieldsNode name(String id, String idNext) {
 			return new FieldsNode(id, idNext, Desc.name)
-				.addField(Field.NAMES.htmlFieldDef)
+				.addField(Field.NAME_1.htmlFieldDef)
+				.addField(Field.NAME_2.htmlFieldDef)
 				.addField(Field.ADDRESS.htmlFieldDef)
 				.addField(Field.PHONE.htmlFieldDef)
 				.addField(Field.EMAIL.htmlFieldDef);
@@ -848,9 +850,9 @@ public class ChangeOrderForm extends CMSForm {
 
 		static FieldTableNode itemsReturned(String id, String idNext) {
 			return new FieldTableNode(id, ChangeOrderForm.Desc.items_returned, 5, idNext)
-				.addColumn("Item Code", "Item Code ", TextField.class, "")
-				.addColumn("Description", "Description ", TextField.class, "")
-				.addColumn("Extended Price (including tax)", "Extended Price ", NumberField.class, "0.00");
+				.addColumn("Item Code", "item_code_", TextField.class, "")
+				.addColumn("Description", "description_", TextField.class, "")
+				.addColumn("Extended Price (including tax)", "extended_price_", NumberField.class, "0.00");
 		}
 	}
 }
