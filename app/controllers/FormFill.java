@@ -1,9 +1,11 @@
 package controllers;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 import models.data.Decision;
+import play.Logger;
 import play.data.Form;
 import play.mvc.Result;
 import util.FileDeletionHandler;
@@ -38,11 +40,22 @@ public class FormFill extends SecureController {
 	/*
 	 * Provide filled PDF for viewing/editing/printing
 	 */
-	public static Result getFormOutput() {
+	public static Result getFilledForm() {
+		Status result;
+		try {
 		String username = getUsername();
-		File filledForm = CMSGuidedFormFill.getFormOutput(username);
-		Status result = ok(filledForm, true);
-		FileDeletionHandler.deleteFile(filledForm);
+		File pdf;
+			pdf = File.createTempFile("Change_Order_Form_Filled", ".pdf");
+			CMSGuidedFormFill.fillForm(username, pdf);
+			
+			result = ok(pdf, true);
+			
+			FileDeletionHandler.deleteFile(pdf);
+		} catch (IOException e) {
+			Logger.error("Couldn't create new temp file.");
+			Logger.error(e.getMessage(), e);
+			result = internalServerError();
+		}
 		return result;
 	}
 

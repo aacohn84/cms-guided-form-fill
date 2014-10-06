@@ -44,15 +44,13 @@ public class CMSGuidedFormFill {
 		return decisionMap.getDecision(root.id);
 	}
 
-	public static File getFormOutput(String owner) {
+	public static void fillForm(String owner, File pdf) {
 		// Get user's form data
 		FormDataStore formDataStore = InMemoryFormDataStore.getInstance();
 		FormData formData = formDataStore.getFormData(owner);
 
 		// Convert FormData to PDF
-		File filledPdf = getFilledPdf(formData);
-
-		return filledPdf;
+		fillPdfWithFormData(formData, pdf);
 	}
 
 	public static Decision getPreviousDecision(String owner,
@@ -131,7 +129,7 @@ public class CMSGuidedFormFill {
 		return currDecision.next;
 	}
 
-	private static File getFilledPdf(FormData formData) {
+	private static File fillPdfWithFormData(FormData formData, File pdf) {
 		// fill fields along the path the user took through the decision tree
 		DecisionMap decisions = formData.decisionMap;
 		FilledFormFields fields = new FilledFormFields();
@@ -143,7 +141,7 @@ public class CMSGuidedFormFill {
 		}
 		CMSForm form = ChangeOrderForm.getInstance();
 		PDFFormFiller formFiller = new PDFFormFiller();
-		return formFiller.fillForm(form, fields);
+		return formFiller.fillForm(form, fields, pdf);
 	}
 
 	private static Decision retrieveOrCreateCurrentDecision(

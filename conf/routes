@@ -11,7 +11,7 @@ GET		/clearSavedChoices			controllers.FormFill.clearSavedChoices()
 GET		/form						controllers.FormFill.startOrContinueForm()
 POST	/next						controllers.FormFill.next()
 POST	/prev						controllers.FormFill.prev()
-GET		/getFormOutput				controllers.FormFill.getFormOutput()
+GET		/getFilledForm				controllers.FormFill.getFilledForm()
 
 POST    /authenticate               controllers.Application.authenticate()
 

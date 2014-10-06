@@ -15,9 +15,8 @@ import org.apache.pdfbox.pdmodel.interactive.form.PDField;
 import play.Logger;
 
 public class PDFFormFiller {
-	public File fillForm(CMSForm form, FilledFormFields formFields) {
+	public File fillForm(CMSForm form, FilledFormFields formFields, File pdf) {
 		String formFileName = form.getFormFileName();
-		File temp;
 		try {
 			// load PDF form
 			PDDocument pdfDoc = PDDocument.load(formFileName);
@@ -34,12 +33,11 @@ public class PDFFormFiller {
 					pdField.setValue(formField.value);
 				}
 			}
-			temp = File.createTempFile("Change_Order_Form_Filled", ".pdf");
-			pdfDoc.save(temp);
-			Logger.debug("Filled PDF @ " + temp.getAbsolutePath());
-		} catch (IOException | SecurityException | COSVisitorException e) {
+			pdfDoc.save(pdf);
+			Logger.debug("Filled PDF @ " + pdf.getAbsolutePath());
+		} catch (IOException | COSVisitorException e) {
 			throw new RuntimeException(e);
 		}
-		return temp;
+		return pdf;
 	}
 }
