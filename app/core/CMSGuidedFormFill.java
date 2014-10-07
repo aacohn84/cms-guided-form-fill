@@ -113,12 +113,6 @@ public class CMSGuidedFormFill {
 		decisionMap.putDecision(currDecision);
 		decisionMap.putDecision(nextDecision);
 
-		// fill/update form fields
-		FilledFormFields filledFormFields = formData.filledFormFields;
-		if (currentNode.isOutputNode) {
-			currentNode.fillFormFields(currDecision.rawInput, filledFormFields);
-		}
-
 		/*
 		 * Return decision associated with next node. If next node not visible,
 		 * make decision for it and repeat.
