@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import models.data.Decision;
+import models.Decision;
 import play.Logger;
 import play.data.Form;
 import play.mvc.Result;

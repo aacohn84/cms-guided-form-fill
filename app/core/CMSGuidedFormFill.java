@@ -3,16 +3,16 @@ package core;
 import java.io.File;
 import java.util.Map;
 
-import models.data.Decision;
-import models.data.DecisionMap;
-import models.data.FilledFormFields;
-import models.data.FormData;
-import models.data.FormDataStore;
-import models.data.InMemoryFormDataStore;
-import models.forms.CMSForm;
-import models.forms.ChangeOrderForm;
-import models.pdf.PDFFormFiller;
-import models.tree.Node;
+import core.forms.CMSForm;
+import core.forms.ChangeOrderForm;
+import core.pdf.PDFFormFiller;
+import core.tree.Node;
+import models.Decision;
+import models.DecisionMap;
+import models.FilledFormFields;
+import models.FormData;
+import models.FormDataStore;
+import models.InMemoryFormDataStore;
 
 public class CMSGuidedFormFill {
 	public static void clearDecisions(String owner) {
@@ -127,6 +127,10 @@ public class CMSGuidedFormFill {
 			return makeDecision(owner, currDecision.next.context.id, requestData);
 		}
 		return currDecision.next;
+	}
+
+	public static void saveForm() {
+		// Save form data to the database (create or update)
 	}
 
 	private static File fillPdfWithFormData(FormData formData, File pdf) {

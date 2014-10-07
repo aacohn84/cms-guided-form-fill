@@ -1,8 +1,8 @@
 package controllers;
 
 import static play.data.Form.form;
-import models.data.AuthStore;
-import models.data.User;
+import models.AuthStore;
+import models.User;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;

@@ -1,4 +1,4 @@
-@(loginForm: Form[data.User])
+@(loginForm: Form[User])
 
 @globalLoginError() = @{
   if (loginForm != null && loginForm.hasGlobalErrors) {
