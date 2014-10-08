@@ -5,15 +5,15 @@ import core.tree.Node;
 /**
  * Represents a decision made by the user while filling out a form.
  * <p>
- * Each decision is composed of a context and an input. {@link Decision#context}
- * is the node that the input applies to. {@link Decision#rawInput} is a string
- * which usually contains a serialized object created by the context node.
+ * Each Decision corresponds to a single Node visited by the user. This Node is
+ * called the context of the Decision. The Decision also stores the relevant
+ * input given at that Node. The input is parsed and serialized by the context
+ * Node, and stored here in String form as <code>Decision.rawInput</code>.
  * </p>
  * <p>
- * Each decision is part of a sequence. If this decision is first in the
- * sequence, then {@link Decision#previous} will be <code>null</code>. If this
- * decision is last in the sequence, then {@link Decision#next} will be
- * <code>null</code>.
+ * Each decision is part of a sequence. If this is the first decision in the
+ * sequence, then <code>Decision.previous == null</code>. If it's the last, then
+ * <code>Decision.next == null</code>.
  * </p>
  * 
  * @author Aaron Cohn
@@ -21,7 +21,7 @@ import core.tree.Node;
 public class Decision {
 	public Node context;
 	public Decision previous, next;
-	public String rawInput;
+	public String serializedInput;
 
 	public Decision setContext(Node context) {
 		this.context = context;
@@ -39,7 +39,7 @@ public class Decision {
 	}
 
 	public Decision setRawInput(String rawInput) {
-		this.rawInput = rawInput;
+		this.serializedInput = rawInput;
 		return this;
 	}
 }

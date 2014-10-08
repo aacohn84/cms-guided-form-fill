@@ -4,31 +4,38 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import core.forms.CMSForm;
 import core.tree.Node;
 
 /**
  * The main data structure involved in forming a decision tree.
  * <p>
- * It allows access to each {@link Decision} using the identifier of the
- * {@link Node} associated with it. Each decision tracks the nodes associated
- * with the previous and next decisions, which allows a sequence of decisions to
- * form. By taking multiple paths through the form, we get multiple sequences,
- * which form a partially connected tree.
+ * It allows access to each {@link Decision} using the id of the Decision's
+ * context {@link Node} as a key. Each Decision links to the previous and next
+ * Decisions, which allows a sequence of decisions to form. By taking multiple
+ * paths through the form, we get multiple sequences, which form a partially
+ * connected tree.
+ * </p>
+ * <p>
+ * Essentially, it's several doubly linked lists, each one reprsenting a section
+ * of a path through the tree. Different sections can be linked together to form
+ * a complete path through the tree. This is referred to as the active path, and
+ * there can only be one in the tree at any given time.
  * </p>
  * 
  * @author Aaron Cohn
  */
-public class DecisionMap implements Iterable<Decision> {
+public class DecisionTree implements Iterable<Decision> {
 	/**
-	 * Traverses the active path through the DecisionMap.
+	 * Traverses the active path through the DecisionTree.
 	 * 
 	 * @author Aaron Cohn
 	 */
-	public class DecisionMapIterator implements Iterator<Decision> {
+	public class DecisionTreeIterator implements Iterator<Decision> {
 		Decision current;
 		Decision negativeOne; // empty decision, serves to start iteration
 
-		public DecisionMapIterator() {
+		public DecisionTreeIterator() {
 			negativeOne = new Decision().setNext(firstDecision);
 			current = negativeOne;
 		}
@@ -51,9 +58,11 @@ public class DecisionMap implements Iterable<Decision> {
 
 	Map<String, Decision> decisions;
 	Decision firstDecision;
+	CMSForm form;
 
-	public DecisionMap() {
+	public DecisionTree(CMSForm form) {
 		decisions = new HashMap<String, Decision>();
+		this.form = form;
 	}
 
 	public Decision getDecision(String contextId) {
@@ -62,6 +71,34 @@ public class DecisionMap implements Iterable<Decision> {
 
 	public Decision getFirstDecision() {
 		return firstDecision;
+	}
+
+	public Decision makeDecision(String contextId, Map<String, String> rawInput) {
+		// retrieve the corresponding Decision if it exists, else create one
+		Decision decision = getDecision(contextId);
+		if (decision == null) {
+			decision = new Decision();
+			decision.context = form.getNode(contextId);
+			putDecision(decision);
+		}
+
+		// set the new input
+		Node context = decision.context;
+		decision.serializedInput = context.serializeInput(rawInput);
+
+		// link to next decision if possible (if it doesn't exist, create it)
+		if (!context.isTerminal()) {
+			String idNextNode = context.getIdNextNode(rawInput);
+			Decision next = getDecision(idNextNode);
+			if (next == null) {
+				next = new Decision();
+				next.context = form.getNode(idNextNode);
+				next.previous = decision;
+				putDecision(next);
+			}
+			decision.next = next;
+		}
+		return decision;
 	}
 
 	public void putDecision(Decision decision) {
@@ -73,6 +110,25 @@ public class DecisionMap implements Iterable<Decision> {
 
 	@Override
 	public Iterator<Decision> iterator() {
-		return new DecisionMapIterator();
+		return new DecisionTreeIterator();
+	}
+
+	/**
+	 * A DecisionMap is complete if there is an unbroken path from the
+	 * firstDecision to a Decision with a TerminalNode as its context.
+	 */
+	public boolean isComplete() {
+		Decision iter = firstDecision;
+		while (iter.next != null) {
+			iter = iter.next;
+		}
+		if (iter.context != null && iter.context.isTerminal()) {
+			return true;
+		}
+		return false;
+	}
+
+	public static byte[] serialize() {
+		return null;
 	}
 }

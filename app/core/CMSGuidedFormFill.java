@@ -8,7 +8,7 @@ import core.forms.ChangeOrderForm;
 import core.pdf.PDFFormFiller;
 import core.tree.Node;
 import models.Decision;
-import models.DecisionMap;
+import models.DecisionTree;
 import models.FilledFormFields;
 import models.FormData;
 import models.FormDataStore;
@@ -21,7 +21,7 @@ public class CMSGuidedFormFill {
 			formDataStore.removeFormData(owner);
 		}
 	}
-	
+
 	/**
 	 * Starts the form-filling process for the specified owner.
 	 * 
@@ -33,14 +33,15 @@ public class CMSGuidedFormFill {
 	 */
 	public static Decision startOrContinueForm(String owner) {
 		FormDataStore formDataStore = InMemoryFormDataStore.getInstance();
-		Node root = ChangeOrderForm.getInstance().getRoot();
+		ChangeOrderForm form = ChangeOrderForm.getInstance();
+		Node root = form.getRoot();
 		if (!formDataStore.containsUsername(owner)) {
-			FormData formData = new FormData(owner);
+			FormData formData = new FormData(owner, form);
 			Decision firstDecision = new Decision().setContext(root);
-			formData.decisionMap.putDecision(firstDecision);
+			formData.decisionTree.putDecision(firstDecision);
 			formDataStore.setFormData(owner, formData);
 		}
-		DecisionMap decisionMap = formDataStore.getFormData(owner).decisionMap;
+		DecisionTree decisionMap = formDataStore.getFormData(owner).decisionTree;
 		return decisionMap.getDecision(root.id);
 	}
 
@@ -61,7 +62,7 @@ public class CMSGuidedFormFill {
 		 */
 		FormDataStore formDataStore = InMemoryFormDataStore.getInstance();
 		FormData formData = formDataStore.getFormData(owner);
-		DecisionMap decisionMap = formData.decisionMap;
+		DecisionTree decisionMap = formData.decisionTree;
 
 		CMSForm form = ChangeOrderForm.getInstance();
 		Decision currDecision = decisionMap.getDecision(idCurrentNode);
@@ -82,45 +83,23 @@ public class CMSGuidedFormFill {
 	 */
 	public static Decision makeDecision(String owner, String idCurrentNode,
 			Map<String, String> requestData) {
-		/*
-		 * Retrieve the owner's form data first, since there's no point in doing
-		 * anything else if the form data doesn't exist.
-		 */
+
+		// retrieve the owner's FormData
 		FormDataStore formDataStore = InMemoryFormDataStore.getInstance();
 		FormData formData = formDataStore.getFormData(owner);
-		DecisionMap decisionMap = formData.decisionMap;
+		DecisionTree decisionTree = formData.decisionTree;
 
-		// retrieve the current node
-		CMSForm form = ChangeOrderForm.getInstance();
-		Node currentNode = form.getNode(idCurrentNode);
-
-		// TODO: validate user input
-
-		Decision currDecision = retrieveOrCreateCurrentDecision(idCurrentNode,
-				decisionMap, currentNode);
-		String rawInput = currentNode.serializeInput(requestData);
-		currDecision.setRawInput(rawInput);
-
-		// link current decision and next decision to each other
-		String idNextNode = currentNode.getIdNextNode(requestData);
-		Node nextNode = form.getNode(idNextNode);
-		Decision nextDecision = retrieveOrCreateNextDecision(decisionMap,
-				nextNode);
-		nextDecision.setPrevious(currDecision);
-		currDecision.setNext(nextDecision);
-
-		// save current and next decisions
-		decisionMap.putDecision(currDecision);
-		decisionMap.putDecision(nextDecision);
+		Decision decision = decisionTree.makeDecision(idCurrentNode,
+				requestData);
 
 		/*
-		 * Return decision associated with next node. If next node not visible,
-		 * make decision for it and repeat.
+		 * Return next decision if context is visible, else continue making
+		 * decisions.
 		 */
-		if (!nextNode.isVisible) {
-			return makeDecision(owner, currDecision.next.context.id, requestData);
+		if (!decision.next.context.isVisible) {
+			return makeDecision(owner, decision.next.context.id, requestData);
 		}
-		return currDecision.next;
+		return decision.next;
 	}
 
 	public static void saveForm() {
@@ -129,34 +108,16 @@ public class CMSGuidedFormFill {
 
 	private static File fillPdfWithFormData(FormData formData, File pdf) {
 		// fill fields along the path the user took through the decision tree
-		DecisionMap decisions = formData.decisionMap;
+		DecisionTree decisions = formData.decisionTree;
 		FilledFormFields fields = new FilledFormFields();
 		for (Decision decision : decisions) {
 			Node context = decision.context;
 			if (context.isOutputNode) {
-				context.fillFormFields(decision.rawInput, fields);
+				context.fillFormFields(decision.serializedInput, fields);
 			}
 		}
 		CMSForm form = ChangeOrderForm.getInstance();
 		PDFFormFiller formFiller = new PDFFormFiller();
 		return formFiller.fillForm(form, fields, pdf);
-	}
-
-	private static Decision retrieveOrCreateCurrentDecision(
-			String idCurrentNode, DecisionMap decisionMap, Node currentNode) {
-		Decision decision = decisionMap.getDecision(idCurrentNode);
-		if (decision == null) {
-			decision = new Decision().setContext(currentNode);
-		}
-		return decision;
-	}
-
-	private static Decision retrieveOrCreateNextDecision(DecisionMap decisions,
-			Node nextNode) {
-		Decision nextDecision = decisions.getDecision(nextNode.id);
-		if (nextDecision == null) {
-			nextDecision = new Decision().setContext(nextNode);
-		}
-		return nextDecision;
 	}
 }

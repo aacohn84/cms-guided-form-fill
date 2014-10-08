@@ -1,11 +1,14 @@
 package models;
 
+import core.forms.CMSForm;
+
 public class FormData {
 	String owner;
-	public DecisionMap decisionMap;
+	public DecisionTree decisionTree;
+	public Integer rowId;
 	
-	public FormData(String owner) {
+	public FormData(String owner, CMSForm form) {
 		this.owner = owner;
-		this.decisionMap = new DecisionMap();
+		this.decisionTree = new DecisionTree(form);
 	}
 }
