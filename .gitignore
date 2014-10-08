@@ -14,13 +14,5 @@ dist
 /RUNNING_PID
 /.settings
 
-activator
-activator.bat
-activator-launch-1.2.3.jar
-activator-sbt-echo-akka-shim.sbt
-project/activator-sbt-echo-shim.sbt
-project/activator-sbt-eclipse-shim.sbt
-project/activator-sbt-idea-shim.sbt
-
 *.bak
 *.orig
