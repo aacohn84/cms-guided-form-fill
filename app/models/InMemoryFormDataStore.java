@@ -3,7 +3,7 @@ package models;
 import java.util.HashMap;
 import java.util.Map;
 
-public class InMemoryFormDataStore implements FormDataStore {
+public class InMemoryFormDataStore {
 
 	static InMemoryFormDataStore instance;
 	
@@ -20,12 +20,10 @@ public class InMemoryFormDataStore implements FormDataStore {
 		formDataStore = new HashMap<String, FormData>();
 	}
 	
-	@Override
 	public boolean containsUsername(String username) {
 		return formDataStore.containsKey(username);
 	}
 
-	@Override
 	public FormData getFormData(String username) throws NoSuchUserException {
 		if (formDataStore.containsKey(username)) {
 			return formDataStore.get(username);
@@ -33,12 +31,10 @@ public class InMemoryFormDataStore implements FormDataStore {
 		throw new NoSuchUserException(username);
 	}
 
-	@Override
 	public void setFormData(String username, FormData formData) {
 		formDataStore.put(username, formData);
 	}
 
-	@Override
 	public void removeFormData(String username) throws NoSuchUserException {
 		if (formDataStore.containsKey(username)) {
 			formDataStore.remove(username);

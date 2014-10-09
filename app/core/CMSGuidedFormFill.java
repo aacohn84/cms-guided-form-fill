@@ -11,12 +11,11 @@ import models.Decision;
 import models.DecisionTree;
 import models.FilledFormFields;
 import models.FormData;
-import models.FormDataStore;
 import models.InMemoryFormDataStore;
 
 public class CMSGuidedFormFill {
 	public static void clearDecisions(String owner) {
-		FormDataStore formDataStore = InMemoryFormDataStore.getInstance();
+		InMemoryFormDataStore formDataStore = InMemoryFormDataStore.getInstance();
 		if (formDataStore.containsUsername(owner)) {
 			formDataStore.removeFormData(owner);
 		}
@@ -71,10 +70,15 @@ public class CMSGuidedFormFill {
 		return decision.next;
 	}
 
-	public static void saveForm() {
+	public static void saveForm(String owner) {
 		// retrieve the user's FormData
+		FormData formData = getFormData(owner);
+		
 		// if the FormData has a database row associated with it
-		//     update the row
+		if (formData.getRowId() != null) {
+			// update the row
+			
+		}
 		// else
 		//     create a new row
 		// set FormData's id to the id of the new row
@@ -90,7 +94,7 @@ public class CMSGuidedFormFill {
 	 *         If a Decision doesn't exist yet, it will be created.
 	 */
 	public static Decision startOrContinueForm(String owner) {
-		FormDataStore formDataStore = InMemoryFormDataStore.getInstance();
+		InMemoryFormDataStore formDataStore = InMemoryFormDataStore.getInstance();
 		ChangeOrderForm form = ChangeOrderForm.getInstance();
 		Node root = form.getRoot();
 		if (!formDataStore.containsUsername(owner)) {
@@ -109,7 +113,7 @@ public class CMSGuidedFormFill {
 	}
 
 	private static FormData getFormData(String owner) {
-		FormDataStore formDataStore = InMemoryFormDataStore.getInstance();
+		InMemoryFormDataStore formDataStore = InMemoryFormDataStore.getInstance();
 		FormData formData = formDataStore.getFormData(owner);
 		return formData;
 	}
