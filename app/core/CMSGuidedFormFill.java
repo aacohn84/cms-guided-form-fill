@@ -37,12 +37,11 @@ public class CMSGuidedFormFill {
 		Node root = form.getRoot();
 		if (!formDataStore.containsUsername(owner)) {
 			FormData formData = new FormData(owner, form);
-			Decision firstDecision = new Decision().setContext(root);
-			formData.decisionTree.putDecision(firstDecision);
+			formData.getDecisionTree().makeDecision(root.id, null);
 			formDataStore.setFormData(owner, formData);
 		}
-		DecisionTree decisionMap = formDataStore.getFormData(owner).decisionTree;
-		return decisionMap.getDecision(root.id);
+		DecisionTree decisionTree = formDataStore.getFormData(owner).getDecisionTree();
+		return decisionTree.getDecision(root.id);
 	}
 
 	public static void fillForm(String owner, File pdf) {
@@ -62,7 +61,7 @@ public class CMSGuidedFormFill {
 		 */
 		FormDataStore formDataStore = InMemoryFormDataStore.getInstance();
 		FormData formData = formDataStore.getFormData(owner);
-		DecisionTree decisionMap = formData.decisionTree;
+		DecisionTree decisionMap = formData.getDecisionTree();
 
 		CMSForm form = ChangeOrderForm.getInstance();
 		Decision currDecision = decisionMap.getDecision(idCurrentNode);
@@ -87,7 +86,7 @@ public class CMSGuidedFormFill {
 		// retrieve the owner's FormData
 		FormDataStore formDataStore = InMemoryFormDataStore.getInstance();
 		FormData formData = formDataStore.getFormData(owner);
-		DecisionTree decisionTree = formData.decisionTree;
+		DecisionTree decisionTree = formData.getDecisionTree();
 
 		Decision decision = decisionTree.makeDecision(idCurrentNode,
 				requestData);
@@ -108,7 +107,7 @@ public class CMSGuidedFormFill {
 
 	private static File fillPdfWithFormData(FormData formData, File pdf) {
 		// fill fields along the path the user took through the decision tree
-		DecisionTree decisions = formData.decisionTree;
+		DecisionTree decisions = formData.getDecisionTree();
 		FilledFormFields fields = new FilledFormFields();
 		for (Decision decision : decisions) {
 			Node context = decision.context;
@@ -116,8 +115,7 @@ public class CMSGuidedFormFill {
 				context.fillFormFields(decision.serializedInput, fields);
 			}
 		}
-		CMSForm form = ChangeOrderForm.getInstance();
 		PDFFormFiller formFiller = new PDFFormFiller();
-		return formFiller.fillForm(form, fields, pdf);
+		return formFiller.fillForm(formData.getForm(), fields, pdf);
 	}
 }
