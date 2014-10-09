@@ -56,6 +56,10 @@ public class DecisionTree implements Iterable<Decision> {
 		}
 	}
 
+	public static byte[] serialize() {
+		return null;
+	}
+
 	Map<String, Decision> decisions;
 	Decision firstDecision;
 	CMSForm form;
@@ -71,6 +75,26 @@ public class DecisionTree implements Iterable<Decision> {
 
 	public Decision getFirstDecision() {
 		return firstDecision;
+	}
+
+	/**
+	 * A DecisionMap is complete if there is an unbroken path from the
+	 * firstDecision to a Decision with a TerminalNode as its context.
+	 */
+	public boolean isComplete() {
+		Decision iter = firstDecision;
+		while (iter.next != null) {
+			iter = iter.next;
+		}
+		if (iter.context != null && iter.context.isTerminal()) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public Iterator<Decision> iterator() {
+		return new DecisionTreeIterator();
 	}
 
 	public Decision makeDecision(String contextId, Map<String, String> rawInput) {
@@ -106,29 +130,5 @@ public class DecisionTree implements Iterable<Decision> {
 			firstDecision = decision;
 		}
 		decisions.put(decision.context.id, decision);
-	}
-
-	@Override
-	public Iterator<Decision> iterator() {
-		return new DecisionTreeIterator();
-	}
-
-	/**
-	 * A DecisionMap is complete if there is an unbroken path from the
-	 * firstDecision to a Decision with a TerminalNode as its context.
-	 */
-	public boolean isComplete() {
-		Decision iter = firstDecision;
-		while (iter.next != null) {
-			iter = iter.next;
-		}
-		if (iter.context != null && iter.context.isTerminal()) {
-			return true;
-		}
-		return false;
-	}
-
-	public static byte[] serialize() {
-		return null;
 	}
 }
