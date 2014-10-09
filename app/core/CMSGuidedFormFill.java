@@ -40,7 +40,8 @@ public class CMSGuidedFormFill {
 			formData.getDecisionTree().makeDecision(root.id, null);
 			formDataStore.setFormData(owner, formData);
 		}
-		DecisionTree decisionTree = formDataStore.getFormData(owner).getDecisionTree();
+		DecisionTree decisionTree = formDataStore.getFormData(owner)
+				.getDecisionTree();
 		return decisionTree.getDecision(root.id);
 	}
 
@@ -106,16 +107,7 @@ public class CMSGuidedFormFill {
 	}
 
 	private static File fillPdfWithFormData(FormData formData, File pdf) {
-		// fill fields along the path the user took through the decision tree
-		DecisionTree decisions = formData.getDecisionTree();
-		FilledFormFields fields = new FilledFormFields();
-		for (Decision decision : decisions) {
-			Node context = decision.context;
-			if (context.isOutputNode) {
-				context.fillFormFields(decision.serializedInput, fields);
-			}
-		}
-		PDFFormFiller formFiller = new PDFFormFiller();
-		return formFiller.fillForm(formData.getForm(), fields, pdf);
+		FilledFormFields fields = formData.getFilledFormFields();
+		return PDFFormFiller.fillForm(formData.getForm(), fields, pdf);
 	}
 }

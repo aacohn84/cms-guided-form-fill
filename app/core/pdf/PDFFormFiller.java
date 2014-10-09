@@ -15,13 +15,14 @@ import core.forms.CMSForm;
 import play.Logger;
 
 public class PDFFormFiller {
-	public File fillForm(CMSForm form, FilledFormFields formFields, File pdf) {
+	public static File fillForm(CMSForm form, FilledFormFields formFields,
+			File pdf) {
 		String formFileName = form.getFormFileName();
 		try {
 			// load PDF form
 			PDDocument pdfDoc = PDDocument.load(formFileName);
 			PDAcroForm acroForm = pdfDoc.getDocumentCatalog().getAcroForm();
-			
+
 			// fill each field
 			for (FilledFormField formField : formFields) {
 				PDField pdField = acroForm.getField(formField.name);
