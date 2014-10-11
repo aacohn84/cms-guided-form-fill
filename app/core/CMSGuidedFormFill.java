@@ -11,11 +11,11 @@ import models.Decision;
 import models.DecisionTree;
 import models.FilledFormFields;
 import models.FormData;
-import models.InMemoryFormDataStore;
+import models.FormDataStore;
 
 public class CMSGuidedFormFill {
 	public static void clearDecisions(String owner) {
-		InMemoryFormDataStore formDataStore = InMemoryFormDataStore.getInstance();
+		FormDataStore formDataStore = FormDataStore.getInstance();
 		if (formDataStore.containsUsername(owner)) {
 			formDataStore.removeFormData(owner);
 		}
@@ -94,7 +94,7 @@ public class CMSGuidedFormFill {
 	 *         If a Decision doesn't exist yet, it will be created.
 	 */
 	public static Decision startOrContinueForm(String owner) {
-		InMemoryFormDataStore formDataStore = InMemoryFormDataStore.getInstance();
+		FormDataStore formDataStore = FormDataStore.getInstance();
 		ChangeOrderForm form = ChangeOrderForm.getInstance();
 		Node root = form.getRoot();
 		if (!formDataStore.containsUsername(owner)) {
@@ -113,7 +113,7 @@ public class CMSGuidedFormFill {
 	}
 
 	private static FormData getFormData(String owner) {
-		InMemoryFormDataStore formDataStore = InMemoryFormDataStore.getInstance();
+		FormDataStore formDataStore = FormDataStore.getInstance();
 		FormData formData = formDataStore.getFormData(owner);
 		return formData;
 	}

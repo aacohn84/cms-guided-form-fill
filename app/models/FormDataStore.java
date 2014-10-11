@@ -3,20 +3,20 @@ package models;
 import java.util.HashMap;
 import java.util.Map;
 
-public class InMemoryFormDataStore {
+public class FormDataStore {
 
-	static InMemoryFormDataStore instance;
+	static FormDataStore instance;
 	
-	public static InMemoryFormDataStore getInstance() {
+	public static FormDataStore getInstance() {
 		if (instance == null) {
-			instance = new InMemoryFormDataStore();
+			instance = new FormDataStore();
 		}
 		return instance;
 	}
 	
 	Map<String, FormData> formDataStore;
 
-	private InMemoryFormDataStore() {
+	private FormDataStore() {
 		formDataStore = new HashMap<String, FormData>();
 	}
 	
