@@ -37,7 +37,7 @@ public class ChangeOrderForm extends CMSForm {
 
 	private ChangeOrderForm() {
 		// Name of PDF file associated with this form
-		super("Change_Order_Form.pdf");
+		super("change_order");
 
 		// decision tree definition
 		root = addNode(new NoteChecksABoxNode(Id.prerequisites_note,
