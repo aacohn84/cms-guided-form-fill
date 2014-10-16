@@ -270,8 +270,8 @@ public class ChangeOrderForm extends CMSForm {
 			.addChoice("Yes", Id.admin_fee_waived_2)
 			.addChoice("No", Id.admin_fee_2));
 
-		addNode(new NoteNode(Id.admin_fee_2, Id.return_goods_choice,
-				Desc.admin_fee));
+		addNode(new FeeNode(Id.admin_fee_2, Id.return_goods_choice, Desc.admin_fee,
+				Field.ADMIN_RETURN_FEES.name, new BigDecimal("100.00")));
 
 		addNode(new ChoiceNode(Id.return_goods_choice, Desc.return_goods_choice)
 			.addChoice("Yes", Id.name_5)
@@ -793,7 +793,7 @@ public class ChangeOrderForm extends CMSForm {
 
 		static NoteChecksABoxNode cashReceipt(String id, String idNext) {
 			return new NoteChecksABoxNode(id, idNext, Field.CASH_RECEIPT.name,
-					ChangeOrderForm.Desc.cash_receipt);
+					Desc.cash_receipt);
 		}
 
 		static ChoiceNode paidInFullChoice(String id, String idYes, String idNo) {
@@ -803,7 +803,7 @@ public class ChangeOrderForm extends CMSForm {
 		}
 
 		static FeeNode disintFee(String id, BigDecimal fee) {
-			return new FeeNode(id, ChangeOrderForm.Id.name_1, ChangeOrderForm.Desc.disint_fee,
+			return new FeeNode(id, Id.name_1, Desc.disint_fee,
 					Field.ADMIN_RETURN_FEES.name, fee);
 		}
 
@@ -833,13 +833,13 @@ public class ChangeOrderForm extends CMSForm {
 		}
 
 		static ChoiceNode origContractDate(String id, String idWithin30Days, String idOutside30Days) {
-			return new ChoiceNode(id, ChangeOrderForm.Desc.orig_contract_date)
+			return new ChoiceNode(id, Desc.orig_contract_date)
 				.addChoice("Within 30 days", idWithin30Days)
 				.addChoice("Outside 30 days", idOutside30Days);
 		}
 
 		static FeeNode adminFeeWaived(String id, String idNext) {
-			return new FeeNode(id, idNext, ChangeOrderForm.Desc.admin_fee_waived, 
+			return new FeeNode(id, idNext, Desc.admin_fee_waived, 
 					Field.ADMIN_RETURN_FEES.name, new BigDecimal("0.00"));
 		}
 
@@ -849,7 +849,7 @@ public class ChangeOrderForm extends CMSForm {
 		}
 
 		static FieldTableNode itemsReturned(String id, String idNext) {
-			return new FieldTableNode(id, ChangeOrderForm.Desc.items_returned, 5, idNext)
+			return new FieldTableNode(id, Desc.items_returned, 5, idNext)
 				.addColumn("Item Code", "item_code_", TextField.class, "")
 				.addColumn("Description", "description_", TextField.class, "")
 				.addColumn("Extended Price (including tax)", "extended_price_", NumberField.class, "0.00");
