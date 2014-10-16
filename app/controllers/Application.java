@@ -2,7 +2,7 @@ package controllers;
 
 import static play.data.Form.form;
 import models.AuthStore;
-import models.User;
+import models.Employee;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -12,22 +12,21 @@ import views.html.login;
 
 public class Application extends Controller {
 
-	final static Form<User> loginForm = form(User.class);
+	final static Form<Employee> loginForm = form(Employee.class);
 
     /*
      * Authenticate a user who is attempting to log in.
      */
     public static Result authenticate() {
-    	Form<User> filledLoginForm = loginForm.bindFromRequest();
+    	Form<Employee> filledLoginForm = loginForm.bindFromRequest();
     	if (filledLoginForm.hasErrors()) {
     		return badRequest(login.render(filledLoginForm));
     	}
     	AuthStore authStore = new AuthStore();
-    	User user = filledLoginForm.get();
-    	String username = user.getUsername();
-    	if (authStore.credentialsAreValid(username, user.getPassword())) {
-    		user.setPermissionLevel(authStore.getPermissionLevel(username));
-    		CMSSession.authenticate(user);
+    	Employee employee = filledLoginForm.get();
+    	String username = employee.getEmployeeName();
+    	if (authStore.credentialsAreValid(username, employee.getPassword())) {
+    		CMSSession.authenticate(authStore.getEmployee());
     		return redirect("/forms");
     	}
     	filledLoginForm.reject("Something wasn't right with your username or password.");

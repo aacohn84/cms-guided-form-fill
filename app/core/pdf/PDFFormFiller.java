@@ -15,7 +15,7 @@ import core.forms.CMSForm;
 import play.Logger;
 
 public class PDFFormFiller {
-	public static File fillForm(CMSForm form, FilledFormFields formFields,
+	public static void fillForm(CMSForm form, FilledFormFields formFields,
 			File pdf) {
 		String formFileName = form.getFormFileName();
 		try {
@@ -39,6 +39,5 @@ public class PDFFormFiller {
 		} catch (IOException | COSVisitorException e) {
 			throw new RuntimeException(e);
 		}
-		return pdf;
 	}
 }

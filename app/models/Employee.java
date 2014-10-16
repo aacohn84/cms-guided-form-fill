@@ -2,7 +2,7 @@ package models;
 
 import play.data.validation.Constraints.Required;
 
-public class User {
+public class Employee {
 	
 	@Required
 	private String username;
@@ -11,8 +11,9 @@ public class User {
 	private String password;
 	
 	private String permissionLevel;
+	private int id;
 	
-	public String getUsername() {
+	public String getEmployeeName() {
 		return username;
 	}
 	
@@ -34,6 +35,14 @@ public class User {
 	
 	public void setPermissionLevel(String permissionLevel) {
 		this.permissionLevel = permissionLevel;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 }

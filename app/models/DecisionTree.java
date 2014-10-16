@@ -1,9 +1,12 @@
 package models;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import play.libs.Json;
 import core.forms.CMSForm;
 import core.tree.Node;
 
@@ -56,8 +59,11 @@ public class DecisionTree implements Iterable<Decision> {
 		}
 	}
 
-	public static byte[] serialize() {
-		return null;
+	static class SerializedDecision implements Serializable {
+		private static final long serialVersionUID = -7893808643530736707L;
+
+		public String contextId;
+		public String serializedInput;
 	}
 
 	Map<String, Decision> decisions;
@@ -130,5 +136,18 @@ public class DecisionTree implements Iterable<Decision> {
 			firstDecision = decision;
 		}
 		decisions.put(decision.context.id, decision);
+	}
+
+	public String serialize() {
+		ArrayList<SerializedDecision> list = new ArrayList<>();
+		for (Decision decision : decisions.values()) {
+			SerializedDecision sd = new SerializedDecision();
+			sd.contextId = decision.context.id;
+			sd.serializedInput = decision.serializedInput;
+			list.add(sd);
+		}
+		SerializedDecision[] array = new SerializedDecision[list.size()];
+		array = list.toArray(array);
+		return Json.toJson(array).toString();
 	}
 }

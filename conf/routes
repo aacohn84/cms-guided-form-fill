@@ -12,6 +12,7 @@ GET		/form						controllers.FormFill.startOrContinueForm()
 POST	/next						controllers.FormFill.next()
 POST	/prev						controllers.FormFill.prev()
 GET		/getFilledForm				controllers.FormFill.getFilledForm()
+GET		/saveAndExit				controllers.FormFill.saveAndExit()
 
 POST    /authenticate               controllers.Application.authenticate()
 

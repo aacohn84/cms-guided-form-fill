@@ -22,18 +22,21 @@ public class FormFill extends SecureController {
 	 * Deletes the user's saved decisions.
 	 */
 	public static Result clearSavedChoices() {
-		String username = getUsername();
-		CMSGuidedFormFill.clearDecisions(username);
+		String username = CMSSession.getEmployeeName();
+		String formName = "change_order";
+		CMSGuidedFormFill.clearDecisions(formName, username);
 		flash().put("clearSavedChoices", "");
 		return redirect(routes.Application.forms());
 	}
-	
+
 	/*
 	 * Provide root node of form.
 	 */
 	public static Result startOrContinueForm() {
-		Decision firstDecision = CMSGuidedFormFill
-				.startOrContinueForm(getUsername());
+		String formName = "change_order";
+		Decision firstDecision = CMSGuidedFormFill.startOrContinueForm(
+				formName, CMSSession.getEmployeeName(),
+				CMSSession.getEmployeeId());
 		return ok(backdrop.render(firstDecision));
 	}
 
@@ -43,13 +46,13 @@ public class FormFill extends SecureController {
 	public static Result getFilledForm() {
 		Status result;
 		try {
-		String username = getUsername();
-		File pdf;
-			pdf = File.createTempFile("Change_Order_Form_Filled", ".pdf");
-			CMSGuidedFormFill.fillForm(username, pdf);
-			
+			String formName = "change_order";
+			String username = CMSSession.getEmployeeName();
+			File pdf = File.createTempFile("Change_Order_Form_Filled", ".pdf");
+			CMSGuidedFormFill.fillForm(formName, username, pdf);
+
 			result = ok(pdf, true);
-			
+
 			FileDeletionHandler.deleteFile(pdf);
 		} catch (IOException e) {
 			Logger.error("Couldn't create new temp file.");
@@ -66,10 +69,11 @@ public class FormFill extends SecureController {
 		// get current node
 		Map<String, String> requestData = Form.form().bindFromRequest().data();
 		String idCurrentNode = requestData.get(RequestParams.CURRENT_NODE);
-		String username = getUsername();
+		String formName = "change_order";
+		String username = CMSSession.getEmployeeName();
 
-		Decision nextDecision = CMSGuidedFormFill.makeDecision(username,
-				idCurrentNode, requestData);
+		Decision nextDecision = CMSGuidedFormFill.makeDecision(formName,
+				username, idCurrentNode, requestData);
 
 		return ok(backdrop.render(nextDecision));
 	}
@@ -80,11 +84,18 @@ public class FormFill extends SecureController {
 	public static Result prev() {
 		Map<String, String> requestData = Form.form().bindFromRequest().data();
 		String idCurrentNode = requestData.get(RequestParams.CURRENT_NODE);
-		String username = getUsername();
+		String formName = "change_order";
+		String username = CMSSession.getEmployeeName();
 
 		Decision previousDecision = CMSGuidedFormFill.getPreviousDecision(
-				username, idCurrentNode);
+				formName, username, idCurrentNode);
 
 		return ok(backdrop.render(previousDecision));
+	}
+
+	public static Result saveAndExit() {
+		String formName = "change_order";
+		CMSGuidedFormFill.saveForm(formName, CMSSession.getEmployeeName());
+		return redirect("/forms");
 	}
 }

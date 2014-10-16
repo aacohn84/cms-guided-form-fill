@@ -3,44 +3,54 @@ package models;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FormDataStore {
+import play.Logger;
 
-	static FormDataStore instance;
-	
+public class FormDataStore {
+	private static FormDataStore instance;
+
+	private static String getFormDataKey(String cmsFormName, String employeeName) {
+		return cmsFormName + employeeName;
+	}
+
 	public static FormDataStore getInstance() {
 		if (instance == null) {
 			instance = new FormDataStore();
 		}
 		return instance;
 	}
-	
-	Map<String, FormData> formDataStore;
+
+	private Map<String, FormData> formDataStore;
 
 	private FormDataStore() {
 		formDataStore = new HashMap<String, FormData>();
 	}
-	
-	public boolean containsUsername(String username) {
-		return formDataStore.containsKey(username);
+
+	public boolean containsEntry(String formName, String employeeName) {
+		String formDataKey = getFormDataKey(formName, employeeName);
+		return formDataStore.containsKey(formDataKey);
 	}
 
-	public FormData getFormData(String username) throws NoSuchUserException {
-		if (formDataStore.containsKey(username)) {
-			return formDataStore.get(username);
+	public FormData getFormData(String formName, String employeeName) {
+		return formDataStore.get(getFormDataKey(formName, employeeName));
+	}
+
+	public FormData removeFormData(String formName,
+			String employeeName) {
+		return formDataStore.remove(getFormDataKey(formName, employeeName));
+	}
+
+	public void saveFormData(FormData formData, String employeeName) {
+		String formName = formData.getForm().getName();
+		Logger.info("Saving " + formName + " for " + employeeName);
+		if (formData.getDecisionTree().isComplete()) {
+			Logger.info("Decision tree is complete, saving to disk.");
+			formData.saveToDisk();
 		}
-		throw new NoSuchUserException(username);
-	}
-
-	public void setFormData(String username, FormData formData) {
-		formDataStore.put(username, formData);
-	}
-
-	public void removeFormData(String username) throws NoSuchUserException {
-		if (formDataStore.containsKey(username)) {
-			formDataStore.remove(username);
-		} else {
-			throw new NoSuchUserException(username);
+		// save FormData to memory
+		String formDataKey = getFormDataKey(formName, employeeName);
+		if (!formDataStore.containsKey(formDataKey)) {
+			Logger.info("New " + formName + " entry for " + employeeName);
+			formDataStore.put(formDataKey, formData);
 		}
 	}
-
 }

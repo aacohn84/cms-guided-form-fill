@@ -64,6 +64,10 @@ public class FilledFormFields implements
 		}
 		return fieldValue;
 	}
+	
+	public int getSize() {
+		return filledFormFields.size();
+	}
 
 	public boolean isFieldFilled(String name) {
 		return filledFormFields.containsKey(name);

@@ -5,16 +5,20 @@ import java.util.HashMap;
 import core.tree.Node;
 
 public class CMSForm {
-	private String formFileName;
+	private String formName;
 	private HashMap<String, Node> nodes = new HashMap<>();
 	protected Node root;
 
-	public CMSForm(String formFileName) {
-		this.formFileName = formFileName;
+	public CMSForm(String formName) {
+		this.formName = formName;
 	}
 
 	public String getFormFileName() {
-		return formFileName;
+		return formName + ".pdf";
+	}
+
+	public String getName() {
+		return formName;
 	}
 
 	public Node getNode(String nodeId) {
@@ -29,7 +33,7 @@ public class CMSForm {
 		return root;
 	}
 
-	Node addNode(Node node) {
+	protected Node addNode(Node node) {
 		if (nodes.containsKey(node.id)) {
 			throw new RuntimeException("A node with id " + node.id
 					+ " already exists in this form.");
