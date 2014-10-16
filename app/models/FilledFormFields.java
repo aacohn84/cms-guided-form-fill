@@ -3,7 +3,6 @@ package models;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 
 public class FilledFormFields implements
 		Iterable<FilledFormFields.FilledFormField> {
@@ -11,62 +10,41 @@ public class FilledFormFields implements
 	public static class FilledFormField {
 		public String name;
 		public String value;
-	}
 
-	private class FilledFormFieldIterator implements Iterator<FilledFormField> {
-		Iterator<Entry<String, String>> underlyingIterator;
-
-		public FilledFormFieldIterator() {
-			underlyingIterator = filledFormFields.entrySet().iterator();
-		}
-
-		@Override
-		public boolean hasNext() {
-			return underlyingIterator.hasNext();
-		}
-
-		@Override
-		public FilledFormField next() {
-			Entry<String, String> nextEntry = underlyingIterator.next();
-			FilledFormField nextField = new FilledFormField();
-			nextField.name = nextEntry.getKey();
-			nextField.value = nextEntry.getValue();
-			return nextField;
-		}
-
-		@Override
-		public void remove() {
-			underlyingIterator.remove();
+		public FilledFormField(String name, String value) {
+			this.name = name;
+			this.value = value;
 		}
 	}
 
-	private Map<String, String> filledFormFields;
+	private Map<String, FilledFormField> filledFormFields;
 
 	public FilledFormFields() {
-		filledFormFields = new HashMap<String, String>();
+		filledFormFields = new HashMap<String, FilledFormField>();
 	}
 
-	public void copyTo(FilledFormFields intermediates) {
-		for (Entry<String, String> entry : filledFormFields.entrySet()) {
-			intermediates.fillField(entry.getKey(), entry.getValue());
+	public void copyTo(FilledFormFields other) {
+		for (FilledFormField field : filledFormFields.values()) {
+			other.fillField(field.name, field.value);
 		}
 	}
 
 	public void fillField(String name, String value) {
-		filledFormFields.put(name, value);
+		FilledFormField field = filledFormFields.get(name);
+		if (field != null) {
+			field.value = value;
+		} else {
+			filledFormFields.put(name, new FilledFormField(name, value));
+		}
 	}
 
 	public String getFieldValue(String name) {
-		String fieldValue = filledFormFields.get(name);
-		if (fieldValue == null) {
+		FilledFormField field = filledFormFields.get(name);
+		if (field == null) {
 			throw new RuntimeException(
 					"The specified field has not been filled: " + name);
 		}
-		return fieldValue;
-	}
-	
-	public int getSize() {
-		return filledFormFields.size();
+		return field.value;
 	}
 
 	public boolean isFieldFilled(String name) {
@@ -75,6 +53,6 @@ public class FilledFormFields implements
 
 	@Override
 	public Iterator<FilledFormField> iterator() {
-		return new FilledFormFieldIterator();
+		return filledFormFields.values().iterator();
 	}
 }
