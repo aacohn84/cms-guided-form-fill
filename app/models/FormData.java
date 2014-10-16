@@ -72,8 +72,10 @@ public class FormData {
 
 		FilledFormFields filledFormFields = getFilledFormFields();
 		String formName = form.getName();
-		rowId = writeFormFieldsToDatabase(formName, employeeId,
+		rowId = writeFormFieldsToDatabase(formName, employeeId, rowId,
 				filledFormFields);
+
+		Logger.info("rowId updated to " + rowId);
 
 		String serializedDecisions = decisionTree.serialize();
 		writeDecisionTreeToFile(formName, rowId, serializedDecisions);
@@ -87,7 +89,8 @@ public class FormData {
 	private static void writeDecisionTreeToFile(String formName, Integer rowId,
 			String serializedDecisions) {
 		String filename = formName + rowId + ".decisions";
-		File decisionFile = new File(CMSGuidedFormFill.getDecisionsFile(), filename);
+		File decisionFile = new File(CMSGuidedFormFill.getDecisionsFile(),
+				filename);
 		try (PrintWriter decisionWriter = new PrintWriter(decisionFile)) {
 			decisionWriter.write(serializedDecisions);
 		} catch (IOException e) {
@@ -99,11 +102,11 @@ public class FormData {
 	 * Creates a new row in the database and returns the row id number.
 	 */
 	private static Integer writeFormFieldsToDatabase(String formName,
-			Integer employeeId, FilledFormFields filledFormFields) {
-		String insertStmt = generateInsertStmt(formName, employeeId,
+			Integer employeeId, Integer rowId, FilledFormFields filledFormFields) {
+		String sql = generateInsertOrUpdateStmt(formName, employeeId, rowId,
 				filledFormFields);
 		try (Connection c = DB.getConnection();
-				PreparedStatement p = c.prepareStatement(insertStmt,
+				PreparedStatement p = c.prepareStatement(sql,
 						Statement.RETURN_GENERATED_KEYS);) {
 			int i = 1;
 			for (FilledFormField filledFormField : filledFormFields) {
@@ -113,26 +116,36 @@ public class FormData {
 			ResultSet generatedKeys = p.getGeneratedKeys();
 			if (generatedKeys.first()) {
 				return generatedKeys.getInt("GENERATED_KEY");
+			} else if (rowId == null) {
+				throw new RuntimeException("No generated keys returned on "
+						+ "INSERT.");
 			}
-			throw new RuntimeException("No generated keys returned.");
 		} catch (SQLException e) {
 			Logger.error(e.getMessage(), e);
 		}
-		return null;
+		return rowId;
 	}
 
 	/*
-	 * Generates an SQL INSERT statement with the formName as the table name and
-	 * the names of the filled fields as the names of columns.
+	 * Generates an SQL INSERT or UPDATE statement with the formName as the
+	 * table name and the names of the filled fields as the names of columns.
 	 */
-	private static String generateInsertStmt(String formName,
-			Integer employeeId, FilledFormFields filledFormFields) {
-		String sql = "INSERT INTO " + formName + "\r\nSET";
-		sql += "\r\n    `employee_id`=" + Integer.toString(employeeId) + ",";
+	private static String generateInsertOrUpdateStmt(String formName,
+			Integer employeeId, Integer rowId, FilledFormFields filledFormFields) {
+		StringBuilder columns = new StringBuilder();
 		for (FilledFormField filledFormField : filledFormFields) {
-			sql += "\r\n    `" + filledFormField.name + "`=?,";
+			columns.append("\r\n    `").append(filledFormField.name)
+					.append("`=?,");
 		}
-		// replace last comma with semi-colon
-		return sql.substring(0, sql.length() - 1) + ";";
+		columns.append("\r\n    `employee_id`=" + employeeId);
+
+		String sql;
+		if (rowId == null) {
+			sql = "INSERT INTO " + formName + "\r\nSET" + columns;
+		} else {
+			sql = "UPDATE " + formName + "\r\nSET" + columns
+					+ "\r\nWHERE `id`=" + rowId;
+		}
+		return sql + ";";
 	}
 }
