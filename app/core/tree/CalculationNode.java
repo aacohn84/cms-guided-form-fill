@@ -2,6 +2,7 @@ package core.tree;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +22,7 @@ public class CalculationNode extends SingleTargetNode {
 
 		public StoredField[] fields;
 	}
-	
+
 	static class CalculatedField {
 		String name;
 		Expression expr;
@@ -32,7 +33,8 @@ public class CalculationNode extends SingleTargetNode {
 		}
 
 		String value(FilledFormFields filledFormFields) {
-			return expr.value(filledFormFields).setScale(2).toString();
+			return expr.value(filledFormFields).setScale(2, RoundingMode.HALF_UP)
+					.toString();
 		}
 	}
 
@@ -101,17 +103,17 @@ public class CalculationNode extends SingleTargetNode {
 	public static class nAryExpr implements Expression {
 		private List<Expression> subExpressions;
 		private Operator operator;
-		
+
 		public nAryExpr(Operator operator) {
 			this.operator = operator;
 			this.subExpressions = new ArrayList<Expression>();
 		}
-		
+
 		public nAryExpr addExpr(Expression expression) {
 			subExpressions.add(expression);
 			return this;
 		}
-		
+
 		@Override
 		public BigDecimal value(FilledFormFields filledFormFields) {
 			if (subExpressions.isEmpty()) {
@@ -119,7 +121,7 @@ public class CalculationNode extends SingleTargetNode {
 			}
 			// get initial value
 			BigDecimal result = subExpressions.get(0).value(filledFormFields);
-			
+
 			// reduction (sum, product, difference) over all sub-expressions
 			int numExpressions = subExpressions.size();
 			for (int exprIndex = 1; exprIndex < numExpressions; exprIndex++) {
@@ -156,15 +158,14 @@ public class CalculationNode extends SingleTargetNode {
 		private Expression exprTrue;
 		private Expression exprFalse;
 		private Condition condition;
-		
+
 		/**
 		 * Construct a condtional expression.
 		 * 
 		 * @param exprTrue
 		 *            - evaluated if condition is satisfied.
 		 * @param exprFalse
-		 *            - evaluated if condition is <i>not</i>
-		 *            satisfied.
+		 *            - evaluated if condition is <i>not</i> satisfied.
 		 * @param condition
 		 *            - {@link Condition} to be checked.
 		 */
@@ -174,7 +175,7 @@ public class CalculationNode extends SingleTargetNode {
 			this.exprFalse = exprFalse;
 			this.condition = condition;
 		}
-		
+
 		@Override
 		public BigDecimal value(FilledFormFields filledFormFields) {
 			if (condition.isSatisfied(filledFormFields)) {
@@ -183,7 +184,7 @@ public class CalculationNode extends SingleTargetNode {
 			return exprFalse.value(filledFormFields);
 		}
 	}
-	
+
 	public static class NumExpr implements Expression {
 		BigDecimal numVal;
 
@@ -262,7 +263,7 @@ public class CalculationNode extends SingleTargetNode {
 		Map<String, String> requestDataCopy = new HashMap<>(requestData);
 		FilledFormFields intermediates = new FilledFormFields();
 		filledFormFields.copyTo(intermediates);
-		
+
 		/*
 		 * Calculate each field and add it to the intermediates list to be used
 		 * as a dependency in further calculations
@@ -270,7 +271,7 @@ public class CalculationNode extends SingleTargetNode {
 		for (CalculatedField calculatedField : calculatedFields) {
 			String fieldValue = calculatedField.value(intermediates);
 			intermediates.fillField(calculatedField.name, fieldValue);
-			
+
 			/*
 			 * Place calculated value in requestData so it can be used in a
 			 * subsequent call to serializeInput.
@@ -279,7 +280,7 @@ public class CalculationNode extends SingleTargetNode {
 		}
 		return super.createDecision(requestDataCopy, filledFormFields);
 	}
-	
+
 	@Override
 	public Html renderAsHtml(String rawInput) {
 		String html = new String();
