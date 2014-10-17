@@ -54,6 +54,6 @@ public class Application extends Controller {
     
     public static Result logout() {
     	CMSSession.clear();
-    	return ok(login.render(null));
+    	return redirect("/");
     }
 }
