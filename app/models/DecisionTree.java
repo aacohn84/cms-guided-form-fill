@@ -50,7 +50,7 @@ public class DecisionTree implements Iterable<Decision> {
 
 		@Override
 		public Decision next() {
-			return (current = decisions.get(current.next.context.id));
+			return (current = current.next);
 		}
 
 		@Override
