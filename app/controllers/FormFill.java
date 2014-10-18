@@ -9,6 +9,7 @@ import play.Logger;
 import play.data.Form;
 import play.mvc.Result;
 import util.FileDeletionHandler;
+import views.html.loadPrevious;
 import views.html.questionnaire.backdrop;
 import core.CMSGuidedFormFill;
 
@@ -19,29 +20,32 @@ public class FormFill extends SecureController {
 	}
 
 	/*
-	 * Deletes the user's saved decisions.
+	 * Starts a new form instance for the employee.
 	 */
-	public static Result clearSavedChoices() {
-		String username = CMSSession.getEmployeeName();
+	public static Result startNewForm() {
 		String formName = "change_order";
-		CMSGuidedFormFill.clearDecisions(formName, username);
-		flash().put("clearSavedChoices", "");
-		return redirect(routes.Application.forms());
-	}
-
-	/*
-	 * Provide root node of form.
-	 */
-	public static Result startOrContinueForm() {
-		String formName = "change_order";
-		Decision firstDecision = CMSGuidedFormFill.startOrContinueForm(
-				formName, CMSSession.getEmployeeName(),
-				CMSSession.getEmployeeId());
+		Decision firstDecision = CMSGuidedFormFill.startNewForm(formName,
+				CMSSession.getEmployeeName(), CMSSession.getEmployeeId());
 		return ok(backdrop.render(firstDecision));
 	}
 
+	public static Result continueCurrentForm() {
+		String formName = "change_order";
+		Decision mostRecentDecision = CMSGuidedFormFill.continueForm(formName,
+				CMSSession.getEmployeeName());
+		if (mostRecentDecision == null) {
+			flash().put("noCurrentForm", "");
+			return redirect("/forms");
+		}
+		return ok(backdrop.render(mostRecentDecision));
+	}
+
+	public static Result loadPrevious() {
+		return ok(loadPrevious.render());
+	}
+
 	/*
-	 * Provide filled PDF for viewing/editing/printing
+	 * Provide filled PDF for viewing/editing/printing.
 	 */
 	public static Result getFilledForm() {
 		Status result;
@@ -63,17 +67,17 @@ public class FormFill extends SecureController {
 	}
 
 	/*
-	 * Save decision and provide next node in active path of form.
+	 * Save decision and provide next node in the form based on user input.
 	 */
 	public static Result next() {
 		// get current node
 		Map<String, String> requestData = Form.form().bindFromRequest().data();
 		String idCurrentNode = requestData.get(RequestParams.CURRENT_NODE);
 		String formName = "change_order";
-		String username = CMSSession.getEmployeeName();
+		String employeeName = CMSSession.getEmployeeName();
 
 		Decision nextDecision = CMSGuidedFormFill.makeDecision(formName,
-				username, idCurrentNode, requestData);
+				employeeName, idCurrentNode, requestData);
 
 		return ok(backdrop.render(nextDecision));
 	}

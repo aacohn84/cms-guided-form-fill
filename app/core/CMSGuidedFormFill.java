@@ -22,23 +22,31 @@ public class CMSGuidedFormFill {
 		formDataStore.removeFormData(formName, employee);
 	}
 
-	public static void fillForm(String formName, String employee, File pdf) {
-		// Get user's form data
+	/**
+	 * Fills the form fields of the given PDF file.
+	 * 
+	 * @param formName
+	 *            - name of the form being filled.
+	 * @param employee
+	 *            - name of the employee who owns the form data.
+	 * @param writableFile
+	 *            - a file that can be created or overwritten with a filled PDF.
+	 */
+	public static void fillForm(String formName, String employee,
+			File writableFile) {
 		FormData formData = getFormData(formName, employee);
 
 		// Convert FormData to PDF
 		FilledFormFields fields = formData.getFilledFormFields();
-		PDFFormFiller.fillForm(formData.getForm(), fields, pdf);
+		PDFFormFiller.fillForm(formData.getForm(), fields, writableFile);
 	}
 
 	public static File getDecisionsFile() {
 		return DECISIONS_FILE;
 	}
 
-	private static FormData getFormData(String formName, String employeeName) {
-		FormDataStore formDataStore = FormDataStore.getInstance();
-		FormData formData = formDataStore.getFormData(formName, employeeName);
-		return formData;
+	public static void setDecisionsFile(File decisionsFile) {
+		DECISIONS_FILE = decisionsFile;
 	}
 
 	public static Decision getPreviousDecision(String formName,
@@ -81,19 +89,6 @@ public class CMSGuidedFormFill {
 		FormDataStore.getInstance().saveFormData(formData, employee);
 	}
 
-	public static void setDecisionsFile(File decisionsFile) {
-		DECISIONS_FILE = decisionsFile;
-	}
-
-	/**
-	 * Starts the form-filling process for the specified employee.
-	 * 
-	 * @param employeeName
-	 *            - the logged-in user who owns the data created and stored
-	 *            during this form-filling session.
-	 * @return the Decision associated with the root node of the decision tree.
-	 *         If a Decision doesn't exist yet, it will be created.
-	 */
 	public static Decision startOrContinueForm(String formName,
 			String employeeName, int employeeId) {
 		FormDataStore formDataStore = FormDataStore.getInstance();
@@ -109,5 +104,62 @@ public class CMSGuidedFormFill {
 		DecisionTree decisionTree = formDataStore.getFormData(formName,
 				employeeName).getDecisionTree();
 		return decisionTree.getDecision(root.id);
+	}
+
+	/**
+	 * Start a new instance of the chosen form (wipes most recently accessed
+	 * FormData from memory).
+	 * 
+	 * @param formName
+	 *            - name of the form to start
+	 * @param employeeName
+	 *            - name of the employee starting the form
+	 * @param employeeId
+	 *            - database ID of the employee starting the form
+	 * @return the first {@link Decision} in the {@link DecisionTree} for this
+	 *         form.
+	 */
+	public static Decision startNewForm(String formName, String employeeName,
+			int employeeId) {
+		FormDataStore formDataStore = FormDataStore.getInstance();
+		formDataStore.removeFormData(formName, employeeName);
+
+		ChangeOrderForm form = ChangeOrderForm.getInstance();
+		Node root = form.getRoot();
+		FormData formData = new FormData(employeeName, employeeId, form);
+
+		DecisionTree decisionTree = formData.getDecisionTree();
+		decisionTree.makeDecision(root.id, null);
+		formDataStore.saveFormData(formData, employeeName);
+
+		return decisionTree.getFirstDecision();
+	}
+
+	/**
+	 * Allows the employee to pick up where they left off in their most recently
+	 * accessed form.
+	 * 
+	 * @param formName
+	 *            - name of the form to continue.
+	 * @param employeeName
+	 *            - name of the employee.
+	 * @return the Decision most recently made by the employee, if it exists.
+	 *         Otherwise, <code>null</code>.
+	 */
+	public static Decision continueForm(String formName, String employeeName) {
+		FormDataStore formDataStore = FormDataStore.getInstance();
+		if (formDataStore.containsEntry(formName, employeeName)) {
+			FormData formData = formDataStore.getFormData(formName,
+					employeeName);
+			DecisionTree decisionTree = formData.getDecisionTree();
+			return decisionTree.getMostRecentlyMadeDecision();
+		}
+		return null;
+	}
+
+	private static FormData getFormData(String formName, String employeeName) {
+		FormDataStore formDataStore = FormDataStore.getInstance();
+		FormData formData = formDataStore.getFormData(formName, employeeName);
+		return formData;
 	}
 }

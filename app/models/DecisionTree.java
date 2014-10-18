@@ -68,6 +68,7 @@ public class DecisionTree implements Iterable<Decision> {
 
 	Map<String, Decision> decisions;
 	Decision firstDecision;
+	Decision mostRecentlyMadeDecision;
 	CMSForm form;
 
 	public DecisionTree(CMSForm form) {
@@ -81,6 +82,10 @@ public class DecisionTree implements Iterable<Decision> {
 
 	public Decision getFirstDecision() {
 		return firstDecision;
+	}
+
+	public Decision getMostRecentlyMadeDecision() {
+		return mostRecentlyMadeDecision;
 	}
 
 	/**
@@ -128,12 +133,15 @@ public class DecisionTree implements Iterable<Decision> {
 			}
 			decision.next = next;
 		}
+		if (decision.context.isVisible) {
+			mostRecentlyMadeDecision = decision;
+		}
 		return decision;
 	}
 
 	public void putDecision(Decision decision) {
 		if (decisions.isEmpty()) {
-			firstDecision = decision;
+			firstDecision = mostRecentlyMadeDecision = decision;
 		}
 		decisions.put(decision.context.id, decision);
 	}
