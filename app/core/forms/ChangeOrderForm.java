@@ -1,20 +1,21 @@
 package core.forms;
 
 import java.math.BigDecimal;
+import java.util.function.Predicate;
 
+import models.FilledFormFields;
 import core.tree.CalculationNode;
-import core.tree.ChoiceNode;
-import core.tree.FeeNode;
-import core.tree.NoteChecksABoxNode;
-import core.tree.NoteNode;
-import core.tree.TerminalNode;
 import core.tree.CalculationNode.BinaryExpr;
-import core.tree.CalculationNode.Condition;
 import core.tree.CalculationNode.ConditionalExpr;
 import core.tree.CalculationNode.NumExpr;
 import core.tree.CalculationNode.Operators;
 import core.tree.CalculationNode.RefExpr;
 import core.tree.CalculationNode.nAryExpr;
+import core.tree.ChoiceNode;
+import core.tree.FeeNode;
+import core.tree.NoteChecksABoxNode;
+import core.tree.NoteNode;
+import core.tree.TerminalNode;
 import core.tree.fields.EmailField;
 import core.tree.fields.FieldTableNode;
 import core.tree.fields.FieldsNode;
@@ -23,7 +24,6 @@ import core.tree.fields.NumberField;
 import core.tree.fields.SelectField;
 import core.tree.fields.TextAreaField;
 import core.tree.fields.TextField;
-import models.FilledFormFields;
 
 public class ChangeOrderForm extends CMSForm {
 	private static ChangeOrderForm instance;
@@ -164,14 +164,14 @@ public class ChangeOrderForm extends CMSForm {
 		addNode(Node.loc(Id.loc_2, Id.orig_contract_num_2));
 		addNode(Node.origContractNum(Id.orig_contract_num_2, Id.reason_2));
 		addNode(Node.reason(Id.reason_2, Id.calc_2));
-		
+
 		addNode(new CalculationNode(Id.calc_2, Id.apply_credit_choice)
 			/*
 			 *  Total to be Returned = Contract Amount - Contract Balance
 			 */
 			.addCalculatedField(Field.TOTAL_TO_BE_RETURNED.name,
 				Expr.contractAmountMinusBalanceExpr)
-			/* 
+			/*
 			 * If fee applies, then
 			 * Admin/Return Fees = Contract Amount * 20%
 			 */
@@ -192,15 +192,15 @@ public class ChangeOrderForm extends CMSForm {
 		addNode(Node.name(Id.name_3, Id.loc_3));
 		addNode(Node.loc(Id.loc_3, Id.orig_contract_num_3));
 		addNode(Node.origContractNum(Id.orig_contract_num_3, Id.gift_amount));
-		
+
 		addNode(new FieldsNode(Id.gift_amount, Id.reason_3, Desc.gift_amount)
 			.setDetailDescription(Desc.gift_amount_detail)
 			.addField(Field.GIFT_AMOUNT.htmlFieldDef));
 
 		addNode(Node.reason(Id.reason_3, Id.calc_3));
-		
+
 		addNode(new CalculationNode(Id.calc_3, Id.apply_credit_choice)
-			/* 
+			/*
 			 * Total to be Returned = Contract Amt - Contract Bal - Gift Amt
 			 */
 			.addCalculatedField(Field.TOTAL_TO_BE_RETURNED.name,
@@ -219,7 +219,7 @@ public class ChangeOrderForm extends CMSForm {
 			 */
 			.addCalculatedField(Field.TOTAL_DEDUCTIONS.name,
 					Expr.adminReturnFees)
-			/* 
+			/*
 			 * Credit/Balance = Total to be Returned - Total Deductions
 			 */
 			.addCalculatedField(Field.CREDIT_BALANCE.name,
@@ -239,7 +239,7 @@ public class ChangeOrderForm extends CMSForm {
 			 *  Total to be Returned = Items to be Returned - Contract Balance
 			 */
 			.addCalculatedField(Field.TOTAL_TO_BE_RETURNED.name, Expr.sumItemsReturnedMinusContractBalance)
-			/* 
+			/*
 			 * If admin fee applies, then
 			 * Admin/Return Fees = Items to be Returned * 20%
 			 */
@@ -287,7 +287,7 @@ public class ChangeOrderForm extends CMSForm {
 		addNode(Node.loc(Id.loc_5, Id.orig_contract_num_5));
 		addNode(Node.origContractNum(Id.orig_contract_num_5, Id.reason_5));
 		addNode(Node.reason(Id.reason_5, Id.calc_5));
-		
+
 		addNode(new CalculationNode(Id.calc_5, Id.apply_credit_choice)
 			/*
 			 *  Total to be Returned = Contract Amount - Contract Balance
@@ -310,7 +310,7 @@ public class ChangeOrderForm extends CMSForm {
 		addNode(Node.itemsReturned(Id.items_returned_2, Id.credits_discounts_2));
 		addNode(Node.creditsDiscounts(Id.credits_discounts_2, Id.reason_6));
 		addNode(Node.reason(Id.reason_6, Id.calc_6));
-		
+
 		addNode(new CalculationNode(Id.calc_6, Id.apply_credit_choice)
 			/*
 			 *  Total to be Returned = Items to be Returned - Contract Balance
@@ -374,7 +374,7 @@ public class ChangeOrderForm extends CMSForm {
 	}
 
 	private void transferTransfer() {
-		addNode(new FeeNode(Id.transfer_fee_note, Id.name_7, 
+		addNode(new FeeNode(Id.transfer_fee_note, Id.name_7,
 				Desc.transfer_fee_note, Field.ADMIN_RETURN_FEES.name,
 				new BigDecimal("300.00")));
 
@@ -418,7 +418,7 @@ public class ChangeOrderForm extends CMSForm {
 		addNode(Node.origContractNum(Id.orig_contract_num_9, Id.reason_9));
 		addNode(Node.reason(Id.reason_9, Id.done));
 	}
-	
+
 	private void partiesAvailable() {
 		addNode(new ChoiceNode(Id.parties_avail_choice, Desc.parties_avail_choice)
 			.addChoice("Yes", Id.done)
@@ -471,7 +471,7 @@ public class ChangeOrderForm extends CMSForm {
 		addNode(new NoteNode(Id.loc_all_parties_note, Id.due_diligence_note,
 				Desc.loc_all_parties_note));
 	}
-	
+
 	// Description associated with each node in the decision tree
 	private static class Desc {
 		final static String prerequisites_note = "Before beginning the Change Order process, make sure you have the Patron’s original contract, and have performed all necessary verifications within HMIS (if applicable).";
@@ -532,31 +532,29 @@ public class ChangeOrderForm extends CMSForm {
 		static final NumExpr zero = new NumExpr(BigDecimal.ZERO);
 
 		static final NumExpr twentyPercent = new NumExpr(new BigDecimal("0.20"));
-		
+
 		static final BinaryExpr amtReturnedMinusDeductions = new BinaryExpr(
 			new RefExpr(Field.TOTAL_TO_BE_RETURNED.name),
 			new RefExpr(Field.TOTAL_DEDUCTIONS.name),
 			Operators.SUBTRACT);
-		
+
 		static final BinaryExpr twentyPercentOfContractAmount = new BinaryExpr(
 			new RefExpr(Field.CONTRACT_AMOUNT.name),
 			Expr.twentyPercent,
 			Operators.MULTIPLY);
-		
+
 		// this condition satisfied if admin fee was waived (that is, fee == 0.00)
-		static final Condition adminReturnFeesCondition = new Condition() {
-			@Override
-			public boolean isSatisfied(FilledFormFields filledFormFields) {
-				try {
-					// return true if (fee == 0.00), false otherwise
-					String adminReturnFeesVal = filledFormFields
-							.getFieldValue(Field.ADMIN_RETURN_FEES.name);
-					BigDecimal returnFeeVal = new BigDecimal(adminReturnFeesVal);
-					return (returnFeeVal.compareTo(BigDecimal.ZERO) == 0);
-				} catch (RuntimeException e) {
-					// field not filled (null); means the fee wasn't waived.
-					return false;
-				}
+		static final Predicate<FilledFormFields> adminReturnFeesCondition =
+				(FilledFormFields filledFormFields) -> {
+			try {
+				// return true if (fee == 0.00), false otherwise
+				String adminReturnFeesVal = filledFormFields
+						.getFieldValue(Field.ADMIN_RETURN_FEES.name);
+				BigDecimal returnFeeVal = new BigDecimal(adminReturnFeesVal);
+				return (returnFeeVal.compareTo(BigDecimal.ZERO) == 0);
+			} catch (RuntimeException e) {
+				// field not filled (null); means the fee wasn't waived.
+				return false;
 			}
 		};
 
@@ -603,7 +601,7 @@ public class ChangeOrderForm extends CMSForm {
 	private static final String[] cemeteries = new String[] {
 		"St. Mary Cemetery", "Calvary Cemetery", "All Souls Cemetery",
 		"George L. Klumpp Chapel of Flowers", "Misc./Parish Cemetery" };
-	
+
 	private static enum Field {
 		CHANGE_ORDER_TYPE("change_order_type", null),
 		RETURN("Return", null),
@@ -668,7 +666,7 @@ public class ChangeOrderForm extends CMSForm {
 		STATEMENT_OF_DUE_DILIGENCE_FORM("statement_due_diligence", null),
 		EVIDENCE_OF_BURIAL("evidence_of_burial", null),
 		NEW_EXISTING_CONTRACT("new_existing_contract", null);
-		
+
 		final String name; /* name of the PDF field */
 		final core.tree.fields.Field htmlFieldDef;
 
@@ -677,7 +675,7 @@ public class ChangeOrderForm extends CMSForm {
 			this.htmlFieldDef = htmlFieldDef;
 		}
 	}
-	
+
 	// Identifier of each node in the Change Order Form decision tree
 	private static class Id {
 		final static String prerequisites_note = "prerequisites_note";
@@ -839,7 +837,7 @@ public class ChangeOrderForm extends CMSForm {
 		}
 
 		static FeeNode adminFeeWaived(String id, String idNext) {
-			return new FeeNode(id, idNext, Desc.admin_fee_waived, 
+			return new FeeNode(id, idNext, Desc.admin_fee_waived,
 					Field.ADMIN_RETURN_FEES.name, new BigDecimal("0.00"));
 		}
 

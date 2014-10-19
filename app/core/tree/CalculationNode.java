@@ -7,14 +7,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import models.Decision;
 import models.FilledFormFields;
 
 import org.apache.commons.lang3.StringUtils;
 
-import core.tree.fields.StoredField;
 import play.twirl.api.Html;
+import core.tree.fields.StoredField;
 
 public class CalculationNode extends SingleTargetNode {
 	public static class StoredSelection implements Serializable {
@@ -97,7 +98,7 @@ public class CalculationNode extends SingleTargetNode {
 	 * <strong>Ex:</strong><br>
 	 * e1 + e2 + ... + eN
 	 * </p>
-	 * 
+	 *
 	 * @author Aaron Cohn
 	 */
 	public static class nAryExpr implements Expression {
@@ -133,44 +134,28 @@ public class CalculationNode extends SingleTargetNode {
 	}
 
 	/**
-	 * Represents a conditional statement that can be satisfied.
-	 * 
-	 * @author Aaron Cohn
-	 */
-	public interface Condition {
-		/**
-		 * Returns <code>true</code> if the condition is satisfied.
-		 * 
-		 * @param filledFormFields
-		 *            - provided in case the condition depends on the value of a
-		 *            filled form field
-		 */
-		public boolean isSatisfied(FilledFormFields filledFormFields);
-	}
-
-	/**
 	 * Allows one expression to be evaluated over another in case a certain
 	 * condition is met.
-	 * 
+	 *
 	 * @author Aaron Cohn
 	 */
 	public static class ConditionalExpr implements Expression {
 		private Expression exprTrue;
 		private Expression exprFalse;
-		private Condition condition;
+		private Predicate<FilledFormFields> condition;
 
 		/**
 		 * Construct a condtional expression.
-		 * 
+		 *
 		 * @param exprTrue
 		 *            - evaluated if condition is satisfied.
 		 * @param exprFalse
 		 *            - evaluated if condition is <i>not</i> satisfied.
 		 * @param condition
-		 *            - {@link Condition} to be checked.
+		 *            - condition to be tested.
 		 */
 		public ConditionalExpr(Expression exprTrue, Expression exprFalse,
-				Condition condition) {
+				Predicate<FilledFormFields> condition) {
 			this.exprTrue = exprTrue;
 			this.exprFalse = exprFalse;
 			this.condition = condition;
@@ -178,7 +163,7 @@ public class CalculationNode extends SingleTargetNode {
 
 		@Override
 		public BigDecimal value(FilledFormFields filledFormFields) {
-			if (condition.isSatisfied(filledFormFields)) {
+			if (condition.test(filledFormFields)) {
 				return exprTrue.value(filledFormFields);
 			}
 			return exprFalse.value(filledFormFields);
