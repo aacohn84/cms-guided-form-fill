@@ -3,16 +3,16 @@ package core;
 import java.io.File;
 import java.util.Map;
 
-import play.Logger;
-import core.forms.CMSForm;
-import core.forms.ChangeOrderForm;
-import core.pdf.PDFFormFiller;
-import core.tree.Node;
 import models.Decision;
 import models.DecisionTree;
 import models.FilledFormFields;
 import models.FormData;
 import models.FormDataStore;
+import play.Logger;
+import core.forms.CMSForm;
+import core.forms.ChangeOrderForm;
+import core.pdf.PDFFormFiller;
+import core.tree.Node;
 
 public class CMSGuidedFormFill {
 	private static File DECISIONS_FILE;
@@ -24,7 +24,7 @@ public class CMSGuidedFormFill {
 
 	/**
 	 * Fills the form fields of the given PDF file.
-	 * 
+	 *
 	 * @param formName
 	 *            - name of the form being filled.
 	 * @param employee
@@ -109,7 +109,7 @@ public class CMSGuidedFormFill {
 	/**
 	 * Start a new instance of the chosen form (wipes most recently accessed
 	 * FormData from memory).
-	 * 
+	 *
 	 * @param formName
 	 *            - name of the form to start
 	 * @param employeeName
@@ -138,13 +138,14 @@ public class CMSGuidedFormFill {
 	/**
 	 * Allows the employee to pick up where they left off in their most recently
 	 * accessed form.
-	 * 
+	 *
 	 * @param formName
 	 *            - name of the form to continue.
 	 * @param employeeName
 	 *            - name of the employee.
-	 * @return the Decision most recently made by the employee, if it exists.
-	 *         Otherwise, <code>null</code>.
+	 * @return the next Decision to be made by the employee, if one exists. If
+	 *         the form is complete, then the last Decision. Otherwise,
+	 *         <code>null</code>.
 	 */
 	public static Decision continueForm(String formName, String employeeName) {
 		FormDataStore formDataStore = FormDataStore.getInstance();
@@ -152,7 +153,11 @@ public class CMSGuidedFormFill {
 			FormData formData = formDataStore.getFormData(formName,
 					employeeName);
 			DecisionTree decisionTree = formData.getDecisionTree();
-			return decisionTree.getMostRecentlyMadeDecision();
+			Decision mostRecentlyMadeDecision = decisionTree.getMostRecentlyMadeDecision();
+			if (mostRecentlyMadeDecision.context.isTerminal()) {
+				return mostRecentlyMadeDecision;
+			}
+			return mostRecentlyMadeDecision.next;
 		}
 		return null;
 	}
