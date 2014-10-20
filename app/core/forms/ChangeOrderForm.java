@@ -543,17 +543,20 @@ public class ChangeOrderForm extends CMSForm {
 			Expr.twentyPercent,
 			Operators.MULTIPLY);
 
-		// this condition satisfied if admin fee was waived (that is, fee == 0.00)
 		static final Predicate<FilledFormFields> adminReturnFeesCondition =
-				(FilledFormFields filledFormFields) -> {
+				filledFormFields -> {
 			try {
-				// return true if (fee == 0.00), false otherwise
+				// return true admin fee waived (fee == 0), false otherwise
 				String adminReturnFeesVal = filledFormFields
 						.getFieldValue(Field.ADMIN_RETURN_FEES.name);
 				BigDecimal returnFeeVal = new BigDecimal(adminReturnFeesVal);
 				return (returnFeeVal.compareTo(BigDecimal.ZERO) == 0);
 			} catch (RuntimeException e) {
-				// field not filled (null); means the fee wasn't waived.
+				/*
+				 * An exception is thrown if the adminReturnFees field was not
+				 * filled or has a null value. We take that to mean that the
+				 * admin fee wasn't waived, and a fee will be applied later.
+				 */
 				return false;
 			}
 		};
