@@ -1,5 +1,17 @@
-@()
+@(employeeHistory: List[EmployeeHistoryEntry])
 
 @main("Load previous change order") {
-  Wassup?
+  <h1>Load Previously Completed Change Order</h1>
+  <table>
+    <tr>
+      <th>Date</th>
+      <th>Patron</th>
+    </tr>
+    @for(entry <- employeeHistory) {
+      <tr>
+        <td>@entry.dateCreated</td>
+        <td>@entry.patronName</td>
+      </tr>
+    }
+  </table>
 }

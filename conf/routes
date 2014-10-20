@@ -13,7 +13,7 @@ GET		/getFilledForm				controllers.FormFill.getFilledForm()
 GET		/saveAndExit				controllers.FormFill.saveAndExit()
 GET		/startNewForm				controllers.FormFill.startNewForm()
 GET		/continueCurrentForm		controllers.FormFill.continueCurrentForm()
-GET		/loadPrevious				controllers.FormFill.loadPrevious()
+GET		/getEmployeeHistory			controllers.FormFill.getEmployeeHistory()
 
 POST    /authenticate               controllers.Application.authenticate()
 

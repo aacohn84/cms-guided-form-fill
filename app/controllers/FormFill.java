@@ -2,9 +2,11 @@ package controllers;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import models.Decision;
+import models.EmployeeHistoryEntry;
 import play.Logger;
 import play.data.Form;
 import play.mvc.Result;
@@ -41,7 +43,15 @@ public class FormFill extends SecureController {
 	}
 
 	public static Result loadPrevious() {
-		return ok(loadPrevious.render());
+		return ok("not implemented");
+	}
+
+	public static Result getEmployeeHistory() {
+		String formName = "change_order";
+		Integer employeeId = CMSSession.getEmployeeId();
+		List<EmployeeHistoryEntry> employeeHistory = CMSGuidedFormFill
+				.getEmployeeHistory(formName, employeeId);
+		return ok(loadPrevious.render(employeeHistory));
 	}
 
 	/*

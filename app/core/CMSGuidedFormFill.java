@@ -1,10 +1,13 @@
 package core;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 
+import models.CMSDB;
 import models.Decision;
 import models.DecisionTree;
+import models.EmployeeHistoryEntry;
 import models.FilledFormFields;
 import models.FormData;
 import models.FormDataStore;
@@ -153,7 +156,8 @@ public class CMSGuidedFormFill {
 			FormData formData = formDataStore.getFormData(formName,
 					employeeName);
 			DecisionTree decisionTree = formData.getDecisionTree();
-			Decision mostRecentlyMadeDecision = decisionTree.getMostRecentlyMadeDecision();
+			Decision mostRecentlyMadeDecision = decisionTree
+					.getMostRecentlyMadeDecision();
 			if (mostRecentlyMadeDecision.context.isTerminal()) {
 				return mostRecentlyMadeDecision;
 			}
@@ -166,5 +170,10 @@ public class CMSGuidedFormFill {
 		FormDataStore formDataStore = FormDataStore.getInstance();
 		FormData formData = formDataStore.getFormData(formName, employeeName);
 		return formData;
+	}
+
+	public static List<EmployeeHistoryEntry> getEmployeeHistory(
+			String formName, int employeeId) {
+		return CMSDB.getEmployeeHistory(employeeId, formName);
 	}
 }
