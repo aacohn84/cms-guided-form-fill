@@ -27,7 +27,7 @@ public class AuthStore {
 				employee.setUsername(username);
 				employee.setPassword(password);
 				employee.setPermissionLevel(rs.getString("permission_level"));
-				employee.setId(rs.getInt("id"));
+				employee.setEmployeeId(rs.getInt("employee_id"));
 				return true;
 			}
 		} catch (SQLException e) {

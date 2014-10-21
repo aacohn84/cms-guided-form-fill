@@ -32,7 +32,7 @@ public class CMSSession extends Controller {
 		put(SessionKey.USERNAME, employee.getEmployeeName());
 		put(SessionKey.EMPLOYEE_NAME, employee.getEmployeeName());
 		put(SessionKey.PERMISSION_LEVEL, employee.getPermissionLevel());
-		put(SessionKey.EMPLOYEE_ID, Integer.toString(employee.getId()));
+		put(SessionKey.EMPLOYEE_ID, Integer.toString(employee.getEmployeeId()));
 		put(SessionKey.AUTH_TIME, new Date().toString());
 	}
 

@@ -11,7 +11,7 @@ public class Employee {
 	private String password;
 	
 	private String permissionLevel;
-	private int id;
+	private int employeeId;
 	
 	public String getEmployeeName() {
 		return username;
@@ -37,12 +37,12 @@ public class Employee {
 		this.permissionLevel = permissionLevel;
 	}
 
-	public int getId() {
-		return id;
+	public int getEmployeeId() {
+		return employeeId;
 	}
 
-	public void setId(int id) {
-		this.id = id;
+	public void setEmployeeId(int id) {
+		this.employeeId = id;
 	}
 
 }
