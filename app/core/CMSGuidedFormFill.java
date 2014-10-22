@@ -13,6 +13,7 @@ import models.FormData;
 import models.FormDataStore;
 import play.Logger;
 import core.forms.CMSForm;
+import core.forms.CMSFormFactory;
 import core.forms.ChangeOrderForm;
 import core.pdf.PDFFormFiller;
 import core.tree.Node;
@@ -127,7 +128,7 @@ public class CMSGuidedFormFill {
 		FormDataStore formDataStore = FormDataStore.getInstance();
 		formDataStore.removeFormData(formName, employeeName);
 
-		ChangeOrderForm form = ChangeOrderForm.getInstance();
+		CMSForm form = CMSFormFactory.getForm(formName);
 		Node root = form.getRoot();
 		FormData formData = new FormData(employeeName, employeeId, form);
 

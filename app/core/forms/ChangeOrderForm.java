@@ -27,6 +27,7 @@ import core.tree.fields.TextField;
 
 public class ChangeOrderForm extends CMSForm {
 	private static ChangeOrderForm instance;
+	public static final String NAME = "change_order";
 
 	public static ChangeOrderForm getInstance() {
 		if (instance == null) {
@@ -36,8 +37,7 @@ public class ChangeOrderForm extends CMSForm {
 	}
 
 	private ChangeOrderForm() {
-		// Name of PDF file associated with this form
-		super("change_order");
+		super(NAME);
 
 		// decision tree definition
 		root = addNode(new NoteChecksABoxNode(Id.prerequisites_note,

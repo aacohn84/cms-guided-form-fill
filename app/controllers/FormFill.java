@@ -14,6 +14,7 @@ import util.FileDeletionHandler;
 import views.html.loadPrevious;
 import views.html.questionnaire.backdrop;
 import core.CMSGuidedFormFill;
+import core.forms.ChangeOrderForm;
 
 public class FormFill extends SecureController {
 
@@ -25,14 +26,14 @@ public class FormFill extends SecureController {
 	 * Starts a new form instance for the employee.
 	 */
 	public static Result startNewForm() {
-		String formName = "change_order";
+		String formName = ChangeOrderForm.NAME;
 		Decision firstDecision = CMSGuidedFormFill.startNewForm(formName,
 				CMSSession.getEmployeeName(), CMSSession.getEmployeeId());
 		return ok(backdrop.render(firstDecision));
 	}
 
 	public static Result continueCurrentForm() {
-		String formName = "change_order";
+		String formName = ChangeOrderForm.NAME;
 		Decision mostRecentDecision = CMSGuidedFormFill.continueForm(formName,
 				CMSSession.getEmployeeName());
 		if (mostRecentDecision == null) {
@@ -47,7 +48,7 @@ public class FormFill extends SecureController {
 	}
 
 	public static Result getEmployeeHistory() {
-		String formName = "change_order";
+		String formName = ChangeOrderForm.NAME;
 		Integer employeeId = CMSSession.getEmployeeId();
 		List<EmployeeHistoryEntry> employeeHistory = CMSGuidedFormFill
 				.getEmployeeHistory(formName, employeeId);
@@ -60,7 +61,7 @@ public class FormFill extends SecureController {
 	public static Result getFilledForm() {
 		Status result;
 		try {
-			String formName = "change_order";
+			String formName = ChangeOrderForm.NAME;
 			String username = CMSSession.getEmployeeName();
 			File pdf = File.createTempFile("Change_Order_Form_Filled", ".pdf");
 			CMSGuidedFormFill.fillForm(formName, username, pdf);
@@ -83,7 +84,7 @@ public class FormFill extends SecureController {
 		// get current node
 		Map<String, String> requestData = Form.form().bindFromRequest().data();
 		String idCurrentNode = requestData.get(RequestParams.CURRENT_NODE);
-		String formName = "change_order";
+		String formName = ChangeOrderForm.NAME;
 		String employeeName = CMSSession.getEmployeeName();
 
 		Decision nextDecision = CMSGuidedFormFill.makeDecision(formName,
@@ -98,7 +99,7 @@ public class FormFill extends SecureController {
 	public static Result prev() {
 		Map<String, String> requestData = Form.form().bindFromRequest().data();
 		String idCurrentNode = requestData.get(RequestParams.CURRENT_NODE);
-		String formName = "change_order";
+		String formName = ChangeOrderForm.NAME;
 		String username = CMSSession.getEmployeeName();
 
 		Decision previousDecision = CMSGuidedFormFill.getPreviousDecision(
@@ -108,7 +109,7 @@ public class FormFill extends SecureController {
 	}
 
 	public static Result saveAndExit() {
-		String formName = "change_order";
+		String formName = ChangeOrderForm.NAME;
 		CMSGuidedFormFill.saveForm(formName, CMSSession.getEmployeeName());
 		return redirect("/forms");
 	}
