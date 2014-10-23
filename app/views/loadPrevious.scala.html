@@ -1,6 +1,18 @@
 @(employeeHistory: List[EmployeeHistoryEntry])
 
+@loadLink(id: Integer, text: String) = {
+  <a href="javascript:{setFormRowId(@id); theForm.submit();}">@text</a>
+}
+
 @main("Load previous change order") {
+  <form id="theForm" action="/loadPrevious" method="POST">
+    <input type="hidden" name="formRowId" id="formRowId" />
+  </form>
+  <script>
+  	function setFormRowId(formRowId) {
+		document.getElementById("formRowId").value = formRowId;
+  	}
+  </script>
   <h1>Load Previously Completed Change Order</h1>
   <table>
     <tr>
@@ -9,8 +21,8 @@
     </tr>
     @for(entry <- employeeHistory) {
       <tr>
-        <td>@entry.dateCreated</td>
-        <td>@entry.patronName</td>
+        <td>@loadLink(entry.formRowId, entry.dateCreated.toString())</td>
+        <td>@loadLink(entry.formRowId, entry.patronName)</td>
       </tr>
     }
   </table>

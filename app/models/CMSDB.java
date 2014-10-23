@@ -14,7 +14,7 @@ public class CMSDB {
 	public static List<EmployeeHistoryEntry> getEmployeeHistory(int employeeId,
 			String formName) {
 		String sql =
-				"SELECT date_created, name_1"
+				"SELECT id, date_created, name_1"
 				+ "\r\nFROM " + formName
 				+ "\r\nWHERE `employee_id`=" + employeeId
 				+ "\r\nORDER BY date_created desc;";
