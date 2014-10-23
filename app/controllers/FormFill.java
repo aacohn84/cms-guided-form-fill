@@ -20,6 +20,7 @@ public class FormFill extends SecureController {
 
 	public static class RequestParams {
 		public static final String CURRENT_NODE = "currentNode";
+		public static final String FORM_ROW_ID = "formRowId";
 	}
 
 	/*
@@ -44,7 +45,16 @@ public class FormFill extends SecureController {
 	}
 
 	public static Result loadPrevious() {
-		return ok("not implemented");
+		String formName = ChangeOrderForm.NAME;
+		String employeeName = CMSSession.getEmployeeName();
+		int employeeId = CMSSession.getEmployeeId();
+		Map<String, String> data = Form.form().bindFromRequest().data();
+		String rowIdStr = data.get(RequestParams.FORM_ROW_ID);
+		int rowId = Integer.parseInt(rowIdStr);
+		Decision mostRecentDecision = CMSGuidedFormFill
+				.loadPreviouslyCompletedForm(formName, employeeName,
+						employeeId, rowId);
+		return ok(backdrop.render(mostRecentDecision));
 	}
 
 	public static Result getEmployeeHistory() {

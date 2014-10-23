@@ -1,6 +1,8 @@
 package models;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -9,9 +11,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import models.FilledFormFields.FilledFormField;
 import play.Logger;
 import play.db.DB;
-import models.FilledFormFields.FilledFormField;
 import core.CMSGuidedFormFill;
 import core.forms.CMSForm;
 import core.tree.Node;
@@ -78,7 +80,7 @@ public class FormData {
 		Logger.info("rowId updated to " + rowId);
 
 		String serializedDecisions = decisionTree.serialize();
-		writeDecisionTreeToFile(formName, rowId, serializedDecisions);
+		writeSerializedDecisionsToFile(formName, rowId, serializedDecisions);
 	}
 
 	/*
@@ -86,7 +88,7 @@ public class FormData {
 	 * on the form name and the row id. So if it's the Change Order form and row
 	 * 2, the filename will be change_order2.decisions
 	 */
-	private static void writeDecisionTreeToFile(String formName, Integer rowId,
+	private static void writeSerializedDecisionsToFile(String formName, Integer rowId,
 			String serializedDecisions) {
 		String filename = formName + rowId + ".decisions";
 		File decisionFile = new File(CMSGuidedFormFill.getDecisionsFile(),
@@ -95,6 +97,46 @@ public class FormData {
 			decisionWriter.write(serializedDecisions);
 		} catch (IOException e) {
 			Logger.error(e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * Constructs a FormData instance from the serialized decisions file stored
+	 * on disk. The form and the rowId form the key by which the data is stored
+	 * and accessed.
+	 *
+	 * @param form
+	 *            - Instance of the form associated with the data being
+	 *            accessed.
+	 * @param employeeName
+	 *            - name of the employee who entered the data.
+	 * @param employeeId
+	 *            - the database
+	 * @param rowId
+	 * @return
+	 */
+	public static FormData loadFromDisk(CMSForm form, String employeeName,
+			int employeeId, int rowId) {
+		String serializedDecisions = readSerializedDecisionsFromFile(
+				form.getName(), rowId);
+		FormData formData = new FormData(employeeName, employeeId, form);
+		formData.decisionTree.deserialize(serializedDecisions);
+		formData.rowId = rowId;
+		return formData;
+	}
+
+	private static String readSerializedDecisionsFromFile(
+			String formName, int rowId) {
+		String filename = formName + rowId + ".decisions";
+		File decisionFile = new File(CMSGuidedFormFill.getDecisionsFile(),
+				filename);
+		try (BufferedReader decisionReader = new BufferedReader(
+				new FileReader(decisionFile));) {
+			// decisions file contains only one line
+			return decisionReader.readLine();
+		} catch (IOException e) {
+			throw new RuntimeException(
+					"Could not read serialized decisions in " + filename, e);
 		}
 	}
 

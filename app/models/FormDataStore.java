@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import play.Logger;
+import core.forms.CMSForm;
 
 public class FormDataStore {
 	private static FormDataStore instance;
@@ -34,8 +35,7 @@ public class FormDataStore {
 		return formDataStore.get(getFormDataKey(formName, employeeName));
 	}
 
-	public FormData removeFormData(String formName,
-			String employeeName) {
+	public FormData removeFormData(String formName, String employeeName) {
 		return formDataStore.remove(getFormDataKey(formName, employeeName));
 	}
 
@@ -52,5 +52,13 @@ public class FormDataStore {
 			Logger.info("New " + formName + " entry for " + employeeName);
 			formDataStore.put(formDataKey, formData);
 		}
+	}
+
+	public void loadFormData(CMSForm cmsForm, String employeeName,
+			int employeeId, int rowId) {
+		FormData formData = FormData.loadFromDisk(cmsForm, employeeName, employeeId, rowId);
+		String formDataKey = getFormDataKey(formData.getForm().getName(),
+				formData.getEmployeeName());
+		formDataStore.put(formDataKey, formData);
 	}
 }

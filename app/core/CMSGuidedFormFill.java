@@ -177,4 +177,12 @@ public class CMSGuidedFormFill {
 			String formName, int employeeId) {
 		return CMSDB.getEmployeeHistory(employeeId, formName);
 	}
+
+	public static Decision loadPreviouslyCompletedForm(String formName,
+			String employeeName, int employeeId, int rowId) {
+		FormDataStore formDataStore = FormDataStore.getInstance();
+		CMSForm form = CMSFormFactory.getForm(formName);
+		formDataStore.loadFormData(form, employeeName, employeeId, rowId);
+		return continueForm(formName, employeeName);
+	}
 }
