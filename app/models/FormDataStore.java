@@ -42,9 +42,11 @@ public class FormDataStore {
 	public void saveFormData(FormData formData, String employeeName) {
 		String formName = formData.getForm().getName();
 		Logger.info("Saving " + formName + " for " + employeeName);
-		if (formData.getDecisionTree().isComplete()) {
-			Logger.info("Decision tree is complete, saving to disk.");
+		DecisionTree decisionTree = formData.getDecisionTree();
+		if (decisionTree.isDirty() && decisionTree.isComplete()) {
+			Logger.info("Saving decisions to disk.");
 			formData.saveToDisk();
+			decisionTree.setDirty(false);
 		}
 		// save FormData to memory
 		String formDataKey = getFormDataKey(formName, employeeName);

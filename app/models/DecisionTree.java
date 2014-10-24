@@ -79,10 +79,12 @@ public class DecisionTree implements Iterable<Decision> {
 	Decision firstDecision;
 	Decision mostRecentlyMadeDecision;
 	CMSForm form;
+	private boolean dirty;
 
 	public DecisionTree(CMSForm form) {
-		decisions = new HashMap<String, Decision>();
+		this.decisions = new HashMap<String, Decision>();
 		this.form = form;
+		this.dirty = false;
 	}
 
 	public Decision getDecision(String contextId) {
@@ -95,6 +97,14 @@ public class DecisionTree implements Iterable<Decision> {
 
 	public Decision getMostRecentlyMadeDecision() {
 		return mostRecentlyMadeDecision;
+	}
+
+	public boolean isDirty() {
+		return dirty;
+	}
+
+	public void setDirty(boolean dirty) {
+		this.dirty = dirty;
 	}
 
 	/**
@@ -119,31 +129,38 @@ public class DecisionTree implements Iterable<Decision> {
 
 	public Decision makeDecision(String contextId, Map<String, String> rawInput) {
 		// retrieve the corresponding Decision if it exists, else create one
+		boolean newDecision = false;
 		Decision decision = getDecision(contextId);
 		if (decision == null) {
+			newDecision = true;
 			decision = new Decision();
 			decision.context = form.getNode(contextId);
 			putDecision(decision);
 		}
 
-		// set the new input
+		// make decision if new input differs from old input
 		Node context = decision.context;
-		decision.serializedInput = context.serializeInput(rawInput);
+		String newInput = context.serializeInput(rawInput);
+		boolean inputChanged = !decision.serializedInput.equals(newInput);
+		if (newDecision || inputChanged) {
+			decision.serializedInput = newInput;
+			dirty = true;
 
-		// link to next decision if possible (if it doesn't exist, create it)
-		if (!context.isTerminal()) {
-			String idNextNode = context.getIdNextNode(rawInput);
-			Decision next = getDecision(idNextNode);
-			if (next == null) {
-				next = new Decision();
-				next.context = form.getNode(idNextNode);
-				next.previous = decision;
-				putDecision(next);
+			// link to next decision if possible (if it doesn't exist, create it)
+			if (!context.isTerminal()) {
+				String idNextNode = context.getIdNextNode(rawInput);
+				Decision next = getDecision(idNextNode);
+				if (next == null) {
+					next = new Decision();
+					next.context = form.getNode(idNextNode);
+					next.previous = decision;
+					putDecision(next);
+				}
+				decision.next = next;
 			}
-			decision.next = next;
-		}
-		if (decision.context.isVisible) {
-			mostRecentlyMadeDecision = decision;
+			if (decision.context.isVisible) {
+				mostRecentlyMadeDecision = decision;
+			}
 		}
 		return decision;
 	}
@@ -184,6 +201,7 @@ public class DecisionTree implements Iterable<Decision> {
 		}
 		firstDecision = getDecision(sdt.f);
 		mostRecentlyMadeDecision = getDecision(sdt.r);
+		dirty = false;
 	}
 
 	/*
