@@ -13,21 +13,45 @@
 		document.getElementById("formRowId").value = formRowId;
   	}
   </script>
-  <h1>Load Previously Completed Change Order</h1>
-  <table>
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Patron</th>
-      </tr>
-    </thead>
-    <tbody>
-    @for(entry <- employeeHistory) {
-      <tr>
-        <td>@loadLink(entry.formRowId, entry.dateCreated.toString())</td>
-        <td>@loadLink(entry.formRowId, entry.patronName)</td>
-      </tr>
+  <style>
+    h1 {
+      margin-top: 20px;
     }
-    </tbody>
-  </table>
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+    }
+    thead {
+      background: #9D1B2F;
+    }
+    th {
+      padding: 5px 10px;
+      color: #FFF;
+    }
+    tbody tr:nth-child(odd) {
+      background: #BCBBBA;
+    }
+    td {
+      padding: 5px 10px;
+    }
+  </style>
+  <h1>Load Previously Completed Change Order</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Date Created</th>
+          <th>Date Modified</th>
+          <th>Patron</th>
+        </tr>
+      </thead>
+      <tbody>
+      @for(entry <- employeeHistory) {
+        <tr>
+          <td>@loadLink(entry.formRowId, entry.dateCreated.toString())</td>
+          <td>@loadLink(entry.formRowId, entry.dateModified.toString())</td>
+          <td>@loadLink(entry.formRowId, entry.patronName)</td>
+        </tr>
+      }
+      </tbody>
+    </table>
 }
