@@ -1,5 +1,7 @@
 package models;
 
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -74,6 +76,7 @@ public class FormData {
 
 		FilledFormFields filledFormFields = getFilledFormFields();
 		String formName = form.getName();
+
 		rowId = writeFormFieldsToDatabase(formName, employeeId, rowId,
 				filledFormFields);
 
@@ -127,46 +130,6 @@ public class FormData {
 		}
 	}
 
-	/**
-	 * Constructs a FormData instance from the serialized decisions file stored
-	 * on disk. The form and the rowId form the key by which the data is stored
-	 * and accessed.
-	 *
-	 * @param form
-	 *            - Instance of the form associated with the data being
-	 *            accessed.
-	 * @param employeeName
-	 *            - name of the employee who entered the data.
-	 * @param employeeId
-	 *            - the database
-	 * @param rowId
-	 * @return
-	 */
-	public static FormData loadFromDisk(CMSForm form, String employeeName,
-			int employeeId, int rowId) {
-		String serializedDecisions = readSerializedDecisionsFromFile(
-				form.getName(), rowId);
-		FormData formData = new FormData(employeeName, employeeId, form);
-		formData.decisionTree.deserialize(serializedDecisions);
-		formData.rowId = rowId;
-		return formData;
-	}
-
-	private static String readSerializedDecisionsFromFile(
-			String formName, int rowId) {
-		String filename = formName + rowId + ".decisions";
-		File decisionFile = new File(CMSGuidedFormFill.getDecisionsFile(),
-				filename);
-		try (BufferedReader decisionReader = new BufferedReader(
-				new FileReader(decisionFile));) {
-			// decisions file contains only one line
-			return decisionReader.readLine();
-		} catch (IOException e) {
-			throw new RuntimeException(
-					"Could not read serialized decisions in " + filename, e);
-		}
-	}
-
 	/*
 	 * Creates a new row in the database and returns the row id number.
 	 */
@@ -216,5 +179,45 @@ public class FormData {
 					+ "\r\nWHERE `id`=" + rowId;
 		}
 		return sql + ";";
+	}
+
+	/**
+	 * Constructs a FormData instance from the serialized decisions file stored
+	 * on disk. The form and the rowId form the key by which the data is stored
+	 * and accessed.
+	 *
+	 * @param form
+	 *            - Instance of the form associated with the data being
+	 *            accessed.
+	 * @param employeeName
+	 *            - name of the employee who entered the data.
+	 * @param employeeId
+	 *            - the database
+	 * @param rowId
+	 * @return
+	 */
+	public static FormData loadFromDisk(CMSForm form, String employeeName,
+			int employeeId, int rowId) {
+		String serializedDecisions = readSerializedDecisionsFromFile(
+				form.getName(), rowId);
+		FormData formData = new FormData(employeeName, employeeId, form);
+		formData.decisionTree.deserialize(serializedDecisions);
+		formData.rowId = rowId;
+		return formData;
+	}
+
+	private static String readSerializedDecisionsFromFile(
+			String formName, int rowId) {
+		String filename = formName + rowId + ".decisions";
+		File decisionFile = new File(CMSGuidedFormFill.getDecisionsFile(),
+				filename);
+		try (BufferedReader decisionReader = new BufferedReader(
+				new FileReader(decisionFile));) {
+			// decisions file contains only one line
+			return decisionReader.readLine();
+		} catch (IOException e) {
+			throw new RuntimeException(
+					"Could not read serialized decisions in " + filename, e);
+		}
 	}
 }

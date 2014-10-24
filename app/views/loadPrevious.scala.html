@@ -15,15 +15,19 @@
   </script>
   <h1>Load Previously Completed Change Order</h1>
   <table>
-    <tr>
-      <th>Date</th>
-      <th>Patron</th>
-    </tr>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Patron</th>
+      </tr>
+    </thead>
+    <tbody>
     @for(entry <- employeeHistory) {
       <tr>
         <td>@loadLink(entry.formRowId, entry.dateCreated.toString())</td>
         <td>@loadLink(entry.formRowId, entry.patronName)</td>
       </tr>
     }
+    </tbody>
   </table>
 }
