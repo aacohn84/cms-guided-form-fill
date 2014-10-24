@@ -79,8 +79,35 @@ public class FormData {
 
 		Logger.info("rowId updated to " + rowId);
 
-		String serializedDecisions = decisionTree.serialize();
-		writeSerializedDecisionsToFile(formName, rowId, serializedDecisions);
+		writeSerializedDecisionsToFile(formName, rowId, decisionTree.serialize());
+
+		// Add patron to database if they don't have an entry yet
+		PatronInfo patron = parsePatronInfo(filledFormFields);
+		Integer patronId = CMSDB.getPatronId(patron);
+		if (patronId == null) {
+			patronId = CMSDB.createPatron(patron);
+			if (patronId == null) {
+				Logger.error("Couldn't retrieve or create the patron " + patron
+						+ ".");
+				return;
+			}
+		}
+		// associate the patron id with the form row id
+		CMSDB.associatePatronWithFormEntry(patronId, formName, rowId);
+	}
+
+	private PatronInfo parsePatronInfo(
+			FilledFormFields filledFormFields) {
+		// parse patron's information from filled form fields
+		String name = filledFormFields.getFieldValue("name_1");
+		String address = filledFormFields.getFieldValue("address");
+		String phone = filledFormFields.getFieldValue("phone");
+		String email = filledFormFields.getFieldValue("email");
+		if (isNotEmpty(name) && isNotEmpty(address) && isNotEmpty(phone)) {
+			return new PatronInfo(name, address, phone, email);
+		}
+		throw new RuntimeException(
+				"Can't parse patron info because required fields are empty.");
 	}
 
 	/*
