@@ -167,9 +167,10 @@ public class FormData {
 		StringBuilder columns = new StringBuilder();
 		for (FilledFormField filledFormField : filledFormFields) {
 			columns.append("\r\n    `").append(filledFormField.name)
-					.append("`=?,");
+				   .append("`=?,");
 		}
 		columns.append("\r\n    `employee_id`=" + employeeId);
+		columns.append(",\r\n    `date_modified`=CURRENT_TIMESTAMP()");
 
 		String sql;
 		if (rowId == null) {
