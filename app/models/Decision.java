@@ -15,13 +15,13 @@ import core.tree.Node;
  * sequence, then <code>Decision.previous == null</code>. If it's the last, then
  * <code>Decision.next == null</code>.
  * </p>
- * 
+ *
  * @author Aaron Cohn
  */
 public class Decision {
 	public Node context;
 	public Decision previous, next;
-	public String serializedInput;
+	public String serializedInput = "";
 
 	public Decision setContext(Node context) {
 		this.context = context;

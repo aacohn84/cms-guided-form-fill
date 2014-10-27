@@ -75,10 +75,10 @@ public class DecisionTree implements Iterable<Decision> {
 		public SerializedDecision[] d; // serialized decisions
 	}
 
-	Map<String, Decision> decisions;
-	Decision firstDecision;
-	Decision mostRecentlyMadeDecision;
-	CMSForm form;
+	private Map<String, Decision> decisions;
+	private Decision firstDecision;
+	private Decision mostRecentlyMadeDecision;
+	private CMSForm form;
 	private boolean dirty;
 
 	public DecisionTree(CMSForm form) {
@@ -141,8 +141,7 @@ public class DecisionTree implements Iterable<Decision> {
 		// make decision if new input differs from old input
 		Node context = decision.context;
 		String newInput = context.serializeInput(rawInput);
-		boolean inputChanged = !decision.serializedInput.equals(newInput);
-		if (newDecision || inputChanged) {
+		if (newDecision || inputChanged(decision, newInput)) {
 			decision.serializedInput = newInput;
 			dirty = true;
 
@@ -163,6 +162,10 @@ public class DecisionTree implements Iterable<Decision> {
 			}
 		}
 		return decision;
+	}
+
+	private boolean inputChanged(Decision decision, String newInput) {
+		return !decision.serializedInput.equals(newInput);
 	}
 
 	public void putDecision(Decision decision) {

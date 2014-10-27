@@ -31,7 +31,7 @@ public class NoteChecksABoxNode extends SingleTargetNode {
 	@Override
 	@SuppressWarnings("unused")
 	public String serializeInput(Map<String, String> input) {
-		return null;
+		return "";
 	}
 
 	@Override
