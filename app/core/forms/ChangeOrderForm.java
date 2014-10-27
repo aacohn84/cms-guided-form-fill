@@ -392,8 +392,7 @@ public class ChangeOrderForm extends CMSForm {
 		addNode(Node.reason(Id.reason_7, Id.calc_7));
 
 		addNode(new CalculationNode(Id.calc_7, Id.parties_avail_choice)
-			.addCalculatedField("Credit/Balance", new RefExpr(
-					"Admin/Return Fees")));
+			.addCalculatedField("Credit/Balance", Expr.adminReturnFees));
 	}
 
 	private void transferDonation() {
