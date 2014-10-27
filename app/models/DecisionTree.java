@@ -80,11 +80,13 @@ public class DecisionTree implements Iterable<Decision> {
 	private Decision mostRecentlyMadeDecision;
 	private CMSForm form;
 	private boolean dirty;
+	private boolean complete;
 
 	public DecisionTree(CMSForm form) {
 		this.decisions = new HashMap<String, Decision>();
 		this.form = form;
 		this.dirty = false;
+		this.complete = false;
 	}
 
 	public Decision getDecision(String contextId) {
@@ -112,14 +114,17 @@ public class DecisionTree implements Iterable<Decision> {
 	 * firstDecision to a Decision with a TerminalNode as its context.
 	 */
 	public boolean isComplete() {
+		if (!dirty) {
+			return complete;
+		}
 		Decision iter = firstDecision;
 		while (iter.next != null) {
 			iter = iter.next;
 		}
 		if (iter.context != null && iter.context.isTerminal()) {
-			return true;
+			return (complete = true);
 		}
-		return false;
+		return (complete = false);
 	}
 
 	@Override
