@@ -157,12 +157,7 @@ public class CMSGuidedFormFill {
 			FormData formData = formDataStore.getFormData(formName,
 					employeeName);
 			DecisionTree decisionTree = formData.getDecisionTree();
-			Decision mostRecentlyMadeDecision = decisionTree
-					.getMostRecentlyMadeDecision();
-			if (mostRecentlyMadeDecision.context.isTerminal()) {
-				return mostRecentlyMadeDecision;
-			}
-			return mostRecentlyMadeDecision.next;
+			return decisionTree.getLastDecision();
 		}
 		return null;
 	}

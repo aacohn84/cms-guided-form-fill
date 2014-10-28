@@ -117,14 +117,22 @@ public class DecisionTree implements Iterable<Decision> {
 		if (!dirty) {
 			return complete;
 		}
+		Decision lastDecision = getLastDecision();
+		if (lastDecision.context != null && lastDecision.context.isTerminal()) {
+			return (complete = true);
+		}
+		return (complete = false);
+	}
+
+	/**
+	 * Returns the last decision in the active path.
+	 */
+	public Decision getLastDecision() {
 		Decision iter = firstDecision;
 		while (iter.next != null) {
 			iter = iter.next;
 		}
-		if (iter.context != null && iter.context.isTerminal()) {
-			return (complete = true);
-		}
-		return (complete = false);
+		return iter;
 	}
 
 	@Override
@@ -150,7 +158,6 @@ public class DecisionTree implements Iterable<Decision> {
 			decision.serializedInput = newInput;
 			dirty = true;
 
-			// link to next decision if possible (if it doesn't exist, create it)
 			// link with next decision if possible
 			if (!context.isTerminal()) {
 				String idNextNode = context.getIdNextNode(rawInput);
