@@ -1,11 +1,10 @@
 package core.forms;
 
 import java.math.BigDecimal;
-import java.util.function.Predicate;
 
-import models.FilledFormFields;
 import core.tree.CalculationNode;
 import core.tree.CalculationNode.BinaryExpr;
+import core.tree.CalculationNode.Condition;
 import core.tree.CalculationNode.ConditionalExpr;
 import core.tree.CalculationNode.NumExpr;
 import core.tree.CalculationNode.Operators;
@@ -542,10 +541,9 @@ public class ChangeOrderForm extends CMSForm {
 			Expr.twentyPercent,
 			Operators.MULTIPLY);
 
-		static final Predicate<FilledFormFields> adminReturnFeesCondition =
-				filledFormFields -> {
+		static final Condition adminReturnFeesCondition = filledFormFields -> {
 			try {
-				// return true admin fee waived (fee == 0), false otherwise
+				// return true if admin fee waived (fee == 0), false otherwise
 				String adminReturnFeesVal = filledFormFields
 						.getFieldValue(Field.ADMIN_RETURN_FEES.name);
 				BigDecimal returnFeeVal = new BigDecimal(adminReturnFeesVal);

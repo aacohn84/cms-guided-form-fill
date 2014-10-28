@@ -133,6 +133,8 @@ public class CalculationNode extends SingleTargetNode {
 		}
 	}
 
+	public static interface Condition extends Predicate<FilledFormFields> {}
+
 	/**
 	 * Allows one expression to be evaluated over another in case a certain
 	 * condition is met.
@@ -142,7 +144,7 @@ public class CalculationNode extends SingleTargetNode {
 	public static class ConditionalExpr implements Expression {
 		private Expression exprTrue;
 		private Expression exprFalse;
-		private Predicate<FilledFormFields> condition;
+		private Condition condition;
 
 		/**
 		 * Construct a condtional expression.
@@ -155,7 +157,7 @@ public class CalculationNode extends SingleTargetNode {
 		 *            - condition to be tested.
 		 */
 		public ConditionalExpr(Expression exprTrue, Expression exprFalse,
-				Predicate<FilledFormFields> condition) {
+				Condition condition) {
 			this.exprTrue = exprTrue;
 			this.exprFalse = exprFalse;
 			this.condition = condition;
