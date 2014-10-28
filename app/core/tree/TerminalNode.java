@@ -7,12 +7,12 @@ import play.twirl.api.Html;
 
 public class TerminalNode extends Node {
 	public String detailDescription;
-	
+
 	public TerminalNode(String id, String description, String detailDescription) {
 		super(id, description);
 		this.detailDescription = detailDescription;
 	}
-	
+
 	@Override
 	@SuppressWarnings("unused")
 	public void fillFormFields(String serializedObj, FilledFormFields formFields) {
@@ -36,11 +36,17 @@ public class TerminalNode extends Node {
 	public Html renderAsHtml(String rawInput) {
 		return views.html.questionnaire.terminal.render(detailDescription);
 	}
-	
+
 	@Override
 	@SuppressWarnings("unused")
 	public String serializeInput(Map<String, String> input) {
 		throw new RuntimeException(
 				"Method serializeInput not implemented in TerminalNode.");
+	}
+
+	@Override
+	public boolean isBranchingNode() {
+		throw new RuntimeException(
+				"Method isBranchingNode not implemented in TerminalNode.");
 	}
 }

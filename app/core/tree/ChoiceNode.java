@@ -6,22 +6,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import models.FilledFormFields;
+
 import org.apache.commons.lang3.StringUtils;
 
-import models.FilledFormFields;
 import play.twirl.api.Html;
 
 /**
  * A node with some mutually exclusive options to choose from, intended to be
  * implemented with radio-buttons in HTML.
- * 
+ *
  * @author Aaron Cohn
  */
 public class ChoiceNode extends Node {
 
 	/**
 	 * A data structure representing a choice in a ChoiceNode.
-	 * 
+	 *
 	 * @author Aaron Cohn
 	 */
 	public static class Choice {
@@ -57,7 +58,7 @@ public class ChoiceNode extends Node {
 	/**
 	 * A data structure for storing the user's selection, intended to be
 	 * serialized and stored as a String.
-	 * 
+	 *
 	 * @author Aaron Cohn
 	 */
 	public static class StoredSelection implements Serializable {
@@ -85,7 +86,7 @@ public class ChoiceNode extends Node {
 	/**
 	 * Construct a ChoiceNode that will send the user to another node but
 	 * doesn't fill a form-field.
-	 * 
+	 *
 	 * @param id
 	 *            - a unique identifier for this node.
 	 * @param description
@@ -97,7 +98,7 @@ public class ChoiceNode extends Node {
 
 	/**
 	 * Constructs a ChoiceNode associated with a form-field.
-	 * 
+	 *
 	 * @param id
 	 *            - a unique identifier for this node.
 	 * @param description
@@ -113,7 +114,7 @@ public class ChoiceNode extends Node {
 
 	/**
 	 * Adds a choice that points to the target node.
-	 * 
+	 *
 	 * @param label
 	 *            - text describing the choice.
 	 * @param targetId
@@ -128,7 +129,7 @@ public class ChoiceNode extends Node {
 
 	/**
 	 * Adds an option that points to the target node.
-	 * 
+	 *
 	 * @param label
 	 *            - text describing this choice.
 	 * @param choiceName
@@ -182,5 +183,10 @@ public class ChoiceNode extends Node {
 		StoredSelection storedSelection = new StoredSelection();
 		storedSelection.choice = choice;
 		return serializeAsString(storedSelection);
+	}
+
+	@Override
+	public boolean isBranchingNode() {
+		return true;
 	}
 }

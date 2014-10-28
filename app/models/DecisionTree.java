@@ -151,22 +151,44 @@ public class DecisionTree implements Iterable<Decision> {
 			dirty = true;
 
 			// link to next decision if possible (if it doesn't exist, create it)
+			// link with next decision if possible
 			if (!context.isTerminal()) {
 				String idNextNode = context.getIdNextNode(rawInput);
 				Decision next = getDecision(idNextNode);
 				if (next == null) {
 					next = new Decision();
 					next.context = form.getNode(idNextNode);
-					next.previous = decision;
+					linkDecisions(decision, next);
 					putDecision(next);
+				} else {
+					linkDecisions(decision, next);
+					if (context.isBranchingNode()) {
+						updateActivePath(next);
+					}
 				}
-				decision.next = next;
 			}
-			if (decision.context.isVisible) {
+			if (context.isVisible) {
 				mostRecentlyMadeDecision = decision;
 			}
 		}
 		return decision;
+	}
+
+	private void linkDecisions(Decision d1, Decision d2) {
+		d2.previous = d1;
+		d1.next = d2;
+	}
+
+	/*
+	 * Updates the active path to the right of the decision so that it is
+	 * consistent both forward and backward.
+	 */
+	private void updateActivePath(Decision decision) {
+		Decision curr = decision;
+		while (curr.next != null) {
+			curr.next.previous = curr;
+			curr = curr.next;
+		}
 	}
 
 	private boolean inputChanged(Decision decision, String newInput) {

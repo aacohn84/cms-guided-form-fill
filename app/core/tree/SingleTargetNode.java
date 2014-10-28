@@ -7,7 +7,7 @@ import java.util.Map;
  * form. Meaning, the node ID you get from idNextNode is not based on some
  * decision or input, it's always the same node, regardless of what input is
  * given.
- * 
+ *
  * @author Aaron Cohn
  */
 public abstract class SingleTargetNode extends Node {
@@ -24,7 +24,7 @@ public abstract class SingleTargetNode extends Node {
 		super(id, description, isOutputNode);
 		this.idNext = idNext;
 	}
-	
+
 	public SingleTargetNode(String id, String idNext, String description,
 			boolean isOutputNode, boolean isVisible) {
 		super(id, description, isOutputNode, isVisible);
@@ -40,4 +40,8 @@ public abstract class SingleTargetNode extends Node {
 		return idNext;
 	}
 
+	@Override
+	public boolean isBranchingNode() {
+		return false;
+	}
 }

@@ -2,17 +2,18 @@ package core.tree;
 
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
-import core.forms.CMSForm;
 import models.Decision;
 import models.FilledFormFields;
 import play.libs.Json;
 import play.twirl.api.Html;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
+import core.forms.CMSForm;
+
 /**
  * Abstraction of a node in a decision tree.
- * 
+ *
  * @author Aaron Cohn
  */
 public abstract class Node {
@@ -42,7 +43,7 @@ public abstract class Node {
 
 	/**
 	 * Creates a {@link Decision} from the available data.
-	 * 
+	 *
 	 * @param form
 	 *            - the {@link CMSForm} instance associated with this decision.
 	 * @param requestData
@@ -61,18 +62,18 @@ public abstract class Node {
 		Decision decision = new Decision()
 			.setContext(this)
 			.setRawInput(rawInput);
-		
+
 		return decision;
 	}
-	
+
 	/**
 	 * Uses the given input to fill any form fields associated with this node.
 	 * The filled fields are returned in a map where the key is the name of the
 	 * field, and the value is the input used to fill it.
-	 * 
+	 *
 	 * @param serializedObj
 	 *            - a String containing a serialized object of saved user input.
-	 * 
+	 *
 	 * @param formFields
 	 *            - a map that is either empty or contains filled form fields
 	 *            for the same form.
@@ -83,7 +84,7 @@ public abstract class Node {
 	/**
 	 * Returns the identifier of the next node in the tree based on the input
 	 * given.
-	 * 
+	 *
 	 * @param input
 	 *            - a mapping of input field names to input data.
 	 */
@@ -97,8 +98,15 @@ public abstract class Node {
 	}
 
 	/**
+	 * Returns <code>true</code> if the output of
+	 * {@link Node#getIdNextNode(Map)} varies, <code>false</code> if it always
+	 * returns the same ID.
+	 */
+	public abstract boolean isBranchingNode();
+
+	/**
 	 * Returns an HTML representation of the node for rendering in a template.
-	 * 
+	 *
 	 * @param rawInput
 	 *            - the rawInput from the decision associated with this node.
 	 */
@@ -106,7 +114,7 @@ public abstract class Node {
 
 	/**
 	 * Converts the input to an object and serializes it as a String.
-	 * 
+	 *
 	 * @param input
 	 *            - a mapping of input field names to input data.
 	 * @return Serialized object in String form
@@ -115,7 +123,7 @@ public abstract class Node {
 
 	/**
 	 * Returns the deserialized object.
-	 * 
+	 *
 	 * @param serializedObj
 	 *            - a String containing a serialized object.
 	 */
