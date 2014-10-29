@@ -20,6 +20,7 @@
     table {
       margin: 20px auto;
       border-collapse: collapse;
+      min-width: 640px;
     }
     thead {
       background: #9D1B2F;
@@ -27,12 +28,14 @@
     th {
       padding: 5px 10px;
       color: #FFF;
+      text-align: left;
     }
     tbody tr:nth-child(odd) {
       background: #BCBBBA;
     }
     td {
       padding: 5px 10px;
+      text-align: left;
     }
   </style>
   <h1>Load Previously Completed Change Order</h1>
@@ -45,6 +48,11 @@
         </tr>
       </thead>
       <tbody>
+      @if(employeeHistory.isEmpty()) {
+        <tr>
+          <td colspan="3" style="text-align: center";>No history to display.</td>
+        </tr>
+      }
       @for(entry <- employeeHistory) {
         <tr>
           <td>@loadLink(entry.formRowId, entry.dateCreated.toString())</td>
@@ -54,4 +62,7 @@
       }
       </tbody>
     </table>
+    <div class="bottom-buttons">
+      <a href="/forms">Back</a>
+    </div>
 }
