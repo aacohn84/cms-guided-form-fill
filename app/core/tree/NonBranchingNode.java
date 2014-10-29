@@ -10,22 +10,22 @@ import java.util.Map;
  *
  * @author Aaron Cohn
  */
-public abstract class SingleTargetNode extends Node {
+public abstract class NonBranchingNode extends Node {
 
 	String idNext;
 
-	public SingleTargetNode(String id, String idNext, String description) {
+	public NonBranchingNode(String id, String idNext, String description) {
 		super(id, description);
 		this.idNext = idNext;
 	}
 
-	public SingleTargetNode(String id, String idNext, String description,
+	public NonBranchingNode(String id, String idNext, String description,
 			boolean isOutputNode) {
 		super(id, description, isOutputNode);
 		this.idNext = idNext;
 	}
 
-	public SingleTargetNode(String id, String idNext, String description,
+	public NonBranchingNode(String id, String idNext, String description,
 			boolean isOutputNode, boolean isVisible) {
 		super(id, description, isOutputNode, isVisible);
 		this.idNext = idNext;

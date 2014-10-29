@@ -10,7 +10,7 @@ import play.twirl.api.Html;
  * 
  * @author Aaron Cohn
  */
-public class NoteNode extends SingleTargetNode {
+public class NoteNode extends NonBranchingNode {
 	
 	String note;
 

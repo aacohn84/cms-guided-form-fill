@@ -8,10 +8,10 @@ import models.FilledFormFields;
 
 import org.apache.commons.lang3.StringUtils;
 
-import core.tree.SingleTargetNode;
+import core.tree.NonBranchingNode;
 import play.twirl.api.Html;
 
-public class FieldTableNode extends SingleTargetNode {
+public class FieldTableNode extends NonBranchingNode {
 
 	// Simple renaming of Field class
 	public static class Column {

@@ -17,7 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import play.twirl.api.Html;
 import core.tree.fields.StoredField;
 
-public class CalculationNode extends SingleTargetNode {
+public class CalculationNode extends NonBranchingNode {
 	public static class StoredSelection implements Serializable {
 		private static final long serialVersionUID = -4566260486738356572L;
 

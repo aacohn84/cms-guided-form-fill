@@ -7,7 +7,7 @@ import java.util.Map;
 import models.FilledFormFields;
 import play.twirl.api.Html;
 
-public class FeeNode extends SingleTargetNode {
+public class FeeNode extends NonBranchingNode {
 	public static class StoredSelection implements Serializable {
 		private static final long serialVersionUID = 4534391046499143699L;
 		public String fieldName;

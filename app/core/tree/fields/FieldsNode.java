@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
-import core.tree.SingleTargetNode;
+import core.tree.NonBranchingNode;
 import models.FilledFormFields;
 import play.twirl.api.Html;
 
@@ -17,7 +17,7 @@ import play.twirl.api.Html;
  * 
  * @author Aaron Cohn
  */
-public class FieldsNode extends SingleTargetNode {
+public class FieldsNode extends NonBranchingNode {
 	String detailDescription;
 	List<Field> fields = new ArrayList<>();
 

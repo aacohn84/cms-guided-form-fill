@@ -9,7 +9,7 @@ import play.twirl.api.Html;
  * Like a {@link NoteNode} but also checks a box on the form after it is
  * visited.
  */
-public class NoteChecksABoxNode extends SingleTargetNode {
+public class NoteChecksABoxNode extends NonBranchingNode {
 
 	private String boxName;
 	private String note;
