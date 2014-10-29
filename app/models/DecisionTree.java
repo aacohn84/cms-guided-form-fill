@@ -199,7 +199,8 @@ public class DecisionTree implements Iterable<Decision> {
 	}
 
 	private boolean inputChanged(Decision decision, String newInput) {
-		return !decision.serializedInput.equals(newInput);
+		return (decision.serializedInput == null
+				|| !decision.serializedInput.equals(newInput));
 	}
 
 	public void putDecision(Decision decision) {

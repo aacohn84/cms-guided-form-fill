@@ -21,7 +21,7 @@ import core.tree.Node;
 public class Decision {
 	public Node context;
 	public Decision previous, next;
-	public String serializedInput = "";
+	public String serializedInput;
 
 	public Decision setContext(Node context) {
 		this.context = context;
