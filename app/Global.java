@@ -6,10 +6,10 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import core.CMSGuidedFormFill;
 import play.Application;
 import play.GlobalSettings;
 import play.Logger;
+import core.CMSGuidedFormFill;
 
 public class Global extends GlobalSettings {
 	@Override
@@ -17,24 +17,24 @@ public class Global extends GlobalSettings {
 	public void onStart(Application app) {
 		// set decisions file
 		String os = System.getProperty("os.name");
-		Path decisionsPath;
+		Path formDataPath;
 		if (os.toLowerCase().contains("win")) {
 			String appData = System.getenv("APPDATA");
-			decisionsPath = Paths.get(appData, "CMS Guided Forms", "decisions");
+			formDataPath = Paths.get(appData, "CMS Guided Forms", "form data");
 			Logger.info("Windows OS detected.");
 		} else {
-			decisionsPath = Paths.get("~/.local", "CMS Guided Forms", "decisions");
+			formDataPath = Paths.get("~/.local", "CMS Guided Forms", "form data");
 			Logger.info("Non-Windows OS detected, assuming *nix.");
 		}
-		File decisionsFile = decisionsPath.toFile();
-		CMSGuidedFormFill.setDecisionsFile(decisionsFile);
-		Logger.info("Decisions files will be stored at: " + decisionsFile);
+		File formDataFile = formDataPath.toFile();
+		CMSGuidedFormFill.setFormDataFile(formDataFile);
+		Logger.info("Form data files will be stored at: " + formDataFile);
 
 		// ensure that decisions file exists in file system
-		if (Files.notExists(decisionsPath, LinkOption.NOFOLLOW_LINKS)) {
+		if (Files.notExists(formDataPath, LinkOption.NOFOLLOW_LINKS)) {
 			try {
 				Logger.info("App data directory doesn't exist; It will be created.");
-				Files.createDirectories(decisionsPath);
+				Files.createDirectories(formDataPath);
 			} catch (IOException e) {
 				Logger.error(e.getMessage(), e);
 			}

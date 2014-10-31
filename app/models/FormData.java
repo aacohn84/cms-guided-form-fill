@@ -1,21 +1,12 @@
 package models;
 
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 
-import models.FilledFormFields.FilledFormField;
 import play.Logger;
-import play.db.DB;
 import core.CMSGuidedFormFill;
 import core.forms.CMSForm;
 import core.tree.Node;
@@ -25,7 +16,9 @@ public class FormData {
 	private CMSForm form;
 	private String employeeName;
 	private int employeeId;
-	private Integer rowId;
+	private Integer formRowId;
+	private PatronInfo patron1;
+	private PatronInfo patron2 = PatronInfo.EMPTY_PATRON_INFO;
 
 	public FormData(String employeeName, int employeeId, CMSForm form) {
 		this.employeeName = employeeName;
@@ -60,57 +53,79 @@ public class FormData {
 		return employeeName;
 	}
 
-	public Integer getRowId() {
-		return rowId;
+	public Integer getFormRowId() {
+		return formRowId;
 	}
 
-	public void setRowId(Integer rowId) {
-		this.rowId = rowId;
+	public void setFormRowId(Integer rowId) {
+		this.formRowId = rowId;
 	}
 
 	/**
 	 * Saves filled form fields to database and decision tree to file.
 	 */
 	public void saveToDisk() {
-		Logger.info("rowId inititally set to " + rowId);
-
 		FilledFormFields filledFormFields = getFilledFormFields();
 		String formName = form.getName();
-
-		rowId = writeFormFieldsToDatabase(formName, employeeId, rowId,
-				filledFormFields);
-
-		Logger.info("rowId updated to " + rowId);
-
-		writeSerializedDecisionsToFile(formName, rowId, decisionTree.serialize());
-
-		// Add patron to database if they don't have an entry yet
-		PatronInfo patron = parsePatronInfo(filledFormFields);
-		Integer patronId = CMSDB.getPatronId(patron);
-		if (patronId == null) {
-			patronId = CMSDB.createPatron(patron);
-			if (patronId == null) {
-				Logger.error("Couldn't retrieve or create the patron " + patron
-						+ ".");
-				return;
-			}
+		if (formRowId == null) {
+			patron1 = createPatron1(filledFormFields);
+			patron2 = createPatron2IfPossible(filledFormFields);
+			formRowId = CMSDB.newForm(formName, employeeId,
+					patron1.getPatronId(), patron2.getPatronId(),
+					filledFormFields);
+			Logger.info("New " + formName + " created with formRowId: "
+					+ formRowId);
+		} else {
+			updatePatron1IfNecessary(filledFormFields);
+			updatePatron2IfNecessary(filledFormFields);
+			CMSDB.updateForm(formName, formRowId, patron2.getPatronId(),
+					filledFormFields);
 		}
-		// associate the patron id with the form row id
-		CMSDB.associatePatronWithFormEntry(patronId, formName, rowId);
+		writeFormDataToFile();
 	}
 
-	private PatronInfo parsePatronInfo(
-			FilledFormFields filledFormFields) {
-		// parse patron's information from filled form fields
-		String name = filledFormFields.getFieldValue("name_1");
-		String address = filledFormFields.getFieldValue("address");
-		String phone = filledFormFields.getFieldValue("phone");
-		String email = filledFormFields.getFieldValue("email");
-		if (isNotEmpty(name) && isNotEmpty(address) && isNotEmpty(phone)) {
-			return new PatronInfo(name, address, phone, email);
+	private PatronInfo createPatron1(FilledFormFields filledFormFields) {
+		PatronInfo patron = PatronInfo.getPatron1Info(filledFormFields);
+		patron.setPatronId(CMSDB.createPatron(patron));
+		return patron;
+	}
+
+	private PatronInfo createPatron2IfPossible(FilledFormFields filledFormFields) {
+		if (filledFormFields.isFieldFilled("name_2")) {
+			PatronInfo patron = PatronInfo.getPatron2Info(filledFormFields);
+			patron.setPatronId(CMSDB.createPatron(patron));
+			return patron;
 		}
-		throw new RuntimeException(
-				"Can't parse patron info because required fields are empty.");
+		return PatronInfo.EMPTY_PATRON_INFO;
+	}
+
+	private void updatePatron1IfNecessary(FilledFormFields filledFormFields) {
+		PatronInfo newPatronInfo = PatronInfo
+				.getPatron1Info(filledFormFields);
+		if (!patron1.equals(newPatronInfo)) {
+			newPatronInfo.setPatronId(patron1.getPatronId());
+			patron1 = newPatronInfo;
+			CMSDB.updatePatron(newPatronInfo);
+		}
+	}
+
+	private void updatePatron2IfNecessary(FilledFormFields filledFormFields) {
+		if (patron2.getPatronId() == null) {
+			patron2 = createPatron2IfPossible(filledFormFields);
+		} else {
+			// patron 2 exists, let's see if it should be updated...
+			if (filledFormFields.isFieldFilled("name_2")) {
+				PatronInfo newPatronInfo = PatronInfo
+						.getPatron2Info(filledFormFields);
+				if (!patron2.equals(newPatronInfo)) {
+					newPatronInfo.setPatronId(patron2.getPatronId());
+					patron2 = newPatronInfo;
+					CMSDB.updatePatron(newPatronInfo);
+				}
+			} else {
+				patron2 = PatronInfo.EMPTY_PATRON_INFO;
+			}
+		}
 	}
 
 	/*
@@ -118,74 +133,26 @@ public class FormData {
 	 * on the form name and the row id. So if it's the Change Order form and row
 	 * 2, the filename will be change_order2.decisions
 	 */
-	private static void writeSerializedDecisionsToFile(String formName, Integer rowId,
-			String serializedDecisions) {
-		String filename = formName + rowId + ".decisions";
-		File decisionFile = new File(CMSGuidedFormFill.getDecisionsFile(),
+	private void writeFormDataToFile() {
+		String formName = form.getName();
+		String filename = getFormDataFileName(formName, formRowId);
+		File formDataFile = new File(CMSGuidedFormFill.getFormDataFile(),
 				filename);
-		try (PrintWriter decisionWriter = new PrintWriter(decisionFile)) {
-			decisionWriter.write(serializedDecisions);
+		try (PrintWriter formDataWriter = new PrintWriter(formDataFile)) {
+			formDataWriter.write(decisionTree.serialize());
+			formDataWriter.write("\n");
+			formDataWriter.write(patron1.serialize());
+			formDataWriter.write("\n");
+			formDataWriter.write(patron2.serialize());
 		} catch (IOException e) {
 			Logger.error(e.getMessage(), e);
 		}
 	}
 
-	/*
-	 * Creates a new row in the database and returns the row id number.
-	 */
-	private static Integer writeFormFieldsToDatabase(String formName,
-			Integer employeeId, Integer rowId, FilledFormFields filledFormFields) {
-		String sql = generateInsertOrUpdateStmt(formName, employeeId, rowId,
-				filledFormFields);
-		try (Connection c = DB.getConnection();
-				PreparedStatement p = c.prepareStatement(sql,
-						Statement.RETURN_GENERATED_KEYS);) {
-			int i = 1;
-			for (FilledFormField filledFormField : filledFormFields) {
-				p.setString(i++, filledFormField.value);
-			}
-			p.execute();
-			ResultSet generatedKeys = p.getGeneratedKeys();
-			if (generatedKeys.first()) {
-				return generatedKeys.getInt("GENERATED_KEY");
-			} else if (rowId == null) {
-				throw new RuntimeException("No generated keys returned on "
-						+ "INSERT.");
-			}
-		} catch (SQLException e) {
-			Logger.error(e.getMessage(), e);
-		}
-		return rowId;
-	}
-
-	/*
-	 * Generates an SQL INSERT or UPDATE statement with the formName as the
-	 * table name and the names of the filled fields as the names of columns.
-	 */
-	private static String generateInsertOrUpdateStmt(String formName,
-			Integer employeeId, Integer rowId, FilledFormFields filledFormFields) {
-		StringBuilder columns = new StringBuilder();
-		for (FilledFormField filledFormField : filledFormFields) {
-			columns.append("\r\n    `").append(filledFormField.name)
-				   .append("`=?,");
-		}
-		columns.append("\r\n    `employee_id`=" + employeeId);
-		columns.append(",\r\n    `date_modified`=CURRENT_TIMESTAMP()");
-
-		String sql;
-		if (rowId == null) {
-			sql = "INSERT INTO " + formName + "\r\nSET" + columns;
-		} else {
-			sql = "UPDATE " + formName + "\r\nSET" + columns
-					+ "\r\nWHERE `id`=" + rowId;
-		}
-		return sql + ";";
-	}
-
 	/**
 	 * Constructs a FormData instance from the serialized decisions file stored
-	 * on disk. The form and the rowId form the key by which the data is stored
-	 * and accessed.
+	 * on disk. The form and the formRowId form the key by which the data is
+	 * stored and accessed.
 	 *
 	 * @param form
 	 *            - Instance of the form associated with the data being
@@ -193,32 +160,38 @@ public class FormData {
 	 * @param employeeName
 	 *            - name of the employee who entered the data.
 	 * @param employeeId
-	 *            - the database
-	 * @param rowId
-	 * @return
+	 *            - the database id of the employee
+	 * @param formRowId
+	 *            - the id of the form instance loaded
+	 * @return a new FormData instance loaded from disk.
 	 */
 	public static FormData loadFromDisk(CMSForm form, String employeeName,
 			int employeeId, int rowId) {
-		String serializedDecisions = readSerializedDecisionsFromFile(
-				form.getName(), rowId);
+		String filename = getFormDataFileName(form.getName(), rowId);
+		File decisionFile = new File(CMSGuidedFormFill.getFormDataFile(),
+				filename);
+		String serializedDecisions = null;
+		String serializedPatron1 = null;
+		String serializedPatron2 = null;
+		try (BufferedReader decisionReader = new BufferedReader(
+				new FileReader(decisionFile));) {
+			serializedDecisions = decisionReader.readLine();
+			serializedPatron1 = decisionReader.readLine();
+			serializedPatron2 = decisionReader.readLine();
+		} catch (IOException e) {
+			throw new RuntimeException(
+					"Could not read serialized form data in " + filename, e);
+		}
 		FormData formData = new FormData(employeeName, employeeId, form);
 		formData.decisionTree.deserialize(serializedDecisions);
-		formData.rowId = rowId;
+		formData.patron1 = PatronInfo.deserialize(serializedPatron1);
+		formData.patron2 = PatronInfo.deserialize(serializedPatron2);
+		formData.formRowId = rowId;
 		return formData;
 	}
 
-	private static String readSerializedDecisionsFromFile(
-			String formName, int rowId) {
-		String filename = formName + rowId + ".decisions";
-		File decisionFile = new File(CMSGuidedFormFill.getDecisionsFile(),
-				filename);
-		try (BufferedReader decisionReader = new BufferedReader(
-				new FileReader(decisionFile));) {
-			// decisions file contains only one line
-			return decisionReader.readLine();
-		} catch (IOException e) {
-			throw new RuntimeException(
-					"Could not read serialized decisions in " + filename, e);
-		}
+	private static String getFormDataFileName(String formName, int rowId) {
+		String filename = formName + rowId + ".formdata";
+		return filename;
 	}
 }

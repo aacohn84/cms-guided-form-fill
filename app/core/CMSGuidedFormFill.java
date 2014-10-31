@@ -19,9 +19,9 @@ import core.pdf.PDFFormFiller;
 import core.tree.Node;
 
 public class CMSGuidedFormFill {
-	private static File DECISIONS_FILE;
+	private static File FORM_DATA_FILE;
 
-	public static void clearDecisions(String formName, String employee) {
+	public static void clearFormData(String formName, String employee) {
 		FormDataStore formDataStore = FormDataStore.getInstance();
 		formDataStore.removeFormData(formName, employee);
 	}
@@ -45,12 +45,12 @@ public class CMSGuidedFormFill {
 		PDFFormFiller.fillForm(formData.getForm(), fields, writableFile);
 	}
 
-	public static File getDecisionsFile() {
-		return DECISIONS_FILE;
+	public static File getFormDataFile() {
+		return FORM_DATA_FILE;
 	}
 
-	public static void setDecisionsFile(File decisionsFile) {
-		DECISIONS_FILE = decisionsFile;
+	public static void setFormDataFile(File formDataFile) {
+		FORM_DATA_FILE = formDataFile;
 	}
 
 	public static Decision getPreviousDecision(String formName,
