@@ -23,7 +23,9 @@ public class Global extends GlobalSettings {
 			formDataPath = Paths.get(appData, "CMS Guided Forms", "form data");
 			Logger.info("Windows OS detected.");
 		} else {
-			formDataPath = Paths.get("~/.local", "CMS Guided Forms", "form data");
+			String userHome = System.getProperty("user.home");
+			formDataPath = Paths.get(userHome, ".local", "CMS_Guided_Forms",
+					"form_data");
 			Logger.info("Non-Windows OS detected, assuming *nix.");
 		}
 		File formDataFile = formDataPath.toFile();
@@ -35,6 +37,12 @@ public class Global extends GlobalSettings {
 			try {
 				Logger.info("App data directory doesn't exist; It will be created.");
 				Files.createDirectories(formDataPath);
+				if (Files.notExists(formDataPath)) {
+					Logger.error("Woops, the file wasn't be created for some "
+							+ "reason. Bad stuff gonna happen!");
+				} else {
+					Logger.info("Path created successfully.");
+				}
 			} catch (IOException e) {
 				Logger.error(e.getMessage(), e);
 			}
