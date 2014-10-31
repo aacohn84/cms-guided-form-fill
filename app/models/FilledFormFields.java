@@ -1,5 +1,7 @@
 package models;
 
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -48,7 +50,8 @@ public class FilledFormFields implements
 	}
 
 	public boolean isFieldFilled(String name) {
-		return filledFormFields.containsKey(name);
+		FilledFormField filledField = filledFormFields.get(name);
+		return (filledField != null && isNotEmpty(filledField.value));
 	}
 
 	@Override
