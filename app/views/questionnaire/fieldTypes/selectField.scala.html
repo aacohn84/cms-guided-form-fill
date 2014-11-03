@@ -1,6 +1,7 @@
 @(field: core.tree.fields.SelectField)
 
 @import views.html.questionnaire.fieldTypes.helpers._
+@import org.apache.commons.lang3.StringUtils
 
 @defining(field.name.replaceAll("\\s+", "")) { id =>
   @fieldLabel(field.label, id)
@@ -16,6 +17,10 @@
     }
   </select>
   <script type="text/javascript">
+  @if(StringUtils.isNotEmpty(field.value)) {
+	document.getElementById('@id').value = '@field.value';
+  } else {
   	document.getElementById('@id').selectedIndex = -1;
+  }
   </script>
 }
