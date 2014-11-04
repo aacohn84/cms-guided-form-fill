@@ -633,7 +633,7 @@ public class ChangeOrderForm extends CMSForm {
 		EXTENDED_PRICE_3("extended_price_3", null),
 		EXTENDED_PRICE_4("extended_price_4", null),
 		EXTENDED_PRICE_5("extended_price_5", null),
-		GIFT_AMOUNT("gift_amount", new NumberField("gift amount", true, "Gift Amount")),
+		GIFT_AMOUNT("gift_amount", new NumberField("gift_amount", true, "Gift Amount")),
 		ADMIN_RETURN_FEES("admin_return_fees", null),
 		CREDITS_DISCOUNTS("credits_discounts", new NumberField("credits_discounts", true, "Credits & Discounts to be deducted")),
 		TOTAL_TO_BE_RETURNED("total_to_be_returned", null),
