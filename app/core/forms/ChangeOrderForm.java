@@ -361,9 +361,9 @@ public class ChangeOrderForm extends CMSForm {
 
 		addNode(new ChoiceNode(Id.transfer_type_choice, Desc.transfer_type_choice,
 				Field.PROPERTY_ASSIGNMENT.name)
-			.addChoice("Transfer of Ownership", Field.TRANSFER_OF_OWNERSHIP.name, Id.transfer_fee_note)
+			.addChoice("Transfer of Ownership", Field.TRANSFER_OF_OWNERSHIP.name, Id.transfer_fee)
 			.addChoice("Donation", Field.DONATION.name, Id.plot_fmv_2)
-			.addChoice("Release of Interest", Field.RELEASE_OF_INTEREST.name, Id.transfer_fee_waived_note));
+			.addChoice("Release of Interest", Field.RELEASE_OF_INTEREST.name, Id.transfer_fee_waived));
 
 		transferTransfer();
 
@@ -373,8 +373,8 @@ public class ChangeOrderForm extends CMSForm {
 	}
 
 	private void transferTransfer() {
-		addNode(new FeeNode(Id.transfer_fee_note, Id.name_7,
-				Desc.transfer_fee_note, Field.ADMIN_RETURN_FEES.name,
+		addNode(new FeeNode(Id.transfer_fee, Id.name_7,
+				Desc.transfer_fee, Field.ADMIN_RETURN_FEES.name,
 				new BigDecimal("300.00")));
 
 		addNode(Node.name(Id.name_7, Id.loc_7));
@@ -407,7 +407,7 @@ public class ChangeOrderForm extends CMSForm {
 	}
 
 	private void transferRelease() {
-		addNode(new FeeNode(Id.transfer_fee_waived_note, Id.name_9,
+		addNode(new FeeNode(Id.transfer_fee_waived, Id.name_9,
 				Desc.transfer_fee_waived_note, Field.ADMIN_RETURN_FEES.name,
 				new BigDecimal("0.00")));
 
@@ -491,7 +491,7 @@ public class ChangeOrderForm extends CMSForm {
 		final static String disint_info = "Please provide the following information regarding the disinterment:";
 		final static String reason = "Please provide a brief description of the reason for this transaction:";
 		final static String transfer_type_choice = "Please select the type of transfer that the Patron wishes to perform:";
-		final static String transfer_fee_note = "A processing fee applies for any property transfer to a new owner.";
+		final static String transfer_fee = "A processing fee applies for any property transfer to a new owner.";
 		final static String transfer_fee_waived_note = "No transfer fee applies for a release of interest. Only those that are present are able to release their interest in the property.";
 		final static String assignee_info = "Please provide the following information regarding the person to receive the property:";
 		final static String orig_contract_date = "What is the date of the original contract?";
@@ -741,8 +741,8 @@ public class ChangeOrderForm extends CMSForm {
 		final static String calc_6 = "calc_6";
 		final static String calc_7 = "calc_7";
 		final static String transfer_type_choice = "transfer_type_choice";
-		final static String transfer_fee_note = "transfer_fee_note";
-		final static String transfer_fee_waived_note = "transfer_fee_waived_note";
+		final static String transfer_fee = "transfer_fee";
+		final static String transfer_fee_waived = "transfer_fee_waived";
 		final static String assignee_info = "assignee_info";
 		final static String orig_contract_date_1 = "orig_contract_date_1";
 		final static String orig_contract_date_2 = "orig_contract_date_2";
