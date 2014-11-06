@@ -20,11 +20,6 @@ public class Admin extends SecureController {
 		return ok(views.html.formVariables.render(formVars));
 	}
 
-	public static Result resetChangeOrder() {
-		CMSFormFactory.resetForm("change_order");
-		return ok();
-	}
-
 	public static Result updateFormVariables() {
 		Map<String, String> requestData = Form.form().bindFromRequest().data();
 		CMSFormFactory.updateFormVariables("change_order", requestData);
