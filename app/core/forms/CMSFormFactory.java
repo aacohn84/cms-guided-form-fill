@@ -9,4 +9,11 @@ public class CMSFormFactory {
 		throw new RuntimeException("Form with name " + formName
 				+ " does not exist.");
 	}
+
+	public static void resetForm(String formName) {
+		switch(formName) {
+		case ChangeOrderForm.NAME:
+			ChangeOrderForm.reset();
+		}
+	}
 }

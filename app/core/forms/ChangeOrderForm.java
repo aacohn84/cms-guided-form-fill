@@ -1,7 +1,13 @@
 package core.forms;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
+import play.Logger;
+import play.db.DB;
 import core.tree.CalculationNode;
 import core.tree.CalculationNode.BinaryExpr;
 import core.tree.CalculationNode.Condition;
@@ -35,8 +41,17 @@ public class ChangeOrderForm extends CMSForm {
 		return instance;
 	}
 
+	public static void reset() {
+		setStaticFormVarsFromDB();
+		setAdminFeePercentageExpr();
+		instance = new ChangeOrderForm();
+	}
+
 	private ChangeOrderForm() {
 		super(NAME);
+
+		setInstanceFormVarsFromStaticFormVars();
+		logVariableValues();
 
 		// decision tree definition
 		root = addNode(new NoteChecksABoxNode(Id.prerequisites_note,
@@ -89,10 +104,10 @@ public class ChangeOrderForm extends CMSForm {
 			.addChoice("Urn", Id.disint_fee_3)
 			.addChoice("Infant", Id.disint_fee_4));
 
-		addNode(Node.disintFee(Id.disint_fee_1, new BigDecimal("1950.00")));
-		addNode(Node.disintFee(Id.disint_fee_2, new BigDecimal("1350.00")));
-		addNode(Node.disintFee(Id.disint_fee_3, new BigDecimal("750.00")));
-		addNode(Node.disintFee(Id.disint_fee_4, new BigDecimal("500.00")));
+		addNode(Node.disintFee(Id.disint_fee_1, getFormVariableValue(Variable.disint_fee_1.getId())));
+		addNode(Node.disintFee(Id.disint_fee_2, getFormVariableValue(Variable.disint_fee_2.getId())));
+		addNode(Node.disintFee(Id.disint_fee_3, getFormVariableValue(Variable.disint_fee_3.getId())));
+		addNode(Node.disintFee(Id.disint_fee_4, getFormVariableValue(Variable.disint_fee_4.getId())));
 
 		disintermentInfo();
 	}
@@ -246,7 +261,7 @@ public class ChangeOrderForm extends CMSForm {
 					Expr.zero,
 					new BinaryExpr(
 						Expr.sumItemsReturned,
-						Expr.twentyPercent,
+						Expr.adminFeePercentage,
 						Operators.MULTIPLY),
 					Expr.adminReturnFeesCondition))
 			/*
@@ -269,8 +284,9 @@ public class ChangeOrderForm extends CMSForm {
 			.addChoice("Yes", Id.admin_fee_waived_2)
 			.addChoice("No", Id.admin_fee_2));
 
-		addNode(new FeeNode(Id.admin_fee_2, Id.return_goods_choice, Desc.admin_fee,
-				Field.ADMIN_RETURN_FEES.name, new BigDecimal("100.00")));
+		addNode(new FeeNode(Id.admin_fee_2, Id.return_goods_choice,
+				Desc.admin_fee, Field.ADMIN_RETURN_FEES.name, new BigDecimal(
+						getFormVariableValue(Variable.admin_fee_2.getId()))));
 
 		addNode(new ChoiceNode(Id.return_goods_choice, Desc.return_goods_choice)
 			.addChoice("Yes", Id.name_5)
@@ -373,9 +389,9 @@ public class ChangeOrderForm extends CMSForm {
 	}
 
 	private void transferTransfer() {
-		addNode(new FeeNode(Id.transfer_fee, Id.name_7,
-				Desc.transfer_fee, Field.ADMIN_RETURN_FEES.name,
-				new BigDecimal("300.00")));
+		addNode(new FeeNode(Id.transfer_fee, Id.name_7, Desc.transfer_fee,
+				Field.ADMIN_RETURN_FEES.name, new BigDecimal(
+						getFormVariableValue(Variable.transfer_fee.getId()))));
 
 		addNode(Node.name(Id.name_7, Id.loc_7));
 		addNode(Node.loc(Id.loc_7, Id.orig_contract_num_7));
@@ -470,6 +486,74 @@ public class ChangeOrderForm extends CMSForm {
 				Desc.loc_all_parties_note));
 	}
 
+	private static void setStaticFormVarsFromDB() {
+		String sql = "SELECT * FROM `change_order_variables`;";
+		FormVariable disint_fee_1 = Variable.disint_fee_1,
+				disint_fee_2 = Variable.disint_fee_2,
+				disint_fee_3 = Variable.disint_fee_3,
+				disint_fee_4 = Variable.disint_fee_4,
+				admin_fee_2 = Variable.admin_fee_2,
+				transfer_fee = Variable.transfer_fee,
+				admin_fee_percentage = Variable.admin_fee_percentage;
+		try (Connection c = DB.getConnection();
+				Statement s = c.createStatement();
+				ResultSet rs = s.executeQuery(sql);) {
+			if (rs.first()) {
+				disint_fee_1.setValue(rs.getString(disint_fee_1.getId()));
+				disint_fee_2.setValue(rs.getString(disint_fee_2.getId()));
+				disint_fee_3.setValue(rs.getString(disint_fee_3.getId()));
+				disint_fee_4.setValue(rs.getString(disint_fee_4.getId()));
+				admin_fee_2.setValue(rs.getString(admin_fee_2.getId()));
+				transfer_fee.setValue(rs.getString(transfer_fee.getId()));
+				admin_fee_percentage.setValue(rs.getString(admin_fee_percentage.getId()));
+			}
+		} catch (SQLException e) {
+			Logger.error("Form variables could not be loaded from the "
+					+ "database.", e);
+		}
+	}
+
+	private static void setAdminFeePercentageExpr() {
+		Expr.adminFeePercentage = new NumExpr(new BigDecimal(
+				Variable.admin_fee_percentage.getValue()));
+	}
+
+	private void setInstanceFormVarsFromStaticFormVars() {
+		setFormVariable(Variable.disint_fee_1);
+		setFormVariable(Variable.disint_fee_2);
+		setFormVariable(Variable.disint_fee_3);
+		setFormVariable(Variable.disint_fee_4);
+		setFormVariable(Variable.admin_fee_2);
+		setFormVariable(Variable.transfer_fee);
+		setFormVariable(Variable.admin_fee_percentage);
+	}
+
+	private static void logVariableValues() {
+		Logger.debug("Current variable values are:" + "\ndisint_fee_1: {}"
+					+ "\ndisint_fee_2: {}" + "\ndisint_fee_3: {}"
+					+ "\ndisint_fee_4: {}" + "\nadmin_fee_2: {}"
+					+ "\ntransfer_fee: {}" + "\nadmin_fee_percentage: {}",
+				Variable.disint_fee_1.getValue(),
+				Variable.disint_fee_2.getValue(),
+				Variable.disint_fee_3.getValue(),
+				Variable.disint_fee_4.getValue(),
+				Variable.admin_fee_2.getValue(),
+				Variable.transfer_fee.getValue(),
+				Variable.admin_fee_percentage.getValue());
+	}
+
+	private static class Variable {
+		// variables are given a default value in case of DB failure
+		static FormVariable disint_fee_1 = new FormVariable("disint_fee_1", "Disinterment Fee (Casket/Ground)", "1950.00");
+		static FormVariable disint_fee_2 = new FormVariable("disint_fee_2", "Disinterment Fee (Casket/Crypt)", "1350.00");
+		static FormVariable disint_fee_3 = new FormVariable("disint_fee_3", "Disinterment Fee (Urn)", "750.00");
+		static FormVariable disint_fee_4 = new FormVariable("disint_fee_4", "Disinterment Fee (Infant)", "500.00");
+		static FormVariable admin_fee_2 = new FormVariable("admin_fee_2", "Admin Fee (no inventory returned)", "100.00");
+		static FormVariable transfer_fee = new FormVariable("transfer_fee", "New Owner Transfer Fee", "300.00");
+		static FormVariable admin_fee_percentage = new FormVariable("admin_fee_percentage", "Admin Fee Percentage", "0.20");
+		static { setStaticFormVarsFromDB(); }
+	}
+
 	// Description associated with each node in the decision tree
 	private static class Desc {
 		final static String prerequisites_note = "Before beginning the Change Order process, make sure you have the Patron’s original contract, and have performed all necessary verifications within HMIS (if applicable).";
@@ -529,16 +613,17 @@ public class ChangeOrderForm extends CMSForm {
 	private static class Expr {
 		static final NumExpr zero = new NumExpr(BigDecimal.ZERO);
 
-		static final NumExpr twentyPercent = new NumExpr(new BigDecimal("0.20"));
+		static NumExpr adminFeePercentage;
+		static { setAdminFeePercentageExpr(); }
 
 		static final BinaryExpr amtReturnedMinusDeductions = new BinaryExpr(
 			new RefExpr(Field.TOTAL_TO_BE_RETURNED.name),
 			new RefExpr(Field.TOTAL_DEDUCTIONS.name),
 			Operators.SUBTRACT);
 
-		static final BinaryExpr twentyPercentOfContractAmount = new BinaryExpr(
+		static final BinaryExpr somePercentOfContractAmount = new BinaryExpr(
 			new RefExpr(Field.CONTRACT_AMOUNT.name),
-			Expr.twentyPercent,
+			Expr.adminFeePercentage,
 			Operators.MULTIPLY);
 
 		static final Condition adminReturnFeesCondition = filledFormFields -> {
@@ -568,7 +653,7 @@ public class ChangeOrderForm extends CMSForm {
 		 */
 		static final ConditionalExpr conditionalAdminReturnFees = new ConditionalExpr(
 				Expr.zero,
-				twentyPercentOfContractAmount,
+				somePercentOfContractAmount,
 				adminReturnFeesCondition);
 
 		static final nAryExpr sumItemsReturned = new nAryExpr(Operators.ADD)
@@ -800,7 +885,8 @@ public class ChangeOrderForm extends CMSForm {
 				.addChoice("No", idNo);
 		}
 
-		static FeeNode disintFee(String id, BigDecimal fee) {
+		static FeeNode disintFee(String id, String feeAmount) {
+			BigDecimal fee = new BigDecimal(feeAmount);
 			return new FeeNode(id, Id.name_1, Desc.disint_fee,
 					Field.ADMIN_RETURN_FEES.name, fee);
 		}

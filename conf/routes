@@ -18,6 +18,8 @@ GET		/getEmployeeHistory			controllers.FormFill.getEmployeeHistory()
 POST	/loadPrevious				controllers.FormFill.loadPrevious()
 
 GET		/admin						controllers.Admin.admin()
+GET		/formVariables				controllers.Admin.formVariables()
+GET		/resetChangeOrder			controllers.Admin.resetChangeOrder()
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

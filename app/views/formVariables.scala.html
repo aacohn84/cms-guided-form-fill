@@ -1,0 +1,22 @@
+@(formVars: List[core.forms.FormVariable])
+
+@main("Form Variables") {
+  <script type="text/javascript" src="@routes.Assets.at("javascripts/jquery-1.11.1.min.js")"></script>
+  <script type="text/javascript">
+    function resetChangeOrder() {
+	  $.get('resetChangeOrder', function (data) {
+		  alert('Form variables have been updated.');
+	  });
+    }
+  </script>
+  <div style="margin: 150px 0 0 0;" id='list-container'>
+  @for(formVar <- formVars) {
+    @defining(formVar.getId()) { varId =>
+    <div class="input-row">
+      <label for="@varId">@formVar.getName()</label>
+      <input type="text" id="@varId" name="@varId" value="@formVar.getValue()" /> 
+    </div>
+    } @* /varId *@
+  }
+  </div>
+}
