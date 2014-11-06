@@ -1,7 +1,9 @@
 package controllers;
 
 import java.util.List;
+import java.util.Map;
 
+import play.data.Form;
 import play.mvc.Result;
 import core.forms.CMSForm;
 import core.forms.CMSFormFactory;
@@ -20,6 +22,12 @@ public class Admin extends SecureController {
 
 	public static Result resetChangeOrder() {
 		CMSFormFactory.resetForm("change_order");
+		return ok();
+	}
+
+	public static Result updateFormVariables() {
+		Map<String, String> requestData = Form.form().bindFromRequest().data();
+		CMSFormFactory.updateFormVariables("change_order", requestData);
 		return ok();
 	}
 }

@@ -2,9 +2,11 @@ package core.forms;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Map;
 
 import play.Logger;
 import play.db.DB;
@@ -511,6 +513,65 @@ public class ChangeOrderForm extends CMSForm {
 			Logger.error("Form variables could not be loaded from the "
 					+ "database.", e);
 		}
+	}
+
+	public static void updateFormVariables(Map<String, String> requestData) {
+		String disintFee1Id = Variable.disint_fee_1.getId();
+		String disintFee1Val = requestData.get(disintFee1Id);
+		String disintFee2Id = Variable.disint_fee_2.getId();
+		String disintFee2Val = requestData.get(disintFee2Id);
+		String disintFee3Id = Variable.disint_fee_3.getId();
+		String disintFee3Val = requestData.get(disintFee3Id);
+		String disintFee4Id = Variable.disint_fee_4.getId();
+		String disintFee4Val = requestData.get(disintFee4Id);
+		String adminFee2Id = Variable.admin_fee_2.getId();
+		String adminFee2Val = requestData.get(adminFee2Id);
+		String transferFeeId = Variable.transfer_fee.getId();
+		String transferFeeVal = requestData.get(transferFeeId);
+		String adminFeePercentageId = Variable.admin_fee_percentage.getId();
+		String adminFeePercentageVal = requestData.get(adminFeePercentageId);
+
+		String sql = "UPDATE `change_order_variables` SET "
+				+ "`" + disintFee1Id + "`=?, "
+				+ "`" + disintFee2Id + "`=?, "
+				+ "`" + disintFee3Id + "`=?, "
+				+ "`" + disintFee4Id + "`=?, "
+				+ "`" + adminFee2Id + "`=?, "
+				+ "`" + transferFeeId + "`=?, "
+				+ "`" + adminFeePercentageId + "`=?;";
+		try (Connection c = DB.getConnection();
+				PreparedStatement pstmt = c.prepareStatement(sql);) {
+			pstmt.setString(1, disintFee1Val);
+			pstmt.setString(2, disintFee2Val);
+			pstmt.setString(3, disintFee3Val);
+			pstmt.setString(4, disintFee4Val);
+			pstmt.setString(5, adminFee2Val);
+			pstmt.setString(6, transferFeeVal);
+			pstmt.setString(7, adminFeePercentageVal);
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			Logger.debug("Params leading involved in SQLException:\n"
+					+ disintFee1Id + ": {}\n"
+					+ disintFee2Id + ": {}\n"
+					+ disintFee3Id + ": {}\n"
+					+ disintFee4Id + ": {}\n"
+					+ adminFee2Id + ": {}\n"
+					+ transferFeeId + ": {}\n"
+					+ adminFeePercentageId + ": {}",
+					disintFee1Val, disintFee2Val, disintFee3Val, disintFee4Val,
+					adminFee2Val, transferFeeVal, adminFeePercentageVal);
+			throw new RuntimeException(
+					"Couldn't update variable values for change_order.", e);
+		}
+		Variable.disint_fee_1.setValue(disintFee1Val);
+		Variable.disint_fee_2.setValue(disintFee2Val);
+		Variable.disint_fee_3.setValue(disintFee3Val);
+		Variable.disint_fee_4.setValue(disintFee4Val);
+		Variable.admin_fee_2.setValue(adminFee2Val);
+		Variable.transfer_fee.setValue(transferFeeVal);
+		Variable.admin_fee_percentage.setValue(adminFeePercentageVal);
+		Logger.debug("Variables updated for change_order form.");
+		logVariableValues();
 	}
 
 	private static void setAdminFeePercentageExpr() {

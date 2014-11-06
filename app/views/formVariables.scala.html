@@ -3,20 +3,38 @@
 @main("Form Variables") {
   <script type="text/javascript" src="@routes.Assets.at("javascripts/jquery-1.11.1.min.js")"></script>
   <script type="text/javascript">
-    function resetChangeOrder() {
-	  $.get('resetChangeOrder', function (data) {
-		  alert('Form variables have been updated.');
+    function updateFormVariables() {
+	  $.post('updateFormVariables', $('#formVariables').serialize(), function(data) {
+		  alert("Form variables have been updated. These values will apply to "
+				  + "all new forms. These values will also apply to new "
+				  + "decisions made for previously completed forms.");
+	  })
+	  .fail(function() {
+		  alert("Your change couldn't be applied. Please check your inputs " 
+				  + "and make sure they are valid. If you believe the inputs "
+				  + "are valid, but you're still having a problem, contact "
+				  + "support.");
 	  });
     }
   </script>
-  <div style="margin: 150px 0 0 0;" id='list-container'>
-  @for(formVar <- formVars) {
-    @defining(formVar.getId()) { varId =>
+  <form id="formVariables" action="/updateFormVariables" method="POST">
+    <fieldset>
+    <legend>Set form variables</legend>
+    @for(formVar <- formVars) {
+      @defining(formVar.getId()) { varId =>
+      <div class="input-row">
+        <label for="@varId">@formVar.getName()</label>
+        <input type="text" id="@varId" name="@varId" value="@formVar.getValue()" /> 
+      </div>
+      } @* /varId *@
+    }
     <div class="input-row">
-      <label for="@varId">@formVar.getName()</label>
-      <input type="text" id="@varId" name="@varId" value="@formVar.getValue()" /> 
+      <label>@*Empty column to align submit button with input fields*@</label>
+      <button type="button" onClick="javascript:{updateFormVariables();}">Submit</button>
     </div>
-    } @* /varId *@
-  }
+    </fieldset>
+  </form>
+  <div class="bottom-buttons">
+    <a href="/forms">Back</a>
   </div>
 }

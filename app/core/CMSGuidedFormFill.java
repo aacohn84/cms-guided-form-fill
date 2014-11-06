@@ -180,4 +180,8 @@ public class CMSGuidedFormFill {
 		formDataStore.loadFormData(form, employeeName, employeeId, rowId);
 		return continueForm(formName, employeeName);
 	}
+
+	public static void setFormVariables(String formName, Map<String, String> requestData) {
+		CMSFormFactory.updateFormVariables(formName, requestData);
+	}
 }
