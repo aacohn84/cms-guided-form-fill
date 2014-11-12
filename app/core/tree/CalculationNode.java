@@ -37,6 +37,11 @@ public class CalculationNode extends NonBranchingNode {
 			return expr.value(filledFormFields).setScale(2, RoundingMode.HALF_UP)
 					.toString();
 		}
+
+		@Override
+		public String toString() {
+			return name + " = " + expr.toString();
+		}
 	}
 
 	public static interface Expression {
@@ -52,6 +57,11 @@ public class CalculationNode extends NonBranchingNode {
 		public BigDecimal operate(BigDecimal left, BigDecimal right) {
 			return left.add(right);
 		}
+
+		@Override
+		public String toString() {
+			return " + ";
+		}
 	}
 
 	static class SubtractionOperator implements Operator {
@@ -59,12 +69,22 @@ public class CalculationNode extends NonBranchingNode {
 		public BigDecimal operate(BigDecimal left, BigDecimal right) {
 			return left.subtract(right);
 		}
+
+		@Override
+		public String toString() {
+			return " - ";
+		}
 	}
 
 	static class MultiplicationOperator implements Operator {
 		@Override
 		public BigDecimal operate(BigDecimal left, BigDecimal right) {
 			return left.multiply(right);
+		}
+
+		@Override
+		public String toString() {
+			return " * ";
 		}
 	}
 
@@ -89,6 +109,12 @@ public class CalculationNode extends NonBranchingNode {
 			BigDecimal leftVal = left.value(formFields);
 			BigDecimal rightVal = right.value(formFields);
 			return operator.operate(leftVal, rightVal);
+		}
+
+		@Override
+		public String toString() {
+			return String.valueOf(left) + String.valueOf(operator)
+					+ String.valueOf(right);
 		}
 	}
 
@@ -131,6 +157,20 @@ public class CalculationNode extends NonBranchingNode {
 			}
 			return result;
 		}
+
+		@Override
+		public String toString() {
+			final int numExprs = subExpressions.size();
+			final int avgCharsPerExpr = 4;
+			final int charsPerOperator = 3;
+			final int exprChars = numExprs * avgCharsPerExpr;
+			final int opChars = (numExprs - 1) * charsPerOperator;
+			StringBuilder result = new StringBuilder(exprChars + opChars);
+			for (Expression subExpr : subExpressions) {
+				result.append(String.valueOf(subExpr));
+			}
+			return result.toString();
+		}
 	}
 
 	public static interface Condition extends Predicate<FilledFormFields> {}
@@ -170,6 +210,12 @@ public class CalculationNode extends NonBranchingNode {
 			}
 			return exprFalse.value(filledFormFields);
 		}
+
+		@Override
+		public String toString() {
+			return "ExprTrue: " + String.valueOf(exprTrue)
+					+ "\nExprFalse: " + String.valueOf(exprFalse);
+		}
 	}
 
 	public static class NumExpr implements Expression {
@@ -184,6 +230,11 @@ public class CalculationNode extends NonBranchingNode {
 				@SuppressWarnings("unused") FilledFormFields formFields) {
 			return numVal;
 		}
+
+		@Override
+		public String toString() {
+			return numVal.toString();
+		}
 	}
 
 	public static class RefExpr implements Expression {
@@ -197,6 +248,11 @@ public class CalculationNode extends NonBranchingNode {
 		public BigDecimal value(FilledFormFields formFields) {
 			String fieldVal = formFields.getFieldValue(referencedField);
 			return new BigDecimal(fieldVal);
+		}
+
+		@Override
+		public String toString() {
+			return referencedField;
 		}
 	}
 

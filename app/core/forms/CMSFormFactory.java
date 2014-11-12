@@ -25,6 +25,7 @@ public class CMSFormFactory {
 		switch (formName) {
 		case ChangeOrderForm.NAME:
 			ChangeOrderForm.updateFormVariables(requestData);
+			ChangeOrderForm.reset();
 		}
 	}
 }

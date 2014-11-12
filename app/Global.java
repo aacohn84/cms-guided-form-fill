@@ -10,6 +10,7 @@ import play.Application;
 import play.GlobalSettings;
 import play.Logger;
 import core.CMSGuidedFormFill;
+import core.forms.ChangeOrderForm;
 
 public class Global extends GlobalSettings {
 	@Override
@@ -47,5 +48,9 @@ public class Global extends GlobalSettings {
 				Logger.error(e.getMessage(), e);
 			}
 		}
+		Logger.info("Initialize Change Order Form");
+		ChangeOrderForm.getInstance();
+
+		Logger.info("Startup tasks complete, application ready.");
 	}
 }

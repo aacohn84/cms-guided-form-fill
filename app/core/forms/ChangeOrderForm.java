@@ -45,7 +45,7 @@ public class ChangeOrderForm extends CMSForm {
 
 	public static void reset() {
 		setStaticFormVarsFromDB();
-		setAdminFeePercentageExpr();
+		Expr.initAdminFeePercentageExprs();
 		instance = new ChangeOrderForm();
 	}
 
@@ -571,12 +571,6 @@ public class ChangeOrderForm extends CMSForm {
 		Variable.transfer_fee.setValue(transferFeeVal);
 		Variable.admin_fee_percentage.setValue(adminFeePercentageVal);
 		Logger.debug("Variables updated for change_order form.");
-		logVariableValues();
-	}
-
-	private static void setAdminFeePercentageExpr() {
-		Expr.adminFeePercentage = new NumExpr(new BigDecimal(
-				Variable.admin_fee_percentage.getValue()));
 	}
 
 	private void setInstanceFormVarsFromStaticFormVars() {
@@ -590,10 +584,11 @@ public class ChangeOrderForm extends CMSForm {
 	}
 
 	private static void logVariableValues() {
-		Logger.debug("Current variable values are:" + "\ndisint_fee_1: {}"
-					+ "\ndisint_fee_2: {}" + "\ndisint_fee_3: {}"
-					+ "\ndisint_fee_4: {}" + "\nadmin_fee_2: {}"
-					+ "\ntransfer_fee: {}" + "\nadmin_fee_percentage: {}",
+		Logger.debug("Current variable values for change_order are:"
+					+ "\ndisint_fee_1: {}" + "\ndisint_fee_2: {}"
+					+ "\ndisint_fee_3: {}" + "\ndisint_fee_4: {}"
+					+ "\nadmin_fee_2: {}" + "\ntransfer_fee: {}"
+					+ "\nadmin_fee_percentage: {}",
 				Variable.disint_fee_1.getValue(),
 				Variable.disint_fee_2.getValue(),
 				Variable.disint_fee_3.getValue(),
@@ -671,82 +666,9 @@ public class ChangeOrderForm extends CMSForm {
 		final static String done_detail = "Your change order form is ready to be printed. You can access this form at any time through the main menu.";
 	}
 
-	private static class Expr {
-		static final NumExpr zero = new NumExpr(BigDecimal.ZERO);
-
-		static NumExpr adminFeePercentage;
-		static { setAdminFeePercentageExpr(); }
-
-		static final BinaryExpr amtReturnedMinusDeductions = new BinaryExpr(
-			new RefExpr(Field.TOTAL_TO_BE_RETURNED.name),
-			new RefExpr(Field.TOTAL_DEDUCTIONS.name),
-			Operators.SUBTRACT);
-
-		static final BinaryExpr somePercentOfContractAmount = new BinaryExpr(
-			new RefExpr(Field.CONTRACT_AMOUNT.name),
-			Expr.adminFeePercentage,
-			Operators.MULTIPLY);
-
-		static final Condition adminReturnFeesCondition = filledFormFields -> {
-			try {
-				// return true if admin fee waived (fee == 0), false otherwise
-				String adminReturnFeesVal = filledFormFields
-						.getFieldValue(Field.ADMIN_RETURN_FEES.name);
-				BigDecimal returnFeeVal = new BigDecimal(adminReturnFeesVal);
-				return (returnFeeVal.compareTo(BigDecimal.ZERO) == 0);
-			} catch (RuntimeException e) {
-				/*
-				 * An exception is thrown if the adminReturnFees field was not
-				 * filled or has a null value. We take that to mean that the
-				 * admin fee wasn't waived, and a fee will be applied later.
-				 */
-				return false;
-			}
-		};
-
-		/**
-		 * <pre>
-		 * if (Field.adminReturnFees == 0.00)
-		 *     value -> 0.00
-		 * else
-		 *     value -> contractAmount * 0.20
-		 * </pre>
-		 */
-		static final ConditionalExpr conditionalAdminReturnFees = new ConditionalExpr(
-				Expr.zero,
-				somePercentOfContractAmount,
-				adminReturnFeesCondition);
-
-		static final nAryExpr sumItemsReturned = new nAryExpr(Operators.ADD)
-			.addExpr(new RefExpr(Field.EXTENDED_PRICE_1.name))
-			.addExpr(new RefExpr(Field.EXTENDED_PRICE_2.name))
-			.addExpr(new RefExpr(Field.EXTENDED_PRICE_3.name))
-			.addExpr(new RefExpr(Field.EXTENDED_PRICE_4.name))
-			.addExpr(new RefExpr(Field.EXTENDED_PRICE_5.name));
-
-		static final RefExpr contractBalance = new RefExpr(Field.CONTRACT_BALANCE.name);
-
-		static final BinaryExpr contractAmountMinusBalanceExpr = new BinaryExpr(
-			new RefExpr(Field.CONTRACT_AMOUNT.name),
-			contractBalance,
-			Operators.SUBTRACT);
-
-		static final BinaryExpr sumItemsReturnedMinusContractBalance = new BinaryExpr(
-			sumItemsReturned,
-			contractBalance,
-			Operators.SUBTRACT);
-
-		static final RefExpr adminReturnFees = new RefExpr(Field.ADMIN_RETURN_FEES.name);
-
-		static final BinaryExpr adminFeesPlusCredits = new BinaryExpr(
-			adminReturnFees,
-			new RefExpr(Field.CREDITS_DISCOUNTS.name),
-			Operators.ADD);
-	}
-
 	private static final String[] cemeteries = new String[] {
-		"St. Mary Cemetery", "Calvary Cemetery", "All Souls Cemetery",
-		"George L. Klumpp Chapel of Flowers", "Misc./Parish Cemetery" };
+	"St. Mary Cemetery", "Calvary Cemetery", "All Souls Cemetery",
+	"George L. Klumpp Chapel of Flowers", "Misc./Parish Cemetery" };
 
 	private static enum Field {
 		CHANGE_ORDER_TYPE("change_order_type", null),
@@ -820,6 +742,88 @@ public class ChangeOrderForm extends CMSForm {
 			this.name = name;
 			this.htmlFieldDef = htmlFieldDef;
 		}
+	}
+
+	private static class Expr {
+		private static final RefExpr contractAmount = new RefExpr(Field.CONTRACT_AMOUNT.name);
+
+		static final NumExpr zero = new NumExpr(BigDecimal.ZERO);
+
+		static final BinaryExpr amtReturnedMinusDeductions = new BinaryExpr(
+			new RefExpr(Field.TOTAL_TO_BE_RETURNED.name),
+			new RefExpr(Field.TOTAL_DEDUCTIONS.name),
+			Operators.SUBTRACT);
+
+		static NumExpr adminFeePercentage;
+
+		static final Condition adminReturnFeesCondition = filledFormFields -> {
+			try {
+				// return true if admin fee waived (fee == 0), false otherwise
+				String adminReturnFeesVal = filledFormFields
+						.getFieldValue(Field.ADMIN_RETURN_FEES.name);
+				BigDecimal returnFeeVal = new BigDecimal(adminReturnFeesVal);
+				return (returnFeeVal.compareTo(BigDecimal.ZERO) == 0);
+			} catch (RuntimeException e) {
+				/*
+				 * An exception is thrown if the adminReturnFees field was not
+				 * filled or has a null value. We take that to mean that the
+				 * admin fee wasn't waived, and a fee will be applied later.
+				 */
+				return false;
+			}
+		};
+
+		/**
+		 * <pre>
+		 * if (Field.adminReturnFees == 0.00)
+		 *     value -> 0.00
+		 * else
+		 *     value -> contractAmount * 0.20
+		 * </pre>
+		 */
+		static ConditionalExpr conditionalAdminReturnFees;
+
+		// Re-initializes all expressions depending on Variable.admin_fee_percentage
+		static void initAdminFeePercentageExprs() {
+			Expr.adminFeePercentage = new NumExpr(new BigDecimal(
+					Variable.admin_fee_percentage.getValue()));
+			BinaryExpr somePercentOfContractAmount = new BinaryExpr(
+					contractAmount,
+					adminFeePercentage,
+					Operators.MULTIPLY);
+			Expr.conditionalAdminReturnFees = new ConditionalExpr(
+					zero,
+					somePercentOfContractAmount,
+					adminReturnFeesCondition);
+		}
+
+		static { initAdminFeePercentageExprs(); }
+
+		static final nAryExpr sumItemsReturned = new nAryExpr(Operators.ADD)
+			.addExpr(new RefExpr(Field.EXTENDED_PRICE_1.name))
+			.addExpr(new RefExpr(Field.EXTENDED_PRICE_2.name))
+			.addExpr(new RefExpr(Field.EXTENDED_PRICE_3.name))
+			.addExpr(new RefExpr(Field.EXTENDED_PRICE_4.name))
+			.addExpr(new RefExpr(Field.EXTENDED_PRICE_5.name));
+
+		static final RefExpr contractBalance = new RefExpr(Field.CONTRACT_BALANCE.name);
+
+		static final BinaryExpr contractAmountMinusBalanceExpr = new BinaryExpr(
+			contractAmount,
+			contractBalance,
+			Operators.SUBTRACT);
+
+		static final BinaryExpr sumItemsReturnedMinusContractBalance = new BinaryExpr(
+			sumItemsReturned,
+			contractBalance,
+			Operators.SUBTRACT);
+
+		static final RefExpr adminReturnFees = new RefExpr(Field.ADMIN_RETURN_FEES.name);
+
+		static final BinaryExpr adminFeesPlusCredits = new BinaryExpr(
+			adminReturnFees,
+			new RefExpr(Field.CREDITS_DISCOUNTS.name),
+			Operators.ADD);
 	}
 
 	// Identifier of each node in the Change Order Form decision tree
