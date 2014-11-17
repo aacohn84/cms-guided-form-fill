@@ -685,7 +685,7 @@ public class ChangeOrderForm extends CMSForm {
 		ORIG_CONTRACT_NUM("orig_contract_num", new TextField("orig_contract_num", true, "Original Contract Number")),
 		CONTRACT_AMOUNT("contract_amount", new NumberField("contract_amount", true, "Current Contract Value")),
 		CONTRACT_BALANCE("contract_balance", new NumberField("contract_balance", true, "Current Contract Balance")),
-		REASON("reason", new TextAreaField("reason", true, "Reason for Change Order")),
+		REASON("reason", new TextAreaField("reason", true, "Reason for Change Order", 3, 105)),
 		ITEM_CODE_1("item_code_1", null),
 		ITEM_CODE_2("item_code_2", null),
 		ITEM_CODE_3("item_code_3", null),

@@ -4,10 +4,11 @@
 
 @defining(field.name.replaceAll("\\s+", "")) { id =>
   <label style="display: block;" for="@id">@field.label</label>
-  <textarea style="display: block; margin: 10px 0 0 0;"
+  <textarea
     name="@field.name"
     id="@id"
     data-parsley-trigger="change"
+    data-parsley-maxlength="@{field.getNumRows() * field.getNumCols()}"
     @required(field.isRequired)
   >@field.value</textarea>
 }

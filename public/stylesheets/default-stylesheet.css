@@ -6,7 +6,6 @@ body {
   font-family: Arial, Verdana, Geneva, sans-serif;
 }
 
-
 h1 {
   font-size: 16pt;
   font-variant: small-caps;
@@ -64,9 +63,11 @@ legend {
 }
 
 textarea {
+  display: block;
+  margin: 10px 0 0 0;
   width: 480px;
   height: 200px;
-  font-family: Arial, Verdana, Geneva, sans-serif, "Lucida Console", Monaco, monospace;
+  font-family: Consolas, "Lucida Console", monospace;
   font-size: 12pt;
 }
 
